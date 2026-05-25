@@ -30,9 +30,8 @@ app.get('/api/hi', (req, res) => res.send('Hello -)'));
 const distPath = path.join(process.cwd(), 'dist', 'AdoptionApp', 'browser');
 app.use(express.static(distPath));
 
-// 7. Catch-all route (Bulletproof syntax for latest Express)
-app.get('*', (req, res, next) => {
-    // If it's an API request, let it pass through to Remult instead of serving HTML
+// 7. Alternative Catch-all middleware
+app.use((req, res, next) => {
     if (req.url.startsWith('/api')) {
         return next();
     }
