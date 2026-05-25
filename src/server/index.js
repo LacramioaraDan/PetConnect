@@ -30,8 +30,8 @@ app.get('/api/hi', (req, res) => res.send('Hello -)'));
 const distPath = path.join(process.cwd(), 'dist', 'AdoptionApp', 'browser');
 app.use(express.static(distPath));
 
-// 7. Catch-all route (Ensures page refreshes don't give 404s)
-app.get('*', (req, res) => {
+// 7. Catch-all route (Updated syntax for newer Express versions)
+app.get('/:any*', (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });
 
