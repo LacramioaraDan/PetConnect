@@ -4,8 +4,9 @@
   "scripts": {
   "ng": "ng",
   "dev": "ng serve --proxy-config proxy.conf.json",
-  "build": "ng build",
-  "start": "node src/server/index.js",
+  "dev-node": "ts-node --project tsconfig.server.json src/server/index.ts",
+  "build": "ng build && npx tsup src/server/index.js --format cjs --clean --outDir dist-server",
+  "start": "node dist-server/index.js",
   "watch": "ng build --watch --configuration development",
   "test": "ng test"
 },
@@ -58,6 +59,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ts-node": "^10.9.2",
+    "tsup": "^8.5.1",
     "typescript": "~5.8.2"
   }
 }
