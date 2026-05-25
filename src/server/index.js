@@ -2,6 +2,7 @@ import express from 'express';
 import { api } from './api';
 import session from 'cookie-session';
 import { authenticate } from './authentication';
+import path from 'path'; // <-- Make sure to add this import line!
 
 const app = express();
 
@@ -25,7 +26,14 @@ app.use(api);
 // 5. Test Route
 app.get('/api/hi', (req, res) => res.send('Hello -)'));
 
-app.use(express.static('process.cwd() + "/dist/AdoptionApp"'));
+// 6. Serve Angular Static Files (Fixed path and removed string quotes)
+const distPath = path.join(process.cwd(), 'dist', 'AdoptionApp', 'browser');
+app.use(express.static(distPath));
+
+// 7. Catch-all route (Ensures page refreshes don't give 404s)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+});
 
 app.listen(process.env['PORT'] || 3002, () => {
     console.log('Started =)');
