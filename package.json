@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "dev": "ng serve --proxy-config proxy.conf.json",
+    "dev-node": "ts-node --project tsconfig.server.json src/server/index.ts",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -26,21 +27,37 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@types/cookie-session": "^2.0.49",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-session": "^2.1.1",
+    "express": "^5.2.1",
+    "nodemailer": "^8.0.7",
+    "pg": "^8.20.0",
+    "remult": "^3.3.6",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "tsx": "^4.21.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.1.0",
+    "@angular/build": "^20.0.6",
     "@angular/cli": "^20.1.0",
     "@angular/compiler-cli": "^20.1.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6",
     "@types/jasmine": "~5.1.0",
+    "@types/node": "^25.9.1",
+    "@types/nodemailer": "^8.0.0",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "~5.8.2"
   }
 }

@@ -1,0 +1,74 @@
+/* --- Global Resets --- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #dcb0e2; 
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- Navbar: Restored to original layout --- */
+.navbar {
+  height: 60px;
+  background: rgb(188, 162, 208);
+  display: flex !important;
+  justify-content: space-between; /* Keeps left, center, right separate */
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0; width: 100%; z-index: 9999;
+}
+
+.nav-left { flex: 1; }
+
+.nav-center { 
+  display: flex; 
+  gap: 40px; /* Restores icon spacing */
+  flex: 2;
+  justify-content: center;
+}
+
+.nav-center a { font-size: 24px; text-decoration: none; padding: 8px 12px; transition: 0.2s; cursor: pointer; }
+.nav-center a.active { border-bottom: 3px solid #6200ea; border-radius: 0; }
+
+.nav-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; }
+
+/* --- Content Layout --- */
+.main-content {
+  padding-top: 80px; width: 100%;
+  display: flex; flex-direction: column; align-items: center; 
+}
+
+/* --- Auth Page: Split-screen style --- */
+.auth-wrapper {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 15000;
+}
+
+.auth-page { display: flex; height: 100%; width: 100%; background: rgb(205, 164, 212); }
+
+.auth-aside { flex: 1; background-color: #b07ac4; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+.auth-aside img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.auth-main { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px; }
+
+.form-container { width: 100%; max-width: 550px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+
+.main-title { font-size: 3rem; font-weight: 900; color: #8b2e8b; margin: 0; line-height: 1.1; letter-spacing: -1.5px; }
+
+.subtitle { color: #666; margin: 10px 0 35px 0; font-size: 1.1rem; }
+
+.stacked-form { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px; }
+
+.input-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+
+.input-wrap label { font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 8px; width: 100%; }
+
+.input-wrap input { width: 100%; padding: 14px 22px; border: 1px solid #ddd; border-radius: 50px; background: #f8fafc; font-size: 1rem; text-align: center; outline: none; }
+
+.pilled-login-btn { width: 100%; background: #000; color: #fff; padding: 16px; border-radius: 50px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
+
+.toggle-text { margin-top: 25px; color: #888; font-size: 0.9rem; cursor: pointer; }

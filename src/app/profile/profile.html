@@ -1,0 +1,43 @@
+<div class="profile-container" *ngIf="currentUser">
+  <div class="profile-header">
+    <div class="avatar-wrapper">
+      <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" 
+           class="main-avatar">
+    </div>
+    
+    <div class="upload-actions" *ngIf="isEditing">
+      <label class="custom-file-upload">
+        <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+        Change Photo
+      </label>
+    </div>
+
+    <h1 *ngIf="!isEditing">{{ currentUser.name }}</h1>
+    <div class="edit-field" *ngIf="isEditing">
+      <label>Display Name</label>
+      <input [(ngModel)]="currentUser.name" class="edit-input" />
+    </div>
+    
+  </div>
+
+  <div class="info-section">
+    <h3>About Me</h3>
+    <p class="bio-text" *ngIf="!isEditing">{{ currentUser.description || 'No description added yet.' }}</p>
+    <textarea *ngIf="isEditing" [(ngModel)]="currentUser.description" 
+              placeholder="Tell us about yourself..." class="edit-textarea"></textarea>
+  </div>
+
+  <div class="settings-section">
+    <div class="button-group">
+      <button *ngIf="!isEditing" (click)="isEditing = true" class="btn-primary">Edit Profile</button>
+      
+      <div class="edit-actions" *ngIf="isEditing">
+        <button (click)="saveProfile()" class="btn-save">Save Changes</button>
+        <button (click)="cancelEdit()" class="btn-cancel">Cancel</button>
+      </div>
+
+      <button *ngIf="!isEditing" (click)="signOut()" class="btn-logout">Log Out</button>
+      <button *ngIf="!isEditing" (click)="deleteAccount()" class="btn-delete">Delete Account</button>
+    </div>
+  </div>
+</div>

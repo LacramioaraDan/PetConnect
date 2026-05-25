@@ -1,12 +1,12 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-
+import { provideHttpClient } from '@angular/common/http';
+import { App } from './app';
 import { routes } from './app.routes';
 
-export const appConfig: ApplicationConfig = {
+bootstrapApplication(App, {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes)
+    provideRouter(routes), // THIS IS WHAT MAKES NAVIGATION WORK
+    provideHttpClient(),
   ]
-};
+}).catch(err => console.error(err));

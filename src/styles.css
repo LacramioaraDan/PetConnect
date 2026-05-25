@@ -1,1 +1,213 @@
-/* You can add global styles to this file, and also import other style files */
+/* --- Global Resets & Theme --- */
+* { 
+  box-sizing: border-box; 
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #d5c1ef; /* Your signature purple theme */
+  color: #1c1e21;
+}
+
+/* --- Typography --- */
+h1 {
+  text-align: center;
+  font-size: 4.5rem; /* Larger, more impactful */
+  font-weight: 900;
+  margin: 3rem 0;
+  background: linear-gradient(to right, #8b1d9e, #db2777);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.15));
+}
+
+/* --- Main Content Container (The List) --- */
+main {
+  background-color: #ffffff;
+  width: 95%;
+  max-width: 800px; /* Matches the Post feed width */
+  margin: 20px auto 50px auto;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* --- Individual Item Cards --- */
+.animal-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 35px; /* Generous spacing */
+  border-bottom: 1px solid #f0f2f5;
+  gap: 40px;
+  transition: background 0.2s ease;
+}
+
+.animal-card:hover {
+  background-color: #fafafa;
+}
+
+.animal-card:last-child {
+  border-bottom: none;
+}
+
+/* Text info inside the card */
+.info {
+  flex: 1;
+}
+
+.info h2 {
+  font-size: 34px; /* Big and Bold */
+  font-weight: 900;
+  color: #1c1e21;
+  margin: 0 0 15px 0;
+  letter-spacing: -0.5px;
+}
+
+.info p {
+  font-size: 19px; /* Scaled up for readability */
+  line-height: 1.6;
+  color: #4b4f56;
+  margin: 10px 0;
+}
+
+.info b {
+  color: #8b1d9e; /* Purple accents for labels */
+}
+
+/* Image inside the card */
+.animal-card img {
+  width: 250px; /* Scaled up from 180px/220px */
+  height: 250px;
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+/* --- Form / Search Styling --- */
+form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 30px 0;
+  width: 95%;
+  max-width: 600px;
+}
+
+form input {
+  flex-grow: 1;
+  padding: 15px 20px;
+  font-size: 17px;
+  border: 2px solid #d8b4fe;
+  border-radius: 12px;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+form input:focus {
+  border-color: #8b1d9e;
+}
+
+form button {
+  background-color: #8b1d9e;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
+}
+
+form button:active {
+  transform: scale(0.96);
+}
+
+/* --- Modal Styles (Scaled Up) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  background-color: #ffffff;
+  padding: 45px;
+  border-radius: 24px;
+  width: 95%;
+  max-width: 600px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 0;
+  color: #8b1d9e;
+}
+
+.modal-card input, 
+.modal-card textarea {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
+  border: 1px solid #d8b4fe;
+  border-radius: 12px;
+  background: #fdf2f8;
+  outline: none;
+}
+
+.modal-card textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* --- Action Buttons (Save/Cancel) --- */
+.btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.btn-save {
+  background: #6200ea;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 50px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: none;
+  color: #64748b;
+  padding: 12px 20px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
