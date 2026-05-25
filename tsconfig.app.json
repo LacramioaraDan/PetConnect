@@ -8,7 +8,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "src/server/index.js"  ],
   "exclude": [
     "src/**/*.spec.ts",
     "src/server/**/*",        // <--- Excludes your backend server folder
