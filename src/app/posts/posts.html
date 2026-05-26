@@ -189,8 +189,20 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 15px; color: #333;">Gender</label>
-          <select [(ngModel)]="editableAnimal.gender" name="gender" class="modal-input" style="width: 100%; box-sizing: border-box; padding: 6px; border-radius: 4px; border: 1px solid #ccc; background-color: white;">
-            <option value="" disabled selected>Select Gender</option>
+          <select [(ngModel)]="editableAnimal.gender" 
+                  name="gender" 
+                  class="modal-input" 
+                  style="width: 100%; 
+                         box-sizing: border-box; 
+                         padding: 12px 14px; 
+                         border: 1px solid #ccd0d5; 
+                         border-radius: 8px; 
+                         font-size: 15px; 
+                         background-color: white; 
+                         outline: none; 
+                         cursor: pointer;
+                         height: auto;">
+            <option value="" disabled selected hidden>Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
           </select>
