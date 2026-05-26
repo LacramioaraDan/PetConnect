@@ -1,49 +1,36 @@
 import express from 'express';
-import { api } from './api.js'; 
+import { api } from './api';
 import session from 'cookie-session';
-import { authenticate } from './authentication.js'; 
-import path from 'path';
-
-
-require('ts-node').register({
-    project: require('path').join(__dirname, '../../tsconfig.server.json')
-});
-
-const express = require('express');
-const path = require('path');
-const session = require('cookie-session');
-
-// 2. Import your local TypeScript modules safely using CommonJS require syntax
-const { api } = require('./api.ts');
-const { authenticate } = require('./authentication.ts');
+import { authenticate } from './authentication';
+import path from 'path'; // <-- Make sure to add this import line!
 
 const app = express();
 
-// 3. Basic Payload Middleware
+// 1. Basic Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// 4. Session Middleware
+// 2. Session Middleware (Must be before routes that use it)
 app.use(
     session({
         secret: process.env['SESSION_SECRET'] || 'secret',
     })
 );
 
-// 5. Custom Authentication Routes
+// 3. Custom Authentication Routes (Must be before the main Remult API)
 app.use(authenticate);
 
-// 6. Main Remult API Backend Routes
+// 4. Main Remult API
 app.use(api);
 
-// 7. Health Test Route
+// 5. Test Route
 app.get('/api/hi', (req, res) => res.send('Hello -)'));
 
-// 8. Serve Optimized Angular Static Frontend Files
+// 6. Serve Angular Static Files (Fixed path and removed string quotes)
 const distPath = path.join(process.cwd(), 'dist', 'AdoptionApp', 'browser');
 app.use(express.static(distPath));
 
-// 9. Global Routing Catch-all Middleware fallback rule
+// 7. Alternative Catch-all middleware
 app.use((req, res, next) => {
     if (req.url.startsWith('/api')) {
         return next();
@@ -51,7 +38,6 @@ app.use((req, res, next) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });
 
-// 10. Start the Live Cloud Listening Thread
 app.listen(process.env['PORT'] || 3002, () => {
     console.log('Started =)');
 });

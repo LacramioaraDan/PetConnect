@@ -65,6 +65,7 @@ export class User {
       user.resetToken = Math.random().toString(36).substring(2, 15);
       await userRepo.save(user);
 
+      // ✅ FIXED: Hiding the module string inside a variable prevents Angular from bundling it on the frontend
       const moduleName = 'nodemailer';
       const nodemailer = await import(/* @vite-ignore */ moduleName);
 
