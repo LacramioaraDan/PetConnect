@@ -1,5 +1,10 @@
-// 1. Register ts-node on-the-fly using your server configuration rules
-// This lets standard Node run your TypeScript files seamlessly in production!
+import express from 'express';
+import { api } from './api.js'; 
+import session from 'cookie-session';
+import { authenticate } from './authentication.js'; 
+import path from 'path';
+
+
 require('ts-node').register({
     project: require('path').join(__dirname, '../../tsconfig.server.json')
 });
