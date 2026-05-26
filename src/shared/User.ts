@@ -65,8 +65,8 @@ export class User {
       user.resetToken = Math.random().toString(36).substring(2, 15);
       await userRepo.save(user);
 
-      // Using require ensures the bundler tracks and includes the dependency safely
-      const nodemailer = require('nodemailer');
+      const moduleName = 'nodemailer';
+      const nodemailer = await import(/* @vite-ignore */ moduleName);
 
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -117,8 +117,8 @@ export class User {
       throw new Error("Invalid or expired reset token");
     }
 
-    // Using require ensures the bundler compiles bcryptjs securely into production
-    const bcrypt = require('bcryptjs');
+    const libraryName = 'bcryptjs';
+    const bcrypt = await import(/* @vite-ignore */ libraryName);
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     
     console.log("OLD PASS IN DB:", user.password);
