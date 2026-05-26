@@ -65,9 +65,8 @@ export class User {
       user.resetToken = Math.random().toString(36).substring(2, 15);
       await userRepo.save(user);
 
-      // ✅ FIXED: Hiding the module string inside a variable prevents Angular from bundling it on the frontend
-      const moduleName = 'nodemailer';
-      const nodemailer = await import(/* @vite-ignore */ moduleName);
+      // Using require ensures the bundler tracks and includes the dependency safely
+      const nodemailer = require('nodemailer');
 
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -118,8 +117,8 @@ export class User {
       throw new Error("Invalid or expired reset token");
     }
 
-    const libraryName = 'bcryptjs';
-    const bcrypt = await import(/* @vite-ignore */ libraryName);
+    // Using require ensures the bundler compiles bcryptjs securely into production
+    const bcrypt = require('bcryptjs');
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     
     console.log("OLD PASS IN DB:", user.password);
