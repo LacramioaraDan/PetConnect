@@ -16,7 +16,7 @@
           <div class="conv-top">
             <span class="user-name">{{ conv.name }}</span>
           </div>
-          <p class="last-msg">Conversație activă</p>
+          <p class="last-msg">Chat with {{ conv.name }}</p>
         </div>
       </div>
     </div>
@@ -28,7 +28,7 @@
         <div class="header-user">
           <img [src]="recipientUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + recipientId" class="header-avatar">
           <div>
-            <h3>{{ recipientUser?.name || 'Utilizator PetConnect' }}</h3>
+            <h3>{{ recipientUser?.name || 'Pet connect user' }}</h3>
           </div>
         </div>
       </div>
@@ -55,7 +55,7 @@
 
         <input [(ngModel)]="newMessage" 
                (keyup.enter)="sendMessage()" 
-               placeholder="Scrie un mesaj..."
+               placeholder="Type a message..."
                autocomplete="off">
         
         <button class="send-btn" 
@@ -71,7 +71,7 @@
     <ng-template #noSelection>
       <div class="empty-state">
         <div class="empty-icon">💬</div>
-        <h3>Selectează un anunț pentru a începe conversația</h3>
+        <h3>Select an user to start a conversation</h3>
       </div>
     </ng-template>
   </div>
