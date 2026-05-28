@@ -69,16 +69,17 @@ export class User {
       const moduleName = 'nodemailer';
       const nodemailer = await import(/* @vite-ignore */ moduleName);
 
+      // 1. Lăsăm configurarea securizată cu host și port explicit (Asta va repara timeout-ul de dinainte!)
       const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
-        secure: true, // true pentru portul 465, false pentru restul
+        secure: true, 
         auth: {
           user: process.env['EMAIL_USER'], 
           pass: process.env['EMAIL_PASS']
         },
         tls: {
-          rejectUnauthorized: false // Permite conexiuni securizate din servere cloud
+          rejectUnauthorized: false 
         }
       });
 
@@ -101,21 +102,18 @@ export class User {
         `
       };
 
-      // 🔥 OPTIMIZARE VITEZĂ: Am scos "await"-ul de aici. 
-      // Serverul va salva tokenul în DB și va răspunde INSTANT pe ecran,
-      // în timp ce Nodemailer trimite emailul asincron în fundal.
-      transporter.sendMail(mailOptions)
-        .then(() => {
-          console.log("Real email sent asynchronously to: " + email);
-        })
-        .catch((err: any) => { // 🔥 FIXED: Am adăugat ": any" aici
-          console.error("Asynchronous email failed to send in background:", err);
-        });
-    }
+      try {
+        // 2. Punem AWAIT înapoi! Serverul va aștepta cele 2 secunde până când Gmail confirmă livrarea
+        await transporter.sendMail(mailOptions);
+        console.log("Real email sent successfully to: " + email);
+      } catch (err) {
+        console.error("Failed to send email after await:", err);
+      }
 
     // Acest text se întoarce la Angular în mai puțin de 200 milisecunde!
     return "If an account exists for this email, a reset link has been sent.";
   }
+}
 
   @BackendMethod({ allowed: Allow.everyone })
   static async resetPassword(token: string, newPassword: string) {
