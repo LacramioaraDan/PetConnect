@@ -65,11 +65,9 @@ export class User {
       user.resetToken = Math.random().toString(36).substring(2, 15);
       await userRepo.save(user);
 
-      // ✅ FIXED: Hiding the module string inside a variable prevents Angular from bundling it on the frontend
       const moduleName = 'nodemailer';
       const nodemailer = await import(/* @vite-ignore */ moduleName);
 
-      // 1. Lăsăm configurarea securizată cu host și port explicit (Asta va repara timeout-ul de dinainte!)
       const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
@@ -103,18 +101,20 @@ export class User {
       };
 
       try {
-        // 2. Punem AWAIT înapoi! Serverul va aștepta cele 2 secunde până când Gmail confirmă livrarea
         await transporter.sendMail(mailOptions);
         console.log("Real email sent successfully to: " + email);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to send email after await:", err);
       }
+    }
 
-    // Acest text se întoarce la Angular în mai puțin de 200 milisecunde!
+    // 🔥 FIXED: Linia de return a fost mutată în AFARA blocului "if (user)".
+    // Acum TypeScript este fericit pentru că funcția returnează un string în 100% din cazuri!
     return "If an account exists for this email, a reset link has been sent.";
   }
-}
 
+
+  
   @BackendMethod({ allowed: Allow.everyone })
   static async resetPassword(token: string, newPassword: string) {
     if (!token) throw new Error("Invalid token");
