@@ -95,7 +95,9 @@ export class User {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: 'PetConnect <onboarding@resend.dev>',
+            // 🔥 SCHIMBĂ ACEASTA LINIE: pune domeniul tău nou!
+            from: 'PetConnect <no-reply@contactpetconnect.site>',
+            // Aici lăsăm variabila email neschimbată, pentru că acum Resend acceptă orice destinatar!
             to: email, 
             subject: 'Reset Your PetConnect Password',
             html: emailHtml
