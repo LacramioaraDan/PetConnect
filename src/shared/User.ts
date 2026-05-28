@@ -43,7 +43,7 @@ export class User {
     validate: (user) => {
       // Adăugăm "petsitter" în lista de validare
       if (user.role && !["user", "shelter", "petsitter", "admin"].includes(user.role)) {
-        throw "Rol invalid!";
+        throw "Invalid role!";
       }
     }
   })
