@@ -1,7 +1,7 @@
 import express from 'express';
-import { api } from './api.ts';
+import { api } from './api';
 import session from 'cookie-session';
-import { authenticate } from './authentication.ts';
+import { authenticate } from './authentication';
 import path from 'path'; // 
 
 const app = express();
