@@ -1,7 +1,7 @@
 import { Allow, Entity, Fields, Validators, BackendMethod, remult } from "remult";
 
-// Definim tipurile de roluri posibile în aplicație
-export type UserRole = "user" | "shelter" | "admin";
+// Adăugăm "petsitter" în tipurile de roluri posibile în aplicație
+export type UserRole = "user" | "shelter" | "petsitter" | "admin";
 
 @Entity("users", {
   allowApiRead: Allow.authenticated,
@@ -24,7 +24,7 @@ export class User {
   email = "";
 
   @Fields.string()
-  description = "";
+  description = ""; // Petsitterii își vor introduce descrierea/anunțul lor de profil aici!
 
   @Fields.string({
     includeInApi: false 
@@ -37,11 +37,12 @@ export class User {
   @Fields.string({ includeInApi: false }) 
   resetToken = "";
 
-  // --- CÂMPURI NOI PENTRU TIPUL DE CONT (SHELTER / USER SIMPLU) ---
+  // --- TIPUL DE CONT (SHELTER / USER SIMPLU / PETSITTER) ---
 
   @Fields.string<User>({
     validate: (user) => {
-      if (user.role && !["user", "shelter", "admin"].includes(user.role)) {
+      // Adăugăm "petsitter" în lista de validare
+      if (user.role && !["user", "shelter", "petsitter", "admin"].includes(user.role)) {
         throw "Rol invalid!";
       }
     }
@@ -49,14 +50,14 @@ export class User {
   role: UserRole = "user"; // Implicit, toată lumea este utilizator normal
 
   @Fields.string({ allowNull: true })
-  address = ""; // Adăposturile își vor putea trece adresa fizică aici
+  address = ""; // Adăposturile își trec adresa, iar petsitterii pot trece orașul/zona aici
 
   @Fields.string({ allowNull: true })
-  phone = ""; // Număr de telefon opțional pentru contact rapid
+  phone = ""; // Număr de telefon pentru contact rapid
 
   /* --- BACKEND METHODS --- */
 
-@BackendMethod({ allowed: Allow.everyone })
+  @BackendMethod({ allowed: Allow.everyone })
   static async sendResetEmail(email: string) {
     const userRepo = remult.repo(User);
     const user = await userRepo.findFirst({ email });
@@ -87,7 +88,6 @@ export class User {
       `;
 
       try {
-        // Folosim globalThis.fetch pentru a asigura compatibilitatea nativă în containerele Node cloud
         const response = await (globalThis as any).fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -95,9 +95,7 @@ export class User {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            // 🔥 SCHIMBĂ ACEASTA LINIE: pune domeniul tău nou!
             from: 'PetConnect <no-reply@contactpetconnect.site>',
-            // Aici lăsăm variabila email neschimbată, pentru că acum Resend acceptă orice destinatar!
             to: email, 
             subject: 'Reset Your PetConnect Password',
             html: emailHtml
