@@ -23,15 +23,29 @@ body {
 
 .nav-left { flex: 1; }
 
+/* --- Navbar Center Component Layout Fix --- */
 .nav-center { 
-  display: flex; 
-  gap: 40px; /* Restores icon spacing */
+  display: flex !important; 
+  gap: 40px; 
   flex: 2;
   justify-content: center;
+  align-items: center;
 }
 
-.nav-center a { font-size: 24px; text-decoration: none; padding: 8px 12px; transition: 0.2s; cursor: pointer; }
-.nav-center a.active { border-bottom: 3px solid #6200ea; border-radius: 0; }
+.nav-center a { 
+  font-size: 26px; /* Optimized scale: perfectly balanced for text length */
+  text-decoration: none !important; 
+  padding: 8px 4px; 
+  transition: 0.2s ease-in-out; 
+  cursor: pointer !important; 
+  color: #8b2e8b; /* Forces your brand purple styling instead of browser link blue */
+}
+
+.nav-center a.active { 
+  border-bottom: 3px solid #6200ea !important; 
+  color: #6200ea !important; 
+  border-radius: 0; 
+}
 
 .nav-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; }
 

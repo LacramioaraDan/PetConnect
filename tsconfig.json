@@ -1,8 +1,8 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": "src", // <--- ADD THIS LINE HERE TO CLEAR THE "COMMON SOURCE DIRECTORY" ERROR
-    "types": ["node"], // <--- ADD THIS LINE RIGHT HERE
+    "rootDir": "src",
+    "types": ["node"],
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "noImplicitOverride": true,

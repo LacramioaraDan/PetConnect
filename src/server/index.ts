@@ -1,16 +1,14 @@
 import express from 'express';
-import { api } from './api';
+import { api } from './api.ts';
 import session from 'cookie-session';
-import { authenticate } from './authentication';
-import path from 'path'; // <-- Make sure to add this import line!
+import { authenticate } from './authentication.ts';
+import path from 'path'; // 
 
 const app = express();
 
-// 1. Basic Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// 2. Session Middleware (Must be before routes that use it)
 app.use(
     session({
         secret: process.env['SESSION_SECRET'] || 'secret',

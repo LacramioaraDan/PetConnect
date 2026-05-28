@@ -1,15 +1,16 @@
 {
   "name": "adoption-app",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-  "ng": "ng",
-  "dev": "ng serve --proxy-config proxy.conf.json",
-  "dev-node": "ts-node --project tsconfig.server.json src/server/index.ts",
-  "build": "ng build && npx tsup src/server/index.js --format cjs --clean --outDir dist-server",
-  "start": "node dist-server/index.js",
-  "watch": "ng build --watch --configuration development",
-  "test": "ng test"
-},
+    "ng": "ng",
+    "dev": "ng serve --proxy-config proxy.conf.json",
+    "dev-node": "tsx watch src/server",
+    "start": "tsx src/server",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
   "prettier": {
     "overrides": [
       {
@@ -34,11 +35,11 @@
     "cookie-session": "^2.1.1",
     "express": "^5.2.1",
     "nodemailer": "^8.0.7",
+    "openai": "^6.39.0",
     "pg": "^8.20.0",
     "remult": "^3.3.6",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "tsx": "^4.21.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -60,6 +61,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.1",
+    "tsx": "^4.22.3",
     "typescript": "~5.8.2"
   }
 }

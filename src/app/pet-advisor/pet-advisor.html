@@ -1,0 +1,33 @@
+<div style="width: 100%; max-width: 600px; margin: 20px auto; background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 75vh; overflow: hidden; border: 1px solid #eee;">
+  
+  <div style="background-color: #8b2e8b; color: white; padding: 20px; text-align: center;">
+    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 900;">🐾 Buddy, Your Pet Advisor</h2>
+    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 1rem;">Ask me anything about pet care and training!</p>
+  </div>
+
+  <div style="flex: 1; padding: 20px; overflow-y: auto; background: #fdfafc; display: flex; flex-direction: column; gap: 15px;">
+    <div *ngFor="let msg of messages" [style.display]="'flex'" [style.justify-content]="msg.sender === 'user' ? 'flex-end' : 'flex-start'">
+      <div [style.background-color]="msg.sender === 'user' ? '#8b2e8b' : '#f0f0f0'"
+           [style.color]="msg.sender === 'user' ? 'white' : '#333'"
+           style="padding: 14px 20px; border-radius: 25px; max-width: 75%; font-size: 1.05rem; line-height: 1.4; box-shadow: 0 2px 5px rgba(0,0,0,0.02); white-space: pre-line;">
+        {{ msg.text }}
+      </div>
+    </div>
+    
+    <div *ngIf="isLoading" style="display: flex; justify-content: flex-start;">
+      <div style="background-color: #f0f0f0; color: #777; padding: 14px 20px; border-radius: 25px; font-size: 1.05rem; font-style: italic;">
+        Buddy is typing...
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 15px 20px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
+    <input [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type a pet care question..." [disabled]="isLoading" 
+           style="flex: 1; padding: 16px 25px; border: 1px solid #ddd; border-radius: 50px; outline: none; font-size: 1rem; background: #fafafa;" />
+    
+    <button (click)="sendMessage()" [disabled]="isLoading" 
+            style="background: #000; color: #fff; padding: 14px 28px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; font-size: 1rem; transition: opacity 0.2s;">
+      Ask
+    </button>
+  </div>
+</div>
