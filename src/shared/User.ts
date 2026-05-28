@@ -68,13 +68,15 @@ export class User {
       const moduleName = 'nodemailer';
       const nodemailer = await import(/* @vite-ignore */ moduleName);
 
-      // ✅ CONFIGURAT PENTRU MAILTRAP SANDBOX
+      // 🔐 Citire securizată prin obiectul global Node, ascunsă de compilerul de frontend
+      const serverEnv = (globalThis as any).process?.env || {};
+
       const transporter = nodemailer.createTransport({
-        host: 'sandbox.smtp.mailtrap.io',
+        host: "sandbox.smtp.mailtrap.io",
         port: 2525,
         auth: {
-          user: process.env['EMAIL_USER'], 
-          pass: process.env['EMAIL_PASS']
+          user: serverEnv.EMAIL_USER, 
+          pass: serverEnv.EMAIL_PASS
         }
       });
 
