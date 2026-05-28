@@ -101,14 +101,19 @@ export class User {
         `
       };
 
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log("Real email sent to: " + email);
-      } catch (err) {
-        console.error("Failed to send email:", err);
-      }
+      // 🔥 OPTIMIZARE VITEZĂ: Am scos "await"-ul de aici. 
+      // Serverul va salva tokenul în DB și va răspunde INSTANT pe ecran,
+      // în timp ce Nodemailer trimite emailul asincron în fundal.
+      transporter.sendMail(mailOptions)
+        .then(() => {
+          console.log("Real email sent asynchronously to: " + email);
+        })
+        .catch((err) => {
+          console.error("Asynchronous email failed to send in background:", err);
+        });
     }
 
+    // Acest text se întoarce la Angular în mai puțin de 200 milisecunde!
     return "If an account exists for this email, a reset link has been sent.";
   }
 
