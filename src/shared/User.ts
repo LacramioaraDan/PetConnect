@@ -108,7 +108,7 @@ export class User {
         .then(() => {
           console.log("Real email sent asynchronously to: " + email);
         })
-        .catch((err) => {
+        .catch((err: any) => { // 🔥 FIXED: Am adăugat ": any" aici
           console.error("Asynchronous email failed to send in background:", err);
         });
     }
