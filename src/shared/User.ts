@@ -56,61 +56,62 @@ export class User {
 
   /* --- BACKEND METHODS --- */
 
-  @BackendMethod({ allowed: Allow.everyone })
+ @BackendMethod({ allowed: Allow.everyone })
   static async sendResetEmail(email: string) {
     const userRepo = remult.repo(User);
     const user = await userRepo.findFirst({ email });
 
     if (user) {
+      // 1. Generăm token-ul unic (rămâne strict pe server/baza de date)
       user.resetToken = Math.random().toString(36).substring(2, 15);
       await userRepo.save(user);
 
-      const moduleName = 'nodemailer';
-      const nodemailer = await import(/* @vite-ignore */ moduleName);
-
-      // 🔐 Citire securizată prin obiectul global Node, ascunsă de compilerul de frontend
+      // 2. Extregem cheia API din mediul securizat Railway
       const serverEnv = (globalThis as any).process?.env || {};
+      const apiKey = serverEnv.RESEND_API_KEY;
 
-      const transporter = nodemailer.createTransport({
-        host: "sandbox.smtp.mailtrap.io",
-        port: 2525,
-        auth: {
-          user: serverEnv.EMAIL_USER, 
-          pass: serverEnv.EMAIL_PASS
-        }
-      });
-
-      console.log("Mailtrap initialization check - User loaded:", !!serverEnv.EMAIL_USER, "Pass loaded:", !!serverEnv.EMAIL_PASS);
-
-      const mailOptions = {
-        from: '"PetConnect Team" <noreply@petconnect-app.com>',
-        to: email,
-        subject: 'Reset Your PetConnect Password',
-        html: `
-          <div style="font-family: sans-serif; text-align: center; color: #8b2e8b;">
-            <h1>Password Reset Request</h1>
-            <p>You requested a password reset for your PetConnect account.</p>
-            <div style="background: #fdf2f8; padding: 20px; border-radius: 10px; display: inline-block; margin: 20px 0;">
-              <p style="font-size: 0.9rem; margin: 0;">Your Reset Token is:</p>
-              <h2 style="letter-spacing: 5px; font-size: 2rem; margin: 10px 0;">${user.resetToken}</h2>
-            </div>
-            <p>Copy this token and paste it into the app to choose a new password.</p>
-            <hr style="border: 1px solid #eee; margin: 20px 0;">
-            <p style="font-size: 0.8rem; color: #666;">If you didn't request this, you can ignore this email.</p>
+      const emailHtml = `
+        <div style="font-family: sans-serif; text-align: center; color: #8b2e8b;">
+          <h1>Password Reset Request</h1>
+          <p>You requested a password reset for your PetConnect account.</p>
+          <div style="background: #fdf2f8; padding: 20px; border-radius: 10px; display: inline-block; margin: 20px 0;">
+            <p style="font-size: 0.9rem; margin: 0;">Your Reset Token is:</p>
+            <h2 style="letter-spacing: 5px; font-size: 2rem; margin: 10px 0;">${user.resetToken}</h2>
           </div>
-        `
-      };
+          <p>Copy this token and paste it into the app to choose a new password.</p>
+          <hr style="border: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 0.8rem; color: #666;">If you didn't request this, you can ignore this email.</p>
+        </div>
+      `;
 
-      // 🔥 FIX FINAL: Am adăugat blocul try/catch cu await. 
-      // Serverul va aștepta confirmarea livrării fizice înainte ca Railway să pună procesul în repaus!
+      // 3. 🔥 SOLUȚIA SALVATOARE: Trimitem mailul printr-un apel HTTP (port deschis pe Railway!)
       try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log("Email captured successfully by Mailtrap sandbox:", info.messageId);
-      } catch (err: any) {
-        console.error("Mailtrap physical delivery failed:", err);
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            // Pe contul gratuit Resend, poți trimite doar către adresa ta cu care ai făcut contul!
+            // Schimbă temporar în "to: 'emailul_tau_cu_care_ai_facut_contul_resend'" pentru teste,
+            // sau lasă variabila "email" dacă testezi fix cu contul tău.
+            from: 'PetConnect <onboarding@resend.dev>',
+            to: email, 
+            subject: 'Reset Your PetConnect Password',
+            html: emailHtml
+          })
+        });
+
+        const data = await response.json();
+        console.log("Resend API Delivery Response:", data);
+      } catch (err) {
+        console.error("Resend API communication failed:", err);
       }
     }
 
+    // 4. Utilizatorul (sau atacatorul) primește doar acest text generic în browser. 
+    // Nu are cum să vadă token-ul! Contul tău e complet în siguranță.
     return "If an account exists for this email, a reset link has been sent.";
   }
 
