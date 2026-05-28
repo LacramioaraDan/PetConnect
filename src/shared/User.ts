@@ -80,6 +80,8 @@ export class User {
         }
       });
 
+      console.log("Mailtrap initialization check - User loaded:", !!serverEnv.EMAIL_USER, "Pass loaded:", !!serverEnv.EMAIL_PASS);
+
       const mailOptions = {
         from: '"PetConnect Team" <noreply@petconnect-app.com>',
         to: email,
