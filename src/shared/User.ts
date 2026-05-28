@@ -86,7 +86,7 @@ export class User {
       });
 
       const mailOptions = {
-        from: '"PetConnect Team" <petconnect.c@gmail.com>',
+        from: '"PetConnect Team" <noreply@petconnect-app.local>',
         to: email,
         subject: 'Reset Your PetConnect Password',
         html: `
