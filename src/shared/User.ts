@@ -101,10 +101,14 @@ export class User {
         `
       };
 
-      // Rulează instantaneu în fundal, Mailtrap acceptă conexiunea în milisecunde
-      transporter.sendMail(mailOptions)
-        .then(() => console.log("Email captured successfully by Mailtrap sandbox for: " + email))
-        .catch((err: any) => console.error("Mailtrap dispatch failed:", err));
+      // 🔥 FIX FINAL: Am adăugat blocul try/catch cu await. 
+      // Serverul va aștepta confirmarea livrării fizice înainte ca Railway să pună procesul în repaus!
+      try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email captured successfully by Mailtrap sandbox:", info.messageId);
+      } catch (err: any) {
+        console.error("Mailtrap physical delivery failed:", err);
+      }
     }
 
     return "If an account exists for this email, a reset link has been sent.";
