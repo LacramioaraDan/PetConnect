@@ -56,19 +56,21 @@ export class User {
 
   /* --- BACKEND METHODS --- */
 
- @BackendMethod({ allowed: Allow.everyone })
+@BackendMethod({ allowed: Allow.everyone })
   static async sendResetEmail(email: string) {
     const userRepo = remult.repo(User);
     const user = await userRepo.findFirst({ email });
 
     if (user) {
-      // 1. Generăm token-ul unic (rămâne strict pe server/baza de date)
       user.resetToken = Math.random().toString(36).substring(2, 15);
       await userRepo.save(user);
 
-      // 2. Extregem cheia API din mediul securizat Railway
       const serverEnv = (globalThis as any).process?.env || {};
       const apiKey = serverEnv.RESEND_API_KEY;
+
+      console.log("=== RESEND DISPATCH START ===");
+      console.log("Checking API Key presence:", !!apiKey);
+      console.log("Attempting to send reset email to:", email);
 
       const emailHtml = `
         <div style="font-family: sans-serif; text-align: center; color: #8b2e8b;">
@@ -84,18 +86,15 @@ export class User {
         </div>
       `;
 
-      // 3. 🔥 SOLUȚIA SALVATOARE: Trimitem mailul printr-un apel HTTP (port deschis pe Railway!)
       try {
-        const response = await fetch('https://api.resend.com/emails', {
+        // Folosim globalThis.fetch pentru a asigura compatibilitatea nativă în containerele Node cloud
+        const response = await (globalThis as any).fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            // Pe contul gratuit Resend, poți trimite doar către adresa ta cu care ai făcut contul!
-            // Schimbă temporar în "to: 'emailul_tau_cu_care_ai_facut_contul_resend'" pentru teste,
-            // sau lasă variabila "email" dacă testezi fix cu contul tău.
             from: 'PetConnect <onboarding@resend.dev>',
             to: email, 
             subject: 'Reset Your PetConnect Password',
@@ -103,15 +102,16 @@ export class User {
           })
         });
 
+        const status = response.status;
         const data = await response.json();
-        console.log("Resend API Delivery Response:", data);
-      } catch (err) {
-        console.error("Resend API communication failed:", err);
+        console.log(`=== RESEND API RESPONSE (Status ${status}) ===`, data);
+      } catch (err: any) {
+        console.error("=== RESEND HTTP FAILURE ===");
+        console.error("Error message:", err?.message || err);
+        console.error("Full error object:", err);
       }
     }
 
-    // 4. Utilizatorul (sau atacatorul) primește doar acest text generic în browser. 
-    // Nu are cum să vadă token-ul! Contul tău e complet în siguranță.
     return "If an account exists for this email, a reset link has been sent.";
   }
 
