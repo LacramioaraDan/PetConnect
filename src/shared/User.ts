@@ -56,7 +56,7 @@ export class User {
 
   /* --- BACKEND METHODS --- */
 
- @BackendMethod({ allowed: Allow.everyone })
+  @BackendMethod({ allowed: Allow.everyone })
   static async sendResetEmail(email: string) {
     const userRepo = remult.repo(User);
     const user = await userRepo.findFirst({ email });
@@ -68,25 +68,18 @@ export class User {
       const moduleName = 'nodemailer';
       const nodemailer = await import(/* @vite-ignore */ moduleName);
 
-      // 🔥 REPARAT: Folosim portul modern TLS/STARTTLS 587, agreat de serverele cloud
+      // ✅ CONFIGURAT PENTRU MAILTRAP SANDBOX
       const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, 
+        host: 'sandbox.smtp.mailtrap.io',
+        port: 2525,
         auth: {
           user: process.env['EMAIL_USER'], 
           pass: process.env['EMAIL_PASS']
-        },
-        tls: {
-          ciphers: 'SSLv3',
-          rejectUnauthorized: false,
-          // 🔥 REPARAT ENETUNREACH: Forțăm Node.js să folosească doar IPv4 pe acest socket
-          family: 4 
         }
       });
 
       const mailOptions = {
-        from: '"PetConnect Team" <noreply@petconnect-app.local>',
+        from: '"PetConnect Team" <noreply@petconnect-app.com>',
         to: email,
         subject: 'Reset Your PetConnect Password',
         html: `
@@ -104,16 +97,14 @@ export class User {
         `
       };
 
-      // 🔥 REPARAT: Rulăm în fundal FĂRĂ await pentru a preveni ERR_CONNECTION_RESET.
-      // Routerul Railway va lăsa canalul deschis deoarece backend-ul răspunde instant.
+      // Rulează instantaneu în fundal, Mailtrap acceptă conexiunea în milisecunde
       transporter.sendMail(mailOptions)
-        .then(() => console.log("Email successfully dispatched via port 587 to: " + email))
-        .catch((err: any) => console.error("SMTP background dispatch failed:", err));
+        .then(() => console.log("Email captured successfully by Mailtrap sandbox for: " + email))
+        .catch((err: any) => console.error("Mailtrap dispatch failed:", err));
     }
 
     return "If an account exists for this email, a reset link has been sent.";
   }
-
 
   @BackendMethod({ allowed: Allow.everyone })
   static async resetPassword(token: string, newPassword: string) {
