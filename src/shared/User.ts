@@ -70,10 +70,15 @@ export class User {
       const nodemailer = await import(/* @vite-ignore */ moduleName);
 
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // true pentru portul 465, false pentru restul
         auth: {
           user: process.env['EMAIL_USER'], 
           pass: process.env['EMAIL_PASS']
+        },
+        tls: {
+          rejectUnauthorized: false // Permite conexiuni securizate din servere cloud
         }
       });
 
