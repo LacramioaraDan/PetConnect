@@ -72,14 +72,16 @@ export class User {
       const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
-        secure: false, // trebuie să fie false pentru portul 587
+        secure: false, 
         auth: {
           user: process.env['EMAIL_USER'], 
           pass: process.env['EMAIL_PASS']
         },
         tls: {
           ciphers: 'SSLv3',
-          rejectUnauthorized: false 
+          rejectUnauthorized: false,
+          // 🔥 REPARAT ENETUNREACH: Forțăm Node.js să folosească doar IPv4 pe acest socket
+          family: 4 
         }
       });
 
