@@ -56,7 +56,7 @@ export class User {
 
   /* --- BACKEND METHODS --- */
 
-  @BackendMethod({ allowed: Allow.everyone })
+ @BackendMethod({ allowed: Allow.everyone })
   static async sendResetEmail(email: string) {
     const userRepo = remult.repo(User);
     const user = await userRepo.findFirst({ email });
@@ -68,15 +68,17 @@ export class User {
       const moduleName = 'nodemailer';
       const nodemailer = await import(/* @vite-ignore */ moduleName);
 
+      // 🔥 REPARAT: Folosim portul modern TLS/STARTTLS 587, agreat de serverele cloud
       const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, 
+        port: 587,
+        secure: false, // trebuie să fie false pentru portul 587
         auth: {
           user: process.env['EMAIL_USER'], 
           pass: process.env['EMAIL_PASS']
         },
         tls: {
+          ciphers: 'SSLv3',
           rejectUnauthorized: false 
         }
       });
@@ -100,21 +102,17 @@ export class User {
         `
       };
 
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log("Real email sent successfully to: " + email);
-      } catch (err: any) {
-        console.error("Failed to send email after await:", err);
-      }
+      // 🔥 REPARAT: Rulăm în fundal FĂRĂ await pentru a preveni ERR_CONNECTION_RESET.
+      // Routerul Railway va lăsa canalul deschis deoarece backend-ul răspunde instant.
+      transporter.sendMail(mailOptions)
+        .then(() => console.log("Email successfully dispatched via port 587 to: " + email))
+        .catch((err: any) => console.error("SMTP background dispatch failed:", err));
     }
 
-    // 🔥 FIXED: Linia de return a fost mutată în AFARA blocului "if (user)".
-    // Acum TypeScript este fericit pentru că funcția returnează un string în 100% din cazuri!
     return "If an account exists for this email, a reset link has been sent.";
   }
 
 
-  
   @BackendMethod({ allowed: Allow.everyone })
   static async resetPassword(token: string, newPassword: string) {
     if (!token) throw new Error("Invalid token");
