@@ -7,10 +7,33 @@ import { api } from "./api";
 
 export const authenticate = Router();
 
+// Helper to notify the admin
+async function sendAdminNotification(user: User) {
+    const apiKey = process.env['RESEND_API_KEY'];
+    const adminEmail = "your-admin-email@example.com"; // Replace with your actual admin email
+
+    try {
+        await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                from: 'PetConnect <no-reply@contactpetconnect.site>',
+                to: adminEmail,
+                subject: 'New Shelter Approval Required',
+                html: `<h1>New Shelter Alert</h1>
+                       <p>A new shelter <strong>${user.name}</strong> has registered.</p>
+                       <p>Document URL: <a href="${user.verificationDocumentUrl}" target="_blank">View License Document</a></p>`
+            })
+        });
+    } catch (err) {
+        console.error("Failed to send admin notification email", err);
+    }
+}
+
 // 1. SIGN UP
 authenticate.post("/api/signUp", api.withRemult, async (req, res) => {
     // Extragem și noile câmpuri specifice trimise din formularul de înregistrare
-    const { email, password, name, role, address, phone, description } = req.body;
+    const { email, password, name, role, address, phone, description, verificationDocumentUrl } = req.body;
     try {
         const repo = remult.repo(User); 
         const existing = await repo.findFirst({ email });
@@ -18,7 +41,7 @@ authenticate.post("/api/signUp", api.withRemult, async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         
-        // Inserăm utilizatorul cu rolul selectat (implicit 'user' dacă frontend-ul nu trimite nimic)
+        // Inserăm utilizatorul cu rolul selectat și setăm isVerified: false pentru securitate
         const newUser = await repo.insert({ 
             email, 
             password: hashedPassword, 
@@ -27,14 +50,22 @@ authenticate.post("/api/signUp", api.withRemult, async (req, res) => {
             role: role || "user",
             address: address || "",
             phone: phone || "",
-            description: description || ""
+            description: description || "",
+            verificationDocumentUrl: verificationDocumentUrl || "",
+            isVerified: false
         });
 
-        // Salvăm în sesiune ID-ul, Numele și ROLUL (păstrează cookie-ul mic și sigur!)
+        // Notify admin if it's a shelter
+        if (newUser.role === 'shelter') {
+            await sendAdminNotification(newUser);
+        }
+
+        // Salvăm în sesiune ID-ul, Numele și ROLUL
         req.session!['user'] = { 
             id: newUser.id, 
             name: newUser.name, 
-            role: newUser.role 
+            role: newUser.role,
+            isVerified: newUser.isVerified
         };
         
         return res.json(req.session!['user']);
@@ -51,11 +82,12 @@ authenticate.post("/api/signIn", api.withRemult, async (req, res) => {
         const user = await repo.findFirst({ email });
 
         if (user && await bcrypt.compare(password, user.password)) {
-            // Adăugăm ROLUL din baza de date în sesiune la logare
+            // Adăugăm ROLUL și starea de verificare în sesiune
             req.session!['user'] = { 
                 id: user.id, 
                 name: user.name, 
-                role: user.role 
+                role: user.role,
+                isVerified: user.isVerified
             };
             return res.json(req.session!['user']);
         } else {

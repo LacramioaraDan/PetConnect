@@ -36,10 +36,14 @@ export class Shelters implements OnInit {
   constructor(private router: Router) {}
 
   async ngOnInit() {
-    // Load registered shelters from the database
+    // Load ONLY VERIFIED shelters from the database
     this.allShelters = await remult.repo(User).find({
-      where: { role: 'shelter' }
+      where: { 
+        role: 'shelter',
+        isVerified: true // <--- THIS ENSURES ONLY VERIFIED SHELTERS ARE LOADED
+      }
     });
+    
     // Set initial display list to show all centers
     this.sheltersList = this.allShelters;
   }

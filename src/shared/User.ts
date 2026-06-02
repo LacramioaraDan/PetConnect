@@ -6,7 +6,7 @@ export type UserRole = "user" | "shelter" | "petsitter" | "admin";
 @Entity("users", {
   allowApiRead: Allow.authenticated,
   allowApiUpdate: Allow.authenticated,
-  allowApiInsert: false, 
+  allowApiInsert: true, 
   allowApiDelete: Allow.authenticated 
 })
 export class User {
@@ -54,6 +54,12 @@ export class User {
 
   @Fields.string({ allowNull: true })
   phone = ""; // Număr de telefon pentru contact rapid
+
+  @Fields.string()
+  verificationDocumentUrl = "";
+
+  @Fields.boolean()
+  isVerified = false;
 
   /* --- BACKEND METHODS --- */
 
@@ -115,6 +121,20 @@ export class User {
     return "If an account exists for this email, a reset link has been sent.";
   }
 
+  // In User.ts
+  @BackendMethod({ allowed: () => remult.user?.role === 'admin' })
+  static async approveShelter(userId: string) {
+    const userRepo = remult.repo(User);
+    const user = await userRepo.findId(userId);
+    if (user) {
+      user.isVerified = true;
+      await userRepo.save(user); // If this fails silently, the change is lost
+      console.log("Database updated: isVerified is now true for", user.name);
+    } else {
+      console.error("User not found!");
+    }
+  }
+
   @BackendMethod({ allowed: Allow.everyone })
   static async resetPassword(token: string, newPassword: string) {
     if (!token) throw new Error("Invalid token");
@@ -145,7 +165,10 @@ export class User {
 
 declare module 'remult' {
   export interface UserInfo {
+    id: string;
+    name?: string;
     imageUrl?: string;
-    role?: UserRole; 
+    role?: UserRole;
+    isVerified?: boolean;
   }
 }

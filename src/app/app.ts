@@ -19,6 +19,7 @@ export class App implements OnInit {
   email = '';
   password = '';
   name = '';
+  verificationDocumentUrl = '';
   
   // MODIFICAT: Permite 'sitter' direct sau extinde tipul dacă UserRole este strict definit în fișierul partajat
   role: UserRole | 'sitter' = 'user'; 
@@ -30,6 +31,7 @@ export class App implements OnInit {
   resetMode = false; 
   resetToken = '';
   newPassword = '';
+  
 
   remult = remult;
   fullUser?: User | null;
@@ -100,22 +102,30 @@ export class App implements OnInit {
           email: this.email,
           password: this.password,
           name: this.name,
-          role: this.role,        // Trimite rolul ('user', 'shelter', sau 'sitter')
-          address: this.address,  // Trimite adresa (dacă e shelter sau sitter)
-          phone: this.phone       // Trimite numărul de telefon
+          role: this.role,
+          address: this.address,
+          phone: this.phone,
+          // We include this to match the backend expectation
+          verificationDocumentUrl: this.verificationDocumentUrl 
         })
       );
+      
       await this.fetchFullUser();
       
-      // Resetăm toate câmpurile formularului după succes
+      // Reset all form fields to clean the UI after successful registration
       this.email = '';
       this.password = '';
       this.name = '';
       this.role = 'user';
       this.address = '';
       this.phone = '';
+      this.verificationDocumentUrl = ''; // Reset the link field
+      
+      alert("Account created successfully!");
     } catch (e: any) {
-      alert(e.error?.message || "Sign up failed");
+      // Improved error reporting
+      console.error("Sign up error:", e);
+      alert(e.error?.message || "Sign up failed. Please check your inputs.");
     }
   }
 }

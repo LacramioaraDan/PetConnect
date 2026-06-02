@@ -81,6 +81,11 @@
               </div>
             </ng-container>
 
+            <div class="input-wrap" *ngIf="isSignUp && role === 'shelter'" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+              <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">Shelter License URL</label>
+              <input [(ngModel)]="verificationDocumentUrl" name="verificationDocumentUrl" type="text" placeholder="Paste link (Google Drive/Imgur)" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />
+            </div>
+
             <div class="input-wrap" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
               <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">Email Address</label>
               <input [(ngModel)]="email" name="email" type="email" placeholder="email@example.com" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />

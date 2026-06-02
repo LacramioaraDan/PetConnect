@@ -2,9 +2,11 @@ import express from 'express';
 import { api } from './api';
 import session from 'cookie-session';
 import { authenticate } from './authentication';
-import path from 'path'; // 
+import path from 'path'; //
+ import multer from 'multer';
 
 const app = express();
+const upload = multer({ dest: 'uploads/' });
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -35,6 +37,15 @@ app.use((req, res, next) => {
     }
     res.sendFile(path.join(distPath, 'index.html'));
 });
+
+app.post('/api/upload', upload.single('file'), (req, res) => {
+    if (!req.file) return res.status(400).send('No file uploaded.');
+    // Return the path/URL to the file
+    res.json({ url: `/uploads/${req.file.filename}` });
+});
+
+// IMPORTANT: Tell express to serve the files so they can be opened
+app.use('/uploads', express.static('uploads'));
 
 app.listen(process.env['PORT'] || 3002, () => {
     console.log('Started =)');
