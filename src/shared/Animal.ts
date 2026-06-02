@@ -1,11 +1,10 @@
-import { Allow, Entity, Fields, Relations, Validators, remult } from 'remult'; // adăugat remult în import
+import { Allow, Entity, Fields, Relations, Validators, remult } from 'remult';
 import { User } from './User';
 
 @Entity('animals', {
     allowApiRead: Allow.authenticated,
     allowApiInsert: Allow.authenticated,
 
-    // Transmitem doar parametrul animal și folosim obiectul global remult pentru sesiune
     allowApiUpdate: (animal) => {
         if (!remult.authenticated()) return false;
         if (remult.user?.role === 'admin') return true;
@@ -60,10 +59,13 @@ export class Animal {
     @Fields.string()
     userId = "";
 
-    // 2. Add a Relation to easily fetch the User's name and photo
     @Relations.toOne(() => User, "userId")
     user?: User;
 
     @Fields.date({ allowApiUpdate: false })
-    createdAt = new Date(); // Good for showing "Posted on June 25"
+    createdAt = new Date();
+
+    // FIXED: Added postType discriminator to differentiate adoption posts from sitting offers
+    @Fields.string()
+    postType = 'adoption'; 
 }

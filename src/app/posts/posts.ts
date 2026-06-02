@@ -55,7 +55,6 @@ export class Posts implements OnInit, OnDestroy {
 
     try {
       const search = this.searchUserQuery.toLowerCase();
-      // Query users directly from database matching typed value criteria
       const results = await remult.repo(User).find();
       this.filteredUsers = results.filter(u => 
         u.name?.toLowerCase().includes(search)
@@ -67,14 +66,18 @@ export class Posts implements OnInit, OnDestroy {
 
   selectUserFromSearch(user: User) {
     this.selectedUser = user;
-    this.searchUserQuery = ''; // Clear input query once selected
-    this.filteredUsers = [];   // Hide suggestion container panel
+    this.searchUserQuery = ''; 
+    this.filteredUsers = [];   
   }
 
   // 4. Data Loading
   async fetchPosts() {
     try {
       this.unSub = this.postRepo.liveQuery({
+        // FIXED: Only stream posts intended for animal adoption on the home page feed
+        where: {
+          postType: 'adoption'
+        },
         include: { user: true },
         orderBy: { createdAt: "desc" } 
       }).subscribe((info) => {
@@ -87,49 +90,53 @@ export class Posts implements OnInit, OnDestroy {
   }
 
   applyFilters() {
-    let temp = [...this.allPosts];
+  let temp = [...this.allPosts];
 
-    if (this.filterSpecies.trim()) {
-      const searchSpecies = this.filterSpecies.toLowerCase();
-      temp = temp.filter(p => p.species?.toLowerCase().includes(searchSpecies));
-    }
+  // FIXED: Exclude posts only if they are explicitly marked as pet sitting offers.
+  // This lets all your older records load normally on the homepage as adoption posts!
+  temp = temp.filter(p => p.postType !== 'sitting');
 
-    if (this.filterGender) {
-      temp = temp.filter(p => p.gender === this.filterGender);
-    }
-
-    if (this.filterLocation.trim()) {
-      const searchLoc = this.filterLocation.toLowerCase();
-      temp = temp.filter(p => p.location?.toLowerCase().includes(searchLoc));
-    }
-
-    if (this.filterAge) {
-      temp = temp.filter(p => {
-        const ageText = p.age.toLowerCase();
-        
-        const isVeryYoung = ageText.includes('month') ||
-                            ageText.includes('week');
-
-        if (this.filterAge === 'baby') {
-          if (isVeryYoung) return true;
-          const ageNum = parseInt(p.age);
-          return !isNaN(ageNum) && ageNum < 1;
-        }
-
-        if (isVeryYoung) return false;
-
-        const ageNum = parseInt(p.age);
-        if (isNaN(ageNum)) return ageText.includes(this.filterAge);
-        
-        if (this.filterAge === 'junior') return ageNum >= 1 && ageNum <= 2;
-        if (this.filterAge === 'adult') return ageNum > 2 && ageNum <= 7;
-        if (this.filterAge === 'senior') return ageNum > 7;
-        return true;
-      });
-    }
-
-    this.posts = temp;
+  if (this.filterSpecies.trim()) {
+    const searchSpecies = this.filterSpecies.toLowerCase();
+    temp = temp.filter(p => p.species?.toLowerCase().includes(searchSpecies));
   }
+
+  if (this.filterGender) {
+    temp = temp.filter(p => p.gender === this.filterGender);
+  }
+
+  if (this.filterLocation.trim()) {
+    const searchLoc = this.filterLocation.toLowerCase();
+    temp = temp.filter(p => p.location?.toLowerCase().includes(searchLoc));
+  }
+
+  if (this.filterAge) {
+    temp = temp.filter(p => {
+      const ageText = p.age.toLowerCase();
+      
+      const isVeryYoung = ageText.includes('month') ||
+                          ageText.includes('week');
+
+      if (this.filterAge === 'baby') {
+        if (isVeryYoung) return true;
+        const ageNum = parseInt(p.age);
+        return !isNaN(ageNum) && ageNum < 1;
+      }
+
+      if (isVeryYoung) return false;
+
+      const ageNum = parseInt(p.age);
+      if (isNaN(ageNum)) return ageText.includes(this.filterAge);
+      
+      if (this.filterAge === 'junior') return ageNum >= 1 && ageNum <= 2;
+      if (this.filterAge === 'adult') return ageNum > 2 && ageNum <= 7;
+      if (this.filterAge === 'senior') return ageNum > 7;
+      return true;
+    });
+  }
+
+  this.posts = temp;
+}
 
   viewUserProfile(user: User | undefined) {
     if (user) {
@@ -180,6 +187,7 @@ export class Posts implements OnInit, OnDestroy {
       if (!this.editableAnimal.id && remult.user) {
         this.editableAnimal.userId = remult.user.id;
       }
+      // Posts added from Home Page are automatically categorized as 'adoption' by the model default value
       await this.postRepo.save(this.editableAnimal);
       this.showModal = false;
     } catch (error: any) {

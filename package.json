@@ -2,7 +2,7 @@
   "name": "adoption-app",
   "version": "0.0.0",
   "type": "module",
-"scripts": {
+  "scripts": {
     "ng": "ng",
     "dev": "ng serve --proxy-config proxy.conf.json",
     "dev-node": "tsx watch src/server",

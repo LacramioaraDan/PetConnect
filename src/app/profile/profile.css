@@ -1,136 +1,583 @@
-.profile-container {
-  max-width: 900px;
-  margin: 40px auto;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+/* ==========================================================================
+   1. SCREEN BREAKOUT GRID OVERRIDES (SHELTERS MIRROR LAYOUT METHOD)
+   ========================================================================== */
+
+.profile-full-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); 
+  width: 100vw;
+  max-height: calc(100vh - 70px); 
+  background: transparent;
+  box-sizing: border-box;
+  
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  padding: 0 25px;
+  position: relative;
+  overflow: hidden; 
 }
 
-/* Header with Solid Color */
-.profile-header {
-  background: #f9d5e9; 
-  padding: 40px;
+@media (max-width: 1024px) {
+  .profile-full-layout {
+    grid-template-columns: 1fr;
+    max-height: none;
+    overflow: visible;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0 15px;
+  }
+}
+
+/* --- LEFT COLUMN: Isolated Scrolling Left Data Stack --- */
+.table-column-profile-left {
+  padding: 5px 40px 30px 10px; /* Reduced padding pulls elements up perfectly toward the navbar */
+  box-sizing: border-box;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto; 
+  position: relative;
+}
+
+/* --- RIGHT COLUMN: Isolated Scrolling Right Listing Feed --- */
+.table-column-posts-right {
+  padding: 30px 10px 30px 40px;
+  box-sizing: border-box;
+  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  background: transparent;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .table-column-profile-left, .table-column-posts-right {
+    max-height: none;
+    overflow: visible;
+    border-left: none;
+    padding: 20px 10px;
+  }
+}
+
+/* ==========================================================================
+   2. ALIGNMENT & TEXT-BREAKING UTILITY PLUGINS
+   ========================================================================== */
+
+.text-center-align {
+  text-align: center !important;
+}
+
+.wrapped-text-block {
+  word-break: break-word !important; /* Breaks long continuous text paths downward safely */
+  white-space: pre-wrap !important;  /* Retains carriage returns and structural breaks */
+  text-align: center !important;     
+  width: 100%;
+}
+
+/* ==========================================================================
+   3. UNIFIED CONTAINER PANEL DESIGN WITH OVERLAPPING AVATAR
+   ========================================================================== */
+
+.profile-avatar-floating-zone {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  z-index: 10;
+  margin-bottom: -90px; 
+  position: relative;
+}
+
+.avatar-wrapper-large {
+  position: relative;
+  width: 180px;  /* Upscaled centerpiece avatar structure size properties */
+  height: 180px; 
+}
+
+.main-avatar-large {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 5px solid white; 
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  object-fit: cover;
+}
+
+/* FIXED: Unified single-piece white panel wrapping all profile parameters */
+.unified-profile-master-card {
+  background: white;
+  border-radius: 16px;
+  padding: 110px 30px 30px 30px; 
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid #ddd;
+  width: 100%; /* Keeps layout broad and expansive across the fractional grid column width */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; 
+}
+
+.card-inner-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.card-divider-line {
+  border: 0;
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  margin: 0;
+  width: 100%;
+}
+
+.custom-file-upload {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(28, 30, 33, 0.85);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
-  gap: 40px; /* Increased gap */
-  border-bottom: 1px solid #eee;
+  justify-content: center;
+  z-index: 12;
 }
 
-.main-avatar {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  border: 5px solid white;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  object-fit: cover;
-  flex-shrink: 0;
+.custom-file-upload:hover {
+  background: #8b2e8b;
 }
 
-/* Container for Name/Inputs in Header */
-.header-content {
-  flex-grow: 1;
+.identity-card-block-centered {
+  text-align: center;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  align-items: center;
+  gap: 6px;
 }
 
-.profile-header h1 {
+.identity-card-block-centered h1 {
   margin: 0;
-  font-size: 2.5rem;
-  color: #8b2e8b;
+  font-size: 26px; 
   font-weight: 900;
+  color: #8b2e8b;
+  letter-spacing: -0.5px;
 }
 
-/* Improved Input Styling */
-.edit-label {
-  display: block;
-  font-size: 0.85rem;
+.header-edit-input {
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.account-role-badge {
+  background: #f0f2f5;
+  padding: 4px 12px;
+  border-radius: 20px;
   font-weight: 700;
+  font-size: 13px;
+  color: #65676b;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #4b4f56;
+  margin: 0;
+}
+
+.bio-display-card {
+  background: #fafafa;
+  border: 1px solid #f0f2f5;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.bio-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #1c1e21;
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 85px;
+  padding: 12px;
+  border: 1px solid #ccd0d5;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+  resize: vertical;
+  background: white;
+}
+
+.contact-item {
+  background: #fafafa;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contact-item:last-child {
+  margin-bottom: 0;
+}
+
+.contact-item label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
   color: #8b2e8b;
-  margin-bottom: 5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.contact-item p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1c1e21;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.edit-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #8b2e8b;
   text-transform: uppercase;
 }
 
 .edit-input {
   width: 100%;
-  max-width: 400px; /* Limits width so it doesn't stretch too far */
-  padding: 12px 16px;
-  border: 2px solid white;
-  border-radius: 12px;
-  font-size: 1rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-/* File Upload Styling */
-.custom-file-upload {
-  display: inline-block;
-  padding: 8px 16px;
-  cursor: pointer;
-  background: white;
+  padding: 12px;
+  border: 1px solid #ccd0d5;
   border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #8b2e8b;
-  border: 1px solid #eee;
-  margin-top: 5px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  background: white;
 }
 
-.custom-file-upload input {
-  display: none;
-}
-
-/* Info Section */
-.info-section {
-  padding: 40px;
-}
-
-.info-section h3 {
-  color: #8b2e8b;
-  margin-bottom: 15px;
-}
-
-.edit-textarea {
+.profile-actions-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
-  min-height: 120px;
-  padding: 20px;
-  border: 2px solid #f9f9f9;
-  border-radius: 15px;
-  background: #eedef7; /* Very light pink tint */
-  font-family: inherit;
-  font-size: 1.1rem;
-  resize: vertical;
+  box-sizing: border-box;
 }
 
-/* Buttons */
+.edit-actions, .danger-zone-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.danger-zone-actions {
+  border-top: 1px dashed #eee;
+  padding-top: 12px;
+}
 
 button {
-  padding: 12px 25px;
-  border-radius: 50px;
+  padding: 12px 20px;
+  border-radius: 30px;
   border: none;
   font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
-  transition: transform 0.2s;
-} 
-
-.settings-section {
-  padding: 20px 40px 40px;
+  transition: opacity 0.2s, transform 0.1s;
 }
 
-.button-group {
+button:active {
+  transform: scale(0.98);
+}
+
+.btn-primary { background: #8b2e8b; color: white; width: 100%; }
+.btn-save { background: #6200ea; color: white; flex: 1; }
+.btn-cancel { background: #f0f2f5; color: #4b4f56; flex: 1; }
+.btn-logout { background: #f0f2f5; color: #1c1e21; flex: 1; }
+.btn-delete { background: #ffebe9; color: #dc2626; flex: 1; }
+
+/* ==========================================================================
+   4. ACTIVE POST FEEDS & DROP-DOWN OVERLAY MENU DESIGN (RIGHT COL)
+   ========================================================================== */
+
+.feed-heading {
+  font-size: 32px;
+  font-weight: 900;
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #8b2e8b;
+  letter-spacing: -0.8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  padding-bottom: 12px;
+  text-align: center;
+}
+
+.timeline-posts-container {
   display: flex;
-  gap: 15px;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
 }
 
-button:hover {
-  transform: translateY(-2px);
+.animal-card {
+  display: block !important;
+  overflow: visible;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.btn-primary { background: #6200ea; color: white; }
-.btn-logout { background: #f0f0f0; color: #333; }
-.btn-delete { background: #fee2e2; color: #dc2626; margin-left: auto; } /* Pushes delete to the right */
+.post-meta-header {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f2f5;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
 
-.btn-save { background: #6200ea; color: white; }
-.btn-cancel { background: #f0f0f0; color: #333; }
+.post-meta-avatar {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 18px;
+  border: 1px solid #eee;
+}
+
+.post-meta-name {
+  font-weight: 800;
+  font-size: 19px;
+  color: #050505;
+}
+
+.post-meta-sub {
+  font-size: 15px;
+  color: #65676b;
+  margin-top: 2px;
+}
+
+.three-dots {
+  background: none !important;
+  border: none !important;
+  font-size: 26px !important;
+  color: #65676b !important;
+  cursor: pointer !important;
+  padding: 6px 12px !important;
+  border-radius: 50% !important;
+  line-height: 1 !important;
+  transition: background-color 0.2s;
+  width: auto !important;
+}
+.three-dots:hover {
+  background-color: #f2f2f2 !important;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 24px;
+  top: 65px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  width: 160px;
+  padding: 6px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-menu button {
+  width: 100% !important;
+  text-align: left !important;
+  background: none !important;
+  border: none !important;
+  padding: 10px 14px !important;
+  cursor: pointer !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #1c1e21 !important;
+  border-radius: 6px !important;
+}
+.dropdown-menu button:hover {
+  background-color: #f2f2f2 !important;
+}
+.dropdown-menu button.menu-delete-btn {
+  color: #ef4444 !important;
+}
+.dropdown-menu button.menu-delete-btn:hover {
+  background-color: #fef2f2 !important;
+}
+
+.post-body-layout {
+  display: flex !important;
+  flex-direction: row !important;
+  padding: 30px;
+  gap: 35px;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.post-details-side {
+  flex: 1;
+}
+
+.post-details-side h2 {
+  font-size: 34px;
+  font-weight: 900;
+  margin: 0 0 18px 0;
+  color: #1c1e21;
+  letter-spacing: -0.8px;
+}
+
+.details-spec-list p {
+  margin: 0 0 10px 0;
+  font-size: 19px;
+  color: #4b4f56;
+}
+
+.details-spec-list p:last-child {
+  margin-bottom: 0;
+}
+
+.post-image-side {
+  width: 180px;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.post-pet-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-footer-description {
+  padding: 0 30px 30px 30px;
+  font-size: 20px;
+  line-height: 1.6;
+  color: #1c1e21;
+  display: block !important;
+}
+
+.empty-feed {
+  padding: 40px 20px;
+  text-align: center;
+  color: #65676b;
+  font-size: 17px;
+  border: 2px dashed rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  background: transparent;
+  font-weight: 600;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   5. MODAL REBUILT GRAPHICS AXIS SYSTEM
+   ========================================================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* ==========================================================================
+   5. NATIVE MODAL REBUILT STYLING FRAMEWORK (COPIED FROM POSTS)
+   ========================================================================== */
+
+/* Modal Scale-up */
+.modal-card {
+  background: white !important; 
+  padding: 35px !important; 
+  border-radius: 20px !important;
+  width: 95% !important; 
+  max-width: 550px !important; /* Wider modal */
+  display: flex !important; 
+  flex-direction: column !important; 
+  gap: 15px !important;
+}
+
+.modal-input { 
+  padding: 14px !important; 
+  font-size: 16px !important; 
+  border: 1px solid #ddd !important; 
+  border-radius: 10px !important; 
+  box-sizing: border-box !important;
+  height: auto !important;
+}
+
+/* Specific styling overrides for modal footer actions row buttons */
+.modal-actions-row {
+  display: flex !important;
+  gap: 12px !important;
+  justify-content: flex-end !important;
+  margin-top: 10px !important;
+}
+
+.modal-card button {
+  border: none !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  transition: opacity 0.2s !important;
+}
+
+.modal-card button[type="button"] {
+  background: #f0f2f5 !important;
+  color: #050505 !important;
+}
+
+.modal-card button[type="submit"] {
+  background: #784b83 !important;
+  color: white !important;
+}

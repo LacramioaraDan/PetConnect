@@ -1,43 +1,199 @@
-<div class="profile-container" *ngIf="currentUser">
-  <div class="profile-header">
-    <div class="avatar-wrapper">
-      <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" 
-           class="main-avatar">
-    </div>
+<div class="profile-full-layout" *ngIf="currentUser">
+  
+  <div class="table-column-profile-left">
     
-    <div class="upload-actions" *ngIf="isEditing">
-      <label class="custom-file-upload">
-        <input type="file" (change)="onFileSelected($event)" accept="image/*" />
-        Change Photo
-      </label>
+    <div class="profile-avatar-floating-zone">
+      <div class="avatar-wrapper-large">
+        <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" 
+             class="main-avatar-large">
+        
+        <label class="custom-file-upload" *ngIf="isEditing">
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
+          Change Photo
+        </label>
+      </div>
     </div>
 
-    <h1 *ngIf="!isEditing">{{ currentUser.name }}</h1>
-    <div class="edit-field" *ngIf="isEditing">
-      <label>Display Name</label>
-      <input [(ngModel)]="currentUser.name" class="edit-input" />
-    </div>
-    
-  </div>
-
-  <div class="info-section">
-    <h3>About Me</h3>
-    <p class="bio-text" *ngIf="!isEditing">{{ currentUser.description || 'No description added yet.' }}</p>
-    <textarea *ngIf="isEditing" [(ngModel)]="currentUser.description" 
-              placeholder="Tell us about yourself..." class="edit-textarea"></textarea>
-  </div>
-
-  <div class="settings-section">
-    <div class="button-group">
-      <button *ngIf="!isEditing" (click)="isEditing = true" class="btn-primary">Edit Profile</button>
+    <div class="unified-profile-master-card">
       
-      <div class="edit-actions" *ngIf="isEditing">
-        <button (click)="saveProfile()" class="btn-save">Save Changes</button>
-        <button (click)="cancelEdit()" class="btn-cancel">Cancel</button>
+      <div class="identity-card-block-centered">
+        <h1 *ngIf="!isEditing">{{ currentUser.name }}</h1>
+        <div class="edit-field" *ngIf="isEditing" style="align-items: center; width: 100%;">
+          <label class="edit-label">Display Name</label>
+          <input [(ngModel)]="currentUser.name" class="edit-input header-edit-input" placeholder="Enter name..." />
+        </div>
+        <span class="account-role-badge">
+          {{ currentUser.role === 'shelter' ? 'Verified Shelter' : (currentUser.role === 'petsitter' ? 'Verified Pet Sitter' : 'Individual Account') }}
+        </span>
       </div>
 
-      <button *ngIf="!isEditing" (click)="signOut()" class="btn-logout">Log Out</button>
-      <button *ngIf="!isEditing" (click)="deleteAccount()" class="btn-delete">Delete Account</button>
+      <hr class="card-divider-line">
+
+      <div class="card-inner-section">
+        <h3 class="section-title text-center-align">{{ currentUser.role === 'shelter' ? 'About Us' : 'About Me' }}</h3>
+        <div class="bio-display-card" *ngIf="!isEditing">
+          <p class="bio-text wrapped-text-block">{{ currentUser.description || 'No description added yet. Edit your profile to introduce yourself.' }}</p>
+        </div>
+        <textarea *ngIf="isEditing" 
+                  [(ngModel)]="currentUser.description" 
+                  [placeholder]="currentUser.role === 'shelter' ? 'Tell us about your shelter...' : 'Tell us about yourself...'" 
+                  class="edit-textarea">
+        </textarea>
+      </div>
+
+      <hr class="card-divider-line" *ngIf="currentUser.role === 'shelter' || currentUser.role === 'petsitter' || isEditing">
+
+      <div class="card-inner-section" *ngIf="currentUser.role === 'shelter' || currentUser.role === 'petsitter' || isEditing">
+        <h3 class="section-title text-center-align">
+          {{ currentUser.role === 'shelter' ? 'Shelter Contact Details' : 'Sitter Contact Details' }}
+        </h3>
+        
+        <div class="contact-view-stack" *ngIf="!isEditing">
+          <div class="contact-item text-center-align">
+            <label class="edit-label">Address / Location</label>
+            <p class="wrapped-text-block">{{ currentUser.address || 'No location specified' }}</p>
+          </div>
+          <div class="contact-item text-center-align">
+            <label class="edit-label">Phone Number</label>
+            <p class="wrapped-text-block">{{ currentUser.phone || 'No phone specified' }}</p>
+          </div>
+        </div>
+
+        <div class="contact-edit-stack" *ngIf="isEditing && (currentUser.role === 'shelter' || currentUser.role === 'petsitter')">
+          <div class="edit-field">
+            <label class="edit-label">Physical Address</label>
+            <input [(ngModel)]="currentUser.address" class="edit-input" placeholder="City, Street, Number" />
+          </div>
+          <div class="edit-field">
+            <label class="edit-label">Contact Phone</label>
+            <input [(ngModel)]="currentUser.phone" class="edit-input" placeholder="07xxxxxxxx" />
+          </div>
+        </div>
+      </div>
+
+      <hr class="card-divider-line">
+
+      <div class="profile-actions-toolbar">
+        <button *ngIf="!isEditing" (click)="isEditing = true" class="btn-primary">Edit Profile</button>
+        
+        <div class="edit-actions" *ngIf="isEditing">
+          <button (click)="saveProfile()" class="btn-save">Save Changes</button>
+          <button (click)="cancelEdit()" class="btn-cancel">Cancel</button>
+        </div>
+
+        <div class="danger-zone-actions" *ngIf="!isEditing">
+          <button (click)="signOut()" class="btn-logout">Log Out</button>
+          <button (click)="deleteAccount()" class="btn-delete">Delete Account</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="table-column-posts-right">
+    <h2 class="feed-heading">Active Posts</h2>
+    
+    <div class="empty-feed" *ngIf="myAnimals.length === 0">
+      <p>No active buddy posts listed yet.</p>
+    </div>
+
+    <div class="timeline-posts-container" *ngIf="myAnimals.length > 0">
+      <div *ngFor="let animal of myAnimals" class="animal-card">
+        
+        <div class="post-meta-header">
+          <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
+          <div style="flex-grow: 1;">
+            <div class="post-meta-name">{{ currentUser.name }}</div>
+            <div class="post-meta-sub">Posted on {{ animal.createdAt | date:'MMMM d, y' }}</div>
+          </div>
+
+          <div class="menu-container" style="position: relative;" (click)="$event.stopPropagation()">
+            <button class="three-dots" (click)="toggleMenu(animal); $event.stopPropagation()">•••</button>
+            <div class="dropdown-menu" *ngIf="isMenuOpen(animal)">
+              <button (click)="openEditModal(animal)">✏️ Edit</button>
+              <button (click)="deletePost(animal)" class="menu-delete-btn">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="post-body-layout">
+          <div class="post-details-side">
+            <h2>{{ animal.name }}</h2>
+            <div class="details-spec-list">
+              <p><b>Species:</b> {{ animal.species }}</p>
+              <p><b>Age:</b> {{ animal.age }}</p>
+              <p><b>Gender:</b> {{ animal.gender }}</p>
+              <p><b>Location:</b> {{ animal.location }}</p>
+            </div>
+          </div>
+          <div class="post-image-side">
+            <img [src]="animal.imageUrl" class="post-pet-img">
+          </div>
+        </div>
+
+        <div class="post-footer-description">
+          {{ animal.description }}
+        </div>
+        
+      </div>
     </div>
   </div>
+
+  <div class="modal-overlay" *ngIf="showModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+    <div class="modal-card">
+      <h3>Edit Buddy</h3>
+      <form (submit)="savePost()" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+        
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 15px; color: #333;">Name</label>
+          <input [(ngModel)]="editableAnimal.name" name="name" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;" required>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 15px; color: #333;">Species</label>
+          <input [(ngModel)]="editableAnimal.species" name="species" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;" required>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 15px; color: #333;">Age</label>
+          <input [(ngModel)]="editableAnimal.age" name="age" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;">
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 15px; color: #333;">Gender</label>
+          <select [(ngModel)]="editableAnimal.gender" 
+                  name="gender" 
+                  class="modal-input" 
+                  style="width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background-color: white; outline: none; cursor: pointer; height: auto;">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 15px; color: #333;">Location</label>
+          <input [(ngModel)]="editableAnimal.location" name="location" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;">
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 15px; color: #333;">Image</label>
+          <input type="file" (change)="onFileSelected($event)">
+          <img *ngIf="editableAnimal.imageUrl" [src]="editableAnimal.imageUrl" style="width: 100px; height: 100px; object-fit: cover; margin-top: 5px; border-radius: 8px; border: 1px solid #eee;">
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 15px; color: #333;">Description</label>
+          <textarea [(ngModel)]="editableAnimal.description" name="description" class="modal-input" style="width: 100%; height: 80px; box-sizing: border-box; resize: vertical; font-family: inherit;"></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px;">
+          <button type="button" (click)="showModal = false" style="padding: 12px 24px; background: #f0f2f5; color: #050505; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 16px;">Cancel</button>
+          <button type="submit" style="padding: 12px 24px; background: #784b83; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 16px;">Save</button>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+
 </div>

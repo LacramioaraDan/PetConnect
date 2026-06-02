@@ -8,6 +8,7 @@ import { Shelters } from './app/shelters/shelters';
 import { Messages } from './app/messages/messages';
 import { Profile } from './app/profile/profile';
 import { PetAdvisor } from './app/pet-advisor/pet-advisor';
+import { PetSitting } from './app/petsitting/petsitting';
 
 // 2. Define the variable FIRST
 export const routes: Routes = [
@@ -18,6 +19,7 @@ export const routes: Routes = [
   // ADD THESE TWO:
   { path: 'messages', component: Messages },           // Generic inbox
   { path: 'messages/:userId', component: Messages },    // Specific chat with a user
+  { path: 'petsitting', component: PetSitting}
 ];
 
 // 3. Now use it in the bootstrap call SECOND

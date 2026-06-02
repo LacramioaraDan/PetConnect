@@ -3,6 +3,7 @@ import { Posts } from './posts/posts';
 import { Messages } from './messages/messages';
 import { Shelters } from './shelters/shelters';
 import { PetAdvisor } from './pet-advisor/pet-advisor';
+import { PetSitting } from './petsitting/petsitting';
 
 
 export const routes: Routes = [
@@ -16,5 +17,7 @@ export const routes: Routes = [
 
   { path: 'shelters', component: Shelters },
 
-  { path: 'advisor', component: PetAdvisor }
+  { path: 'advisor', component: PetAdvisor },
+
+  { path: 'petsitting', component: PetSitting}
 ];

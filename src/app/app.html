@@ -53,22 +53,23 @@
 
           <ng-container *ngIf="!forgotPasswordMode && !resetMode">
             
-            <div *ngIf="isSignUp" class="input-wrap" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+            <div class="input-wrap" *ngIf="isSignUp" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
               <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">Account Type</label>
               <select [(ngModel)]="role" name="role" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem; cursor: pointer; text-align-last: center;">
                 <option value="user">Individual (Looking to adopt)</option>
                 <option value="shelter">Animal Shelter</option>
+                <option value="petsitter">Pet Sitter (Available for petsitting)</option>
               </select>
             </div>
 
-            <div *ngIf="isSignUp" class="input-wrap" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+            <div class="input-wrap" *ngIf="isSignUp" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
               <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">
                 {{ role === 'shelter' ? 'Shelter Name' : 'User Name' }}
               </label>
               <input [(ngModel)]="name" name="name" type="text" [placeholder]="role === 'shelter' ? 'e.g., Happy Paws Shelter' : 'Your Name'" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />
             </div>
 
-            <ng-container *ngIf="isSignUp && role === 'shelter'">
+            <ng-container *ngIf="isSignUp && (role === 'shelter' || role === 'petsitter')">
               <div class="input-wrap" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
                 <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">Physical Address</label>
                 <input [(ngModel)]="address" name="address" type="text" placeholder="City, Street, Number" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />
@@ -90,7 +91,7 @@
               <input [(ngModel)]="password" name="password" type="password" placeholder="••••••••" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />
             </div>
 
-            <p *ngIf="!isSignUp" (click)="forgotPasswordMode = true" style="color: #8b2e8b; font-size: 0.9rem; cursor: pointer; margin-bottom: 15px; text-decoration: underline; font-weight: 600; width: 100%; text-align: center;">
+            <p class="edit-p-text" *ngIf="!isSignUp" (click)="forgotPasswordMode = true" style="color: #8b2e8b; font-size: 0.9rem; cursor: pointer; margin-bottom: 15px; text-decoration: underline; font-weight: 600; width: 100%; text-align: center;">
               Forgot Password?
             </p>
 
@@ -115,16 +116,17 @@
     </div>
 
     <div class="nav-center" style="display: flex; gap: 40px; flex: 2; justify-content: center; align-items: center;">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Adoption Announcements</a>
       <a routerLink="/shelters" routerLinkActive="active">Shelters</a>
       <a routerLink="/messages" routerLinkActive="active">Messages</a>
-      <a routerLink="/advisor" routerLinkActive="active">Pet Advisor</a>
+      <a routerLink="/advisor" routerLinkActive="active">Virtual Pet Advisor</a>
+      <a routerLink="/petsitting" routerLinkActive="active">Pet Sitting</a>
     </div>
 
     <div style="flex: 1; display: flex; justify-content: flex-end; align-items: center;">
       <div routerLink="/profile" style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
         <span style="font-size: 18px; font-weight: 700; color: #050505;">{{ remult.user?.name }}</span>
-        <img [src]="fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user?.name" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #6200ea;">
+        <img [src]="remult.user?.imageUrl || fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user?.name" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #6200ea;">
       </div>
     </div>
   </nav>

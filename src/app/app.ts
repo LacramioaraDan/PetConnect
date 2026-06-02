@@ -7,7 +7,6 @@ import { RouterModule } from '@angular/router';
 import { lastValueFrom } from 'rxjs'; 
 import { User, UserRole } from '../shared/User'; 
 
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -21,8 +20,8 @@ export class App implements OnInit {
   password = '';
   name = '';
   
-  // Variabile noi pentru gestionarea adăposturilor la înregistrare
-  role: UserRole = 'user'; 
+  // MODIFICAT: Permite 'sitter' direct sau extinde tipul dacă UserRole este strict definit în fișierul partajat
+  role: UserRole | 'sitter' = 'user'; 
   address = '';
   phone = '';
 
@@ -101,14 +100,14 @@ export class App implements OnInit {
           email: this.email,
           password: this.password,
           name: this.name,
-          role: this.role,        // <--- Trimitem rolul selectat (user / shelter)
-          address: this.address,  // <--- Trimitem adresa (completată doar dacă e shelter)
-          phone: this.phone       // <--- Trimitem telefonul
+          role: this.role,        // Trimite rolul ('user', 'shelter', sau 'sitter')
+          address: this.address,  // Trimite adresa (dacă e shelter sau sitter)
+          phone: this.phone       // Trimite numărul de telefon
         })
       );
       await this.fetchFullUser();
       
-      // Resetăm toate câmpurile formularului
+      // Resetăm toate câmpurile formularului după succes
       this.email = '';
       this.password = '';
       this.name = '';

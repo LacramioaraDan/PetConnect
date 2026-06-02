@@ -1,0 +1,353 @@
+:host {
+  width: 100%;
+  display: block;
+}
+
+/* ==========================================================================
+   1. MASTER LAYOUT STRUCTURE (SPLIT GRID 3 COLOANE)
+   ========================================================================== */
+.posts-full-layout {
+  display: grid;
+  grid-template-columns: 360px 2fr 1.2fr;
+  width: 100vw;
+  max-height: calc(100vh - 70px);
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.table-column-filters, .table-column-posts, .table-column-profile {
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   2. COLOANA 1: FILTRE (STÂNGA)
+   ========================================================================== */
+.table-column-filters {
+  padding: 30px 24px 30px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-column-filters h3 {
+  margin: 0 0 24px 0;
+  font-size: 25px;
+  font-weight: 800;
+  color: #8b2e8b;
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+  padding-bottom: 12px;
+  text-align: center;
+}
+
+.filter-input-group {
+  margin-bottom: 24px;
+}
+
+.filter-input-group label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: #4b4f56;
+}
+
+.filter-input-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ccd0d5;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  outline: none;
+  background: white;
+}
+
+/* ==========================================================================
+   3. COLOANA 2: SITTER CARDS GRID (MIJLOC)
+   ========================================================================== */
+.table-column-posts {
+  padding: 30px 40px;
+  border-left: 1px solid rgba(0,0,0,0.15);
+  border-right: 1px solid rgba(0,0,0,0.15);
+}
+
+.sitter-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Aliniat perfect la 3 coloane ca la Shelters */
+  gap: 20px;
+  width: 100%;
+}
+
+.animal-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.interactive-sitter-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
+}
+
+.sitter-cover-thumb {
+  width: 100%;
+  height: 160px;
+  border-bottom: 1px solid #f0f2f5;
+  background: #fafafa;
+}
+
+.sitter-cover-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sitter-card-body {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sitter-meta-details h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  color: #1c1e21;
+  cursor: pointer;
+}
+
+.sitter-badge-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: #65676b;
+  font-weight: 600;
+}
+
+.sitter-short-bio {
+  margin: 10px 0 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b4f56;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sitter-card-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.sitter-card-actions button {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.btn-view-offers { background: #8b2e8b; color: white; }
+.btn-message-sitter { background: #784b83; color: white; }
+
+/* ==========================================================================
+   4. COLOANA 3: PROFIL DETALIAT & TIMELINE (DREAPTA)
+   ========================================================================== */
+.table-column-profile {
+  padding: 30px 10px 30px 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.create-sitting-post-trigger {
+  cursor: pointer;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.create-sitting-post-trigger img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.fake-input-pill {
+  background-color: #f0f2f5;
+  border-radius: 25px;
+  padding: 10px 16px;
+  color: #65676b;
+  flex-grow: 1;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.horizontal-offer-post {
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.offer-post-header h3 {
+  font-size: 22px;
+  font-weight: 900;
+  color: #8b2e8b;
+  margin: 0 0 10px 0;
+}
+
+.offer-post-image {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  margin-bottom: 12px;
+}
+
+.offer-post-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.offer-spec-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+  color: #4b4f56;
+}
+
+.offer-post-description {
+  background: #fafafa;
+  border: 1px solid #f0f2f5;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  color: #1c1e21;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* Custom Scrollbar */
+.table-column-posts::-webkit-scrollbar { width: 8px; }
+.table-column-posts::-webkit-scrollbar-track { background: transparent; }
+.table-column-posts::-webkit-scrollbar-thumb { background-color: #ccd0d5; border-radius: 10px; }
+.table-column-posts::-webkit-scrollbar-thumb:hover { background-color: #8b2e8b; }
+
+/* ==========================================================================
+   5. NATIVE MODAL REBUILT STYLING FRAMEWORK (COPIED FROM POSTS)
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 9999;
+}
+
+.modal-card {
+  background: white !important; 
+  padding: 35px !important; 
+  border-radius: 20px !important;
+  width: 95% !important; 
+  max-width: 500px !important; 
+  display: flex !important; 
+  flex-direction: column !important; 
+  gap: 15px !important;
+}
+
+.modal-vertical-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 15px !important;
+  width: 100%;
+}
+
+.modal-input-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  width: 100%;
+}
+
+.modal-input-group label {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
+
+.modal-input { 
+  padding: 14px !important; 
+  font-size: 16px !important; 
+  border: 1px solid #ddd !important; 
+  border-radius: 10px !important; 
+  box-sizing: border-box !important;
+  width: 100%;
+  outline: none;
+}
+
+.edit-textarea-modal {
+  height: 80px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.modal-preview-thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.modal-actions-row {
+  display: flex !important;
+  gap: 12px !important;
+  justify-content: flex-end !important;
+  margin-top: 10px !important;
+}
+
+.modal-actions-row button {
+  padding: 12px 24px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
+.btn-modal-cancel { background: #f0f2f5 !important; color: #050505 !important; }
+.btn-modal-save { background: #784b83 !important; color: white !important; }
