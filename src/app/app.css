@@ -86,3 +86,25 @@ body {
 .pilled-login-btn { width: 100%; background: #000; color: #fff; padding: 16px; border-radius: 50px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
 
 .toggle-text { margin-top: 25px; color: #888; font-size: 0.9rem; cursor: pointer; }
+
+/* Add this at the very bottom of your CSS file */
+@media (max-width: 1050px) {
+  .nav-center {
+    gap: 15px; /* Shrink the gap to fit more on one line */
+  }
+  .nav-center a {
+    font-size: 18px; /* Reduce font size slightly during zoom */
+  }
+}
+
+@media (max-width: 850px) {
+  .navbar {
+    padding: 0 10px; /* Reduce side padding to save space */
+  }
+  .nav-center {
+    gap: 10px;
+  }
+  .nav-center a {
+    font-size: 14px; /* Further reduction for very tight spaces */
+  }
+}
