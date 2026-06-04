@@ -40,12 +40,19 @@
     
     <div style="max-width: 800px; margin: 0 auto; display: block;">
 
-      <div class="create-post-card" (click)="openAddModal()" style="cursor: pointer; margin-bottom: 30px;">
-        <img [src]="fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user?.name" class="user-pic-small">
-        <div class="fake-input">
-          Got a new buddy to introduce, {{ remult.user?.name }}? 🐾
-        </div>
+     <div *ngIf="remult.user?.role !== 'shelter' || (remult.user?.role === 'shelter' && fullUser?.isVerified)" 
+        class="create-post-card" (click)="openAddModal()" style="cursor: pointer;">
+      <img [src]="fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user?.name" class="user-pic-small">
+      <div class="fake-input">
+        Got a new buddy to introduce, {{ remult.user?.name }}? 🐾
       </div>
+    </div>
+
+  <div *ngIf="remult.user?.role === 'shelter' && fullUser && !fullUser.isVerified" 
+       style="padding: 20px; background: #fff3f3; border: 1px solid #ffcccc; border-radius: 12px; color: #a94442; text-align: center; font-weight: 600;">
+    ⚠️ Your shelter is pending verification. Once an administrator approves your account, you will be able to create adoption posts.
+  </div>
+
 
       <div *ngFor="let post of posts" class="animal-card" style="display: block !important; overflow: visible; margin-bottom: 35px; background: white; border: 1px solid #ddd; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
         

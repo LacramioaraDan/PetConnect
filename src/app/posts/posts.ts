@@ -39,7 +39,7 @@ export class Posts implements OnInit, OnDestroy {
   // 2. Lifecycle
   async ngOnInit() {
     this.fetchPosts();
-    this.fetchCurrentUser();
+    await this.fetchCurrentUser();
   }
   
   ngOnDestroy() {

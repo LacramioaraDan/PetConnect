@@ -3,20 +3,31 @@ import { User } from './User';
 
 @Entity('animals', {
     allowApiRead: Allow.authenticated,
-    allowApiInsert: Allow.authenticated,
 
-    allowApiUpdate: (animal) => {
-        if (!remult.authenticated()) return false;
-        if (remult.user?.role === 'admin') return true;
-        return animal?.userId === remult.user?.id;
+        // Correct: Only (entity, remult) or (remult)
+    allowApiInsert: (entity, remult) => {
+        const user = remult?.user;
+        if (!user) return false;
+        if (user.role === 'admin') return true;
+        if (user.role === 'shelter') return !!user.isVerified;
+        return true;
     },
 
-    allowApiDelete: (animal) => {
-        if (!remult.authenticated()) return false;
-        if (remult.user?.role === 'admin') return true;
-        return animal?.userId === remult.user?.id;
+    allowApiUpdate: (entity, remult) => {
+        const animal = entity as Animal;
+        if (!remult?.authenticated()) return false;
+        if (remult?.user?.role === 'admin') return true;
+        return animal.userId === remult?.user?.id;
+    },
+
+    allowApiDelete: (entity, remult) => {
+        const animal = entity as Animal;
+        if (!remult?.authenticated()) return false;
+        if (remult?.user?.role === 'admin') return true;
+        return animal?.userId === remult?.user?.id;
     }
 })
+
 export class Animal {
     @Fields.autoIncrement()
     id = 0;
