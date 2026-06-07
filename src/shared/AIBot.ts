@@ -99,7 +99,7 @@ export class AIBot {
     const scores = userSessions[userId];
     const text = answerText.toLowerCase();
 
-    if (currentQuestionIndex === -1 && (text.includes("hi") || text.includes("hello"))) {
+    if (currentQuestionIndex === -1 && (text.includes("hi") || text.includes("hello") || text.match(/ready|start|go|let's|sure|yeah/))) {
       return { question: CONVERSATIONAL_MAP[0].bridge, final: false, index: 0 };
     }
 
