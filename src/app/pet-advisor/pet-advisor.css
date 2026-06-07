@@ -89,3 +89,11 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.message-bubble {
+  white-space: pre-line; /* This makes the \n in your string create new lines */
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-radius: 10px;
+  margin: 5px 0;
+}
