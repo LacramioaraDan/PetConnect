@@ -351,3 +351,12 @@
 
 .btn-modal-cancel { background: #f0f2f5 !important; color: #050505 !important; }
 .btn-modal-save { background: #784b83 !important; color: white !important; }
+
+.dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.dropdown-menu button:hover {
+  background-color: #f2f2f2;
+}

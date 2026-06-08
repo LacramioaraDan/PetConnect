@@ -4,37 +4,47 @@ import { FormsModule } from '@angular/forms';
 import { remult } from 'remult';
 import { Router } from '@angular/router';
 import { User } from '../../shared/User';
-import { Animal } from '../../shared/Animal';
+import { SittingPost } from '../../shared/SittingPosts';
 
 @Component({
   selector: 'app-petsitting',
   standalone: true,
   imports: [CommonModule, FormsModule], 
   templateUrl: './petsitting.html', 
-  styleUrl: './petsitting.css'       
+  styleUrl: './petsitting.css'        
 })
 export class PetSitting implements OnInit {
   allPetsitters: User[] = []; 
   petsittersList: User[] = [];
-  sitterPosts: Animal[] = []; 
+  sitterPosts: SittingPost[] = [];
   
   selectedUser: User | null = null; 
   remult = remult;
 
   filterLocation = '';
   filterPetsitterName = ''; 
+  filterExperience = ''; 
+  fullUser?: User;
 
   showModal = false;
-  editableAnimal: Partial<Animal> = {};
+  editableSittingPost: Partial<SittingPost> = {};
+  isMenuOpen(post: any): boolean { return !!post['_showMenu']; }
 
   constructor(private router: Router) {}
 
   async ngOnInit() {
+
+    if (remult.user) {
+      const user = await remult.repo(User).findId(remult.user.id);
+      if (user) {
+        this.fullUser = user;
+      }
+    }
+
     try {
       this.allPetsitters = await remult.repo(User).find({
         where: { role: 'petsitter' }
       });
-      
       this.petsittersList = this.allPetsitters;
     } catch (error) {
       console.error("Failed to load petsitters from DB:", error);
@@ -45,31 +55,45 @@ export class PetSitting implements OnInit {
     let tempPetsitters = [...this.allPetsitters];
 
     if (this.filterLocation.trim()) {
-      const searchLoc = this.filterLocation.toLowerCase();
       tempPetsitters = tempPetsitters.filter(sitter => 
-        sitter.address?.toLowerCase().includes(searchLoc)
+        sitter.address?.toLowerCase().includes(this.filterLocation.toLowerCase())
       );
     }
-
-    if (this.filterPetsitterName.trim()) {
-      const searchName = this.filterPetsitterName.toLowerCase();
+    
+    if (this.filterExperience.trim()) {
       tempPetsitters = tempPetsitters.filter(sitter => 
-        sitter.name?.toLowerCase().includes(searchName)
+        sitter.experience?.toLowerCase().includes(this.filterExperience.toLowerCase())
       );
     }
 
     this.petsittersList = tempPetsitters;
   }
 
+  toggleMenu(post: any) {
+    const currentState = !!post['_showMenu'];
+    this.sitterPosts.forEach((p: any) => p['_showMenu'] = false);
+    post['_showMenu'] = !currentState;
+  }
+
+  openEditSittingModal(post: SittingPost) {
+    this.editableSittingPost = { ...post };
+    this.showModal = true;
+  }
+
+  async deleteSittingPost(post: SittingPost) {
+    if (!confirm('Delete this offer?')) return;
+    try {
+      await remult.repo(SittingPost).delete(post);
+      this.sitterPosts = this.sitterPosts.filter(p => p.id !== post.id);
+    } catch (error: any) { alert(error.message); }
+  }
+
   async selectSitter(sitter: User) {
     this.selectedUser = sitter;
     try {
-      // FIXED: Only load entries created explicitly as service listings on this channel
-      this.sitterPosts = await remult.repo(Animal).find({
-        where: { 
-          userId: sitter.id,
-          postType: 'sitting'
-        },
+      // Acum căutăm direct în tabelul de SittingPost
+      this.sitterPosts = await remult.repo(SittingPost).find({
+        where: { userId: sitter.id },
         orderBy: { createdAt: "desc" }
       });
     } catch (error) {
@@ -78,20 +102,16 @@ export class PetSitting implements OnInit {
   }
 
   openChatWithPetsitter(petsitterId: string) {
-    if (!petsitterId) {
-      alert("Error: Missing profile ID for chat.");
-      return;
-    }
+    if (!petsitterId) return;
     this.router.navigate(['/messages', petsitterId]);
   }
 
-  // --- LOGICĂ FORMULAR MODAL CREARE POSTARE SITTER ---
   openAddModal() {
-    this.editableAnimal = {
+    this.editableSittingPost = {
       name: '',
       species: '',
-      age: '',
-      gender: '',
+      experience: '',
+      pricing: '',
       location: '',
       description: '',
       imageUrl: ''
@@ -104,7 +124,7 @@ export class PetSitting implements OnInit {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.editableAnimal.imageUrl = e.target.result;
+        this.editableSittingPost.imageUrl = e.target.result;
       };
       reader.readAsDataURL(file);
     }
@@ -113,13 +133,11 @@ export class PetSitting implements OnInit {
   async savePost() {
     try {
       if (remult.user) {
-        this.editableAnimal.userId = remult.user.id;
+        this.editableSittingPost.userId = remult.user.id;
       }
       
-      // FIXED: Tag this instance explicitly as a pet sitting offer so it avoids leaking into home feed
-      this.editableAnimal.postType = 'sitting';
-
-      const saved = await remult.repo(Animal).save(this.editableAnimal);
+      // Salvare directă în SittingPost
+      const saved = await remult.repo(SittingPost).save(this.editableSittingPost as SittingPost);
       
       if (this.selectedUser && this.selectedUser.id === remult.user?.id) {
         this.sitterPosts = [saved, ...this.sitterPosts];

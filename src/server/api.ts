@@ -5,9 +5,10 @@ import { User } from "../shared/User";
 import { Message } from "../shared/Message";
 import { SseSubscriptionServer } from "remult/server";
 import { AIBot } from "../shared/AIBot"; 
+import { SittingPost } from "../shared/SittingPosts";
 
 export const api = remultApi({
-  entities: [User, Message, Animal],
+  entities: [User, Message, Animal, SittingPost], 
   controllers: [AIBot], // 2. Updated registration
   getUser: (req) => req.session!['user'],
   subscriptionServer: new SseSubscriptionServer(), // SSE este suficient dacă optimizăm datele

@@ -33,7 +33,7 @@ async function sendAdminNotification(user: User) {
 // 1. SIGN UP
 authenticate.post("/api/signUp", api.withRemult, async (req, res) => {
     // Extragem și noile câmpuri specifice trimise din formularul de înregistrare
-    const { email, password, name, role, address, phone, description, verificationDocumentUrl } = req.body;
+    const { email, password, name, role, address, phone, description, experience, verificationDocumentUrl } = req.body;
     try {
         const repo = remult.repo(User); 
         const existing = await repo.findFirst({ email });
@@ -51,6 +51,7 @@ authenticate.post("/api/signUp", api.withRemult, async (req, res) => {
             address: address || "",
             phone: phone || "",
             description: description || "",
+            experience: experience || "",
             verificationDocumentUrl: verificationDocumentUrl || "",
             isVerified: false
         });

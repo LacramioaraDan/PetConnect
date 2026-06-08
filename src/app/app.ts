@@ -25,6 +25,7 @@ export class App implements OnInit {
   role: UserRole | 'sitter' = 'user'; 
   address = '';
   phone = '';
+  experience = '';
 
   isSignUp = false;
   forgotPasswordMode = false;
@@ -105,6 +106,7 @@ export class App implements OnInit {
           role: this.role,
           address: this.address,
           phone: this.phone,
+          experience: this.experience,
           // We include this to match the backend expectation
           verificationDocumentUrl: this.verificationDocumentUrl 
         })
@@ -119,6 +121,7 @@ export class App implements OnInit {
       this.role = 'user';
       this.address = '';
       this.phone = '';
+      this.experience = '';
       this.verificationDocumentUrl = ''; // Reset the link field
       
       alert("Account created successfully!");

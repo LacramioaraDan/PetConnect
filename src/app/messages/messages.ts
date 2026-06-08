@@ -21,6 +21,11 @@ export class Messages implements OnInit, OnDestroy {
   unSub?: () => void;
   remult = remult;
   conversations: any[] = [];
+  filteredConversations: any[] = [];
+  searchText = '';
+  searchUserQuery = '';
+  filteredUsers: User[] = [];
+  showMenu = false;
 
   constructor(private route: ActivatedRoute, private router: Router, private zone: NgZone) {}
 
@@ -129,7 +134,63 @@ export class Messages implements OnInit, OnDestroy {
     this.conversations = await remult.repo(User).find({
       where: { id: Array.from(partnerIds) as string[] }
     });
+    
+    // Initialize filter
+    this.filteredConversations = this.conversations;
   }
+
+  filterConversations() {
+    this.filteredConversations = this.conversations.filter(c => 
+      c.name.toLowerCase().includes(this.searchText.toLowerCase())
+    );
+  }
+
+  async onUserSearch() {
+  if (!this.searchUserQuery.trim()) {
+    this.filteredUsers = [];
+    return;
+  }
+  const search = this.searchUserQuery.toLowerCase();
+  // Fetch all users to search through
+  const allUsers = await remult.repo(User).find();
+  this.filteredUsers = allUsers.filter(u => 
+    u.name?.toLowerCase().includes(search) && u.id !== remult.user?.id
+  );
+}
+
+toggleConvMenu() {
+  this.showMenu = !this.showMenu;
+}
+
+async deleteConversation(userId: string | null) {
+  if (!userId || !confirm('Are you sure you want to delete this conversation?')) return;
+  
+  // Close menu
+  this.showMenu = false;
+  
+  const messagesToDelete = await remult.repo(Message).find({
+    where: {
+      $or: [
+        { senderId: remult.user!.id, recipientId: userId },
+        { senderId: userId, recipientId: remult.user!.id }
+      ]
+    }
+  });
+
+  for (const msg of messagesToDelete) {
+    await remult.repo(Message).delete(msg);
+  }
+  
+  // Reset view
+  this.recipientId = null;
+  await this.loadConversations();
+}
+
+startNewChat(userId: string) {
+  this.searchUserQuery = '';
+  this.filteredUsers = [];
+  this.navigateToChat(userId);
+}
 
   async onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -194,6 +255,7 @@ export class Messages implements OnInit, OnDestroy {
       };
     };
   }
+  
 
   viewImage(url: string) {
     window.open(url, '_blank');

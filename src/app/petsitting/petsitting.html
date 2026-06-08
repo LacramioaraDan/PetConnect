@@ -12,6 +12,15 @@
     </div>
 
     <div style="margin-bottom: 24px;">
+      <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Filter by Experience</label>
+      <input type="text" 
+            [(ngModel)]="filterExperience" 
+            (input)="onFilterChange()" 
+            placeholder="e.g. 3 years..." 
+            style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: white;">
+    </div>
+
+    <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Location</label>
       <input type="text" [(ngModel)]="filterLocation" (input)="onFilterChange()" placeholder="e.g. Timisoara" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: white;">
     </div>
@@ -42,6 +51,7 @@
             <div style="font-size: 16px; color: #4b4f56; margin-bottom: 16px; line-height: 1.4; display: grid; grid-template-columns: 1fr; gap: 8px;">
               <p style="margin: 0;"><b>📍 Address:</b> {{ sitter.address || 'No address specified' }}</p>
               <p style="margin: 0;"><b>📞 Phone:</b> {{ sitter.phone || 'No phone specified' }}</p>
+              <p style="margin: 0;" *ngIf="sitter.experience"><b>✨ Experience:</b> {{ sitter.experience }}</p>
               <p style="margin: 6px 0 0 0; font-style: italic; color: #65676b; border-top: 1px dashed #ddd; padding-top: 6px;" *ngIf="sitter.description">
                 "{{ sitter.description }}"
               </p>
@@ -74,21 +84,25 @@
   <!-- COLOANA 3: PROFIL DETALIAT & ANUNȚURI ACTIVE FORMATARE MODALĂ (DREAPTA) -->
   <div class="table-column-profile" style="padding: 30px 10px 30px 35px; box-sizing: border-box; background: transparent; position: sticky; top: 0; max-height: calc(100vh - 70px); overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
     
-    <div class="create-post-wrapper" *ngIf="remult.user?.role === 'petsitter'" 
-         (click)="openAddModal()" 
-         style="cursor: pointer; background: white; padding: 16px 20px; border-radius: 14px; display: flex; align-items: center; gap: 15px; border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.06); width: 100%; box-sizing: border-box;">
-      <img [src]="remult.user?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user?.name" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 1px solid #eee;">
-      <div style="background-color: #f0f2f5; border-radius: 25px; padding: 10px 16px; color: #65676b; flex-grow: 1; font-size: 14px; font-weight: 600;">
-        Create sitting offer, {{ remult.user?.name }}? 🐾
-      </div>
-    </div>
+<div *ngIf="remult.user?.role === 'petsitter'" 
+     class="create-post-wrapper" 
+     (click)="openAddModal()" 
+     style="cursor: pointer; background: white; padding: 16px 20px; border-radius: 14px; display: flex; align-items: center; gap: 15px; border: 1px solid #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.06); width: 100%; box-sizing: border-box;">
+  
+  <img [src]="fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + fullUser?.name" 
+       style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 1px solid #eee;">
+  
+  <div style="background-color: #f0f2f5; border-radius: 25px; padding: 10px 16px; color: #65676b; flex-grow: 1; font-size: 14px; font-weight: 600;">
+    Create sitting offer, {{ fullUser?.name }}? 🐾
+  </div>
+</div>
 
     <h2 style="font-size: 32px; font-weight: 900; margin-top: 0; margin-bottom: 4px; color: #8b2e8b; letter-spacing: -0.8px; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 12px; text-align: center;">
       User Profile
     </h2>
 
     <div *ngIf="!selectedUser" style="padding: 40px 20px; text-align: center; color: #65676b; font-size: 17px; border: 2px dashed rgba(0,0,0,0.15); border-radius: 12px; background: transparent; font-weight: 600;">
-      Select a sitter from the middle column to see their active buddy and service cards here. 🐾
+      Select a sitter from the middle column to see their active pet sitting offers and contact details.
     </div>
 
     <!-- PROFILE MANAGEMENT CARD CONTAINER -->
@@ -149,37 +163,48 @@
       </div>
 
       <div *ngFor="let post of sitterPosts" class="animal-card" 
-           style="background: white; border: 1px solid #ddd; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: visible; width: 100%; box-sizing: border-box; display: block !important;">
-        
-        <div style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid #f0f2f5; width: 100%; box-sizing: border-box;">
-          <img [src]="selectedUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + selectedUser.name" 
-               style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 18px; border: 1px solid #eee;">
-          <div style="flex-grow: 1;">
-            <div style="font-weight: 800; font-size: 19px; color: #050505;">{{ selectedUser.name }}</div>
-            <div style="font-size: 15px; color: #65676b; margin-top: 2px;">Pet Sitting Provider</div>
-          </div>
-        </div>
-
-        <div style="display: flex; padding: 30px; gap: 35px; align-items: flex-start; width: 100%; box-sizing: border-box;">
-          <div style="flex: 1;">
-            <h2 style="font-size: 34px; font-weight: 900; margin: 0 0 18px 0; color: #1c1e21; letter-spacing: -0.8px;">{{ post.name }}</h2>
-            <div style="display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 19px; color: #4b4f56;">
-              <p style="margin: 0;"><b>Accepted Species:</b> {{ post.species }}</p>
-              <p style="margin: 0;"><b>Pet Sitter Experience:</b> {{ post.age }}</p>
-              <p style="margin: 0;"><b>Pricing Rate:</b> {{ post.gender }}</p>
-              <p style="margin: 0;"><b>Coverage Location:</b> {{ post.location }}</p>
-            </div>
-          </div>
-
-          <div *ngIf="post.imageUrl" style="width: 250px; height: 250px; border-radius: 14px; overflow: hidden; border: 1px solid #eee; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-            <img [src]="post.imageUrl" style="width: 100%; height: 100%; object-fit: cover;">
-          </div>
-        </div>
-
-        <div style="padding: 0 30px 30px 30px; font-size: 20px; line-height: 1.6; color: #1c1e21;">
-          {{ post.description }}
+        style="background: white; border: 1px solid #ddd; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: visible; width: 100%; box-sizing: border-box; display: block !important; position: relative; margin-bottom: 20px; padding: 20px;">
+      
+      <div *ngIf="remult.user?.id === post.userId" style="position: absolute; right: 15px; top: 15px; z-index: 10;">
+        <button (click)="toggleMenu(post); $event.stopPropagation()" style="background:none; border:none; cursor:pointer; font-size: 20px;">•••</button>
+        <div *ngIf="isMenuOpen(post)" style="background: white; border: 1px solid #ddd; position: absolute; right: 0; padding: 5px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 100px;"> 
+          <button (click)="openEditSittingModal(post)" style="display: flex; align-items: center; gap: 8px; width: 100%; border: none; background: none; cursor: pointer; padding: 8px; font-size: 14px; font-weight: 500;">
+            <span>✏️</span> Edit
+          </button>
+          <button (click)="deleteSittingPost(post)" style="display: flex; align-items: center; gap: 8px; width: 100%; border: none; background: none; cursor: pointer; padding: 8px; font-size: 14px; font-weight: 500; color: #ef4444;">
+            <span>🗑️</span> Delete
+          </button>
         </div>
       </div>
+
+      <div style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid #f0f2f5; width: 100%; box-sizing: border-box;">
+        <img [src]="selectedUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + selectedUser.name" 
+            style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 18px; border: 1px solid #eee;">
+        <div style="flex-grow: 1;">
+          <div style="font-weight: 800; font-size: 19px; color: #050505;">{{ selectedUser.name }}</div>
+          <div style="font-size: 15px; color: #65676b; margin-top: 2px;">Pet Sitting Provider</div>
+        </div>
+      </div>
+
+      <div style="display: flex; padding: 30px; gap: 35px; align-items: flex-start; width: 100%; box-sizing: border-box;">
+        <div style="flex: 1;">
+          <h2 style="font-size: 34px; font-weight: 900; margin: 0 0 18px 0; color: #1c1e21; letter-spacing: -0.8px;">{{ post.name }}</h2>
+          <div style="display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 19px; color: #4b4f56;">
+            <p style="margin: 0;"><b>Accepted Species:</b> {{ post.species }}</p>
+            <p style="margin: 0;"><b>Pet Sitter Experience:</b> {{ post.experience }}</p>
+            <p style="margin: 0;"><b>Pricing Rate:</b> {{ post.pricing }}</p>
+            <p style="margin: 0;"><b>Coverage Location:</b> {{ post.location }}</p>
+          </div>
+        </div>
+        <div *ngIf="post.imageUrl" style="width: 250px; height: 250px; border-radius: 14px; overflow: hidden; border: 1px solid #eee; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+          <img [src]="post.imageUrl" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+
+      <div style="padding: 0 30px 30px 30px; font-size: 20px; line-height: 1.6; color: #1c1e21;">
+        {{ post.description }}
+      </div>
+    </div>
 
     </div>
   </div>
@@ -192,32 +217,32 @@
       <form (submit)="savePost()" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 15px; color: #333;">Offer Title</label>
-          <input [(ngModel)]="editableAnimal.name" name="name" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;" required>
+          <input [(ngModel)]="editableSittingPost.name" name="name" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;" required>
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 15px; color: #333;">Accepted Species</label>
-          <input [(ngModel)]="editableAnimal.species" name="species" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;" required>
+          <input [(ngModel)]="editableSittingPost.species" name="species" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;" required>
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 15px; color: #333;">Pet Sitter Experience</label>
-          <input [(ngModel)]="editableAnimal.age" name="age" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;">
+          <input [(ngModel)]="editableSittingPost.experience" name="experience" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;">
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 15px; color: #333;">Pricing Rate</label>
-          <input [(ngModel)]="editableAnimal.gender" name="gender" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;">
+          <input [(ngModel)]="editableSittingPost.pricing" name="pricing" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;">
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 15px; color: #333;">Coverage Location</label>
-          <input [(ngModel)]="editableAnimal.location" name="location" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;">
+          <input [(ngModel)]="editableSittingPost.location" name="location" type="text" class="modal-input" style="width: 100%; box-sizing: border-box;">
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 15px; color: #333;">Image</label>
           <input type="file" (change)="onFileSelected($event)">
-          <img *ngIf="editableAnimal.imageUrl" [src]="editableAnimal.imageUrl" style="width: 100px; height: 100px; object-fit: cover; margin-top: 5px; border-radius: 8px; border: 1px solid #eee;">
+          <img *ngIf="editableSittingPost.imageUrl" [src]="editableSittingPost.imageUrl" style="width: 100px; height: 100px; object-fit: cover; margin-top: 5px; border-radius: 8px; border: 1px solid #eee;">
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 15px; color: #333;">Description</label>
-          <textarea [(ngModel)]="editableAnimal.description" name="description" class="modal-input" style="width: 100%; height: 80px; box-sizing: border-box; resize: vertical; font-family: inherit;"></textarea>
+          <textarea [(ngModel)]="editableSittingPost.description" name="description" class="modal-input" style="width: 100%; height: 80px; box-sizing: border-box; resize: vertical; font-family: inherit;"></textarea>
         </div>
         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px;">
           <button type="button" (click)="showModal = false" style="padding: 12px 24px; background: #f0f2f5; color: #050505; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 16px;">Cancel</button>

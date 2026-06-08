@@ -77,14 +77,14 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 10px; width: 100%;">
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
           <button (click)="viewShelterAnimals(shelter)" 
-                  style="flex: 1; background: #8b2e8b; color: white; border: none; padding: 12px 6px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;">
+                  style="width: 100%; background: #8b2e8b; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; white-space: nowrap;">
             🐾 View Animals
           </button>
           <button (click)="openChatWithShelter(shelter.id)" 
-                  style="flex: 1; background: #8b2e8b; color: white; border: none; padding: 12px 6px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;">
-            💬 Contact
+                  style="width: 100%; background: #784b83; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; white-space: nowrap;">
+            💬 Contact Shelter
           </button>
         </div>
       </div>
@@ -147,9 +147,10 @@
             <span>💬</span> Send a message to {{ selectedShelterName }}
           </button>
         </div>
-
       </div>
     </div>
   </div>
 
 </div>
+
+```

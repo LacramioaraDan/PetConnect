@@ -162,3 +162,107 @@
   min-width: 100px;
   min-height: 100px;
 }
+
+/* Ensure the parent container can anchor the absolute dropdown */
+.sidebar-header {
+  padding: 20px;
+  position: relative; /* This is crucial for the dropdown to "stick" here */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Dropdown styling */
+.search-dropdown {
+  position: absolute; /* Anchored to .sidebar-header */
+  top: 100%;          /* Forces it to start exactly below the header */
+  left: 20px;         /* Align with your padding */
+  right: 20px;        /* Align with your padding */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  margin-top: 5px;    /* Small gap between input and list */
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;      /* Ensure it sits on top of chat area */
+}
+
+.search-item {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.search-item:hover {
+  background: #fdf2f8;
+}
+
+.search-item img {
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.conv-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  position: relative; /* Anchor for the menu */
+}
+
+.menu-container {
+  position: relative; /* <--- CRITICAL: Ensures the dropdown knows where the button is */
+  display: flex;
+  align-items: center;
+}
+.three-dots {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 5px;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  position: relative; /* <--- CRITICAL: This anchors the menu to the header */
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;   /* Starts right below the header */
+  right: 0;    /* Aligns to the right of the menu-container */
+  margin-top: 10px; /* Adds a clear gap so it doesn't touch the messages */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+  z-index: 9999; /* Higher than message bubbles */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  white-space: nowrap;
+}

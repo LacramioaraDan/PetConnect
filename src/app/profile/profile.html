@@ -17,15 +17,11 @@
           <input [(ngModel)]="currentUser.name" class="edit-input header-edit-input" placeholder="Enter name..." />
         </div>
         <span class="account-role-badge">
-          <span *ngIf="currentUser.role === 'shelter'">
-            {{ currentUser.isVerified ? 'Verified Shelter' : 'Pending Shelter Verification' }}
-          </span>
-          <span *ngIf="currentUser.role !== 'shelter'">
-            {{ currentUser.role === 'petsitter' ? 'Pet Sitter' : 'Individual Account' }}
-          </span>
+          <span *ngIf="currentUser.role === 'shelter'">{{ currentUser.isVerified ? 'Verified Shelter' : 'Pending Shelter Verification' }}</span>
+          <span *ngIf="currentUser.role !== 'shelter'">{{ currentUser.role === 'petsitter' ? 'Pet Sitter' : 'Individual Account' }}</span>
         </span>
       </div>
-      <hr class="card-divider-line">
+      <hr class="card-divider-line" *ngIf="currentUser.role === 'shelter' || currentUser.role === 'petsitter' || isEditing">
       <div class="card-inner-section">
         <h3 class="section-title text-center-align">{{ currentUser.role === 'shelter' ? 'About Us' : 'About Me' }}</h3>
         <div class="bio-display-card" *ngIf="!isEditing">
@@ -41,6 +37,10 @@
             <label class="edit-label">Address / Location</label>
             <p class="wrapped-text-block">{{ currentUser.address || 'No location specified' }}</p>
           </div>
+          <div class="contact-item text-center-align" *ngIf="currentUser.role === 'petsitter'">
+            <label class="edit-label">Experience</label>
+            <p class="wrapped-text-block">{{ currentUser.experience || 'No experience specified' }}</p>
+          </div>
           <div class="contact-item text-center-align">
             <label class="edit-label">Phone Number</label>
             <p class="wrapped-text-block">{{ currentUser.phone || 'No phone specified' }}</p>
@@ -50,6 +50,10 @@
           <div class="edit-field">
             <label class="edit-label">Physical Address</label>
             <input [(ngModel)]="currentUser.address" class="edit-input" placeholder="City, Street, Number" />
+          </div>
+          <div class="edit-field" *ngIf="currentUser.role === 'petsitter'">
+            <label class="edit-label">Pet Sitting Experience</label>
+            <input [(ngModel)]="currentUser.experience" class="edit-input" placeholder="e.g., 5 years with dogs..." />
           </div>
           <div class="edit-field">
             <label class="edit-label">Contact Phone</label>
@@ -73,48 +77,34 @@
   </div>
 
   <div class="table-column-posts-right">
-    <div *ngIf="currentUser?.role === 'admin'" style="margin-bottom: 30px;">
+    <div *ngIf="currentUser.role === 'admin'" style="margin-bottom: 30px;">
       <h2 class="feed-heading">Shelter Approval Dashboard</h2>
-      <div class="empty-feed" *ngIf="pendingShelters.length === 0">
-        <p>No pending shelters at this time.</p>
-      </div>
-      <div class="timeline-posts-container" *ngIf="pendingShelters.length > 0">
-        <div *ngFor="let shelter of pendingShelters" class="animal-card" style="padding: 20px; margin-bottom: 15px;">
-          <h3>{{ shelter.name }}</h3>
-          <p><strong>Email:</strong> {{ shelter.email }}</p>
-          <a *ngIf="shelter.verificationDocumentUrl && shelter.verificationDocumentUrl.trim().length > 5"
-            [href]="shelter.verificationDocumentUrl.startsWith('http') ? shelter.verificationDocumentUrl : 'https://' + shelter.verificationDocumentUrl" 
-            target="_blank" 
-            style="color: #8b2e8b; font-weight: bold; text-decoration: underline;">
-            View License Document
-          </a>
-          <span *ngIf="!shelter.verificationDocumentUrl || shelter.verificationDocumentUrl.trim().length <= 5" 
-                style="color: #999; font-style: italic;">
-            No valid link provided
-          </span>
-          <br><br>
-          <button (click)="approveShelter(shelter.id)" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Approve Shelter</button>
+      <div class="empty-feed" *ngIf="pendingShelters.length === 0"><p>No pending shelters at this time.</p></div>
+      <div class="timeline-posts-container" *ngFor="let shelter of pendingShelters">
+        <div class="animal-card" style="padding: 20px; margin-bottom: 15px;">
+           <h3>{{ shelter.name }}</h3>
+           <button (click)="approveShelter(shelter.id)">Approve Shelter</button>
         </div>
       </div>
     </div>
 
-    <h2 class="feed-heading">Active Posts</h2>
+    <h2 class="feed-heading">Active Pet Adoption Posts</h2>
     <div class="empty-feed" *ngIf="myAnimals.length === 0">
-      <p>No active buddy posts listed yet.</p>
+      <p>No active posts listed yet.</p>
     </div>
-    <div class="timeline-posts-container" *ngIf="myAnimals.length > 0">
+    <div class="timeline-posts-container">
       <div *ngFor="let animal of myAnimals" class="animal-card">
         <div class="post-meta-header">
-          <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
-          <div style="flex-grow: 1;">
-            <div class="post-meta-name">{{ currentUser.name }}</div>
-            <div class="post-meta-sub">Posted on {{ animal.createdAt | date:'MMMM d, y' }}</div>
-          </div>
-          <button class="three-dots" (click)="toggleMenu(animal)">•••</button>
-          <div class="dropdown-menu" *ngIf="isMenuOpen(animal)">
-            <button (click)="openEditModal(animal)">✏️ Edit</button>
-            <button (click)="deletePost(animal)" class="menu-delete-btn">🗑️ Delete</button>
-          </div>
+           <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
+           <div style="flex-grow: 1;">
+             <div class="post-meta-name">{{ currentUser.name }}</div>
+             <div class="post-meta-sub">Posted on {{ animal.createdAt | date:'MMMM d, y' }}</div>
+           </div>
+           <button class="three-dots" (click)="toggleMenu(animal)">•••</button>
+           <div class="dropdown-menu" *ngIf="isMenuOpen(animal)">
+             <button (click)="openEditModal(animal)">✏️ Edit</button>
+             <button (click)="deletePost(animal)" class="menu-delete-btn">🗑️ Delete</button>
+           </div>
         </div>
         <div class="post-body-layout">
           <div class="post-details-side">
@@ -131,46 +121,116 @@
         <div class="post-footer-description">{{ animal.description }}</div>
       </div>
     </div>
+
+    <div *ngIf="mySittingOffers.length > 0" style="margin-top: 40px;">
+      <h2 class="feed-heading">Active Sitting Offers</h2>
+      <div class="timeline-posts-container">
+        <div *ngFor="let offer of mySittingOffers" class="animal-card">
+          <div class="post-meta-header">
+            <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
+            <div style="flex-grow: 1;">
+              <div class="post-meta-name">{{ currentUser.name }}</div>
+              <div class="post-meta-sub">Posted on {{ offer.createdAt | date:'MMMM d, y' }}</div>
+            </div>
+            <button class="three-dots" (click)="toggleMenu(offer)">•••</button>
+            <div class="dropdown-menu" *ngIf="isMenuOpen(offer)">
+              <button (click)="openEditSittingModal(offer)">✏️ Edit</button>
+              <button (click)="deleteSittingPost(offer)" class="menu-delete-btn">🗑️ Delete</button>
+            </div>
+          </div>
+          <div class="post-body-layout">
+            <div class="post-details-side">
+              <h2>{{ offer.name }}</h2>
+              <div class="details-spec-list">
+                <p><b>Species:</b> {{ offer.species }}</p>
+                <p><b>Experience:</b> {{ offer.experience }}</p>
+                <p><b>Pricing:</b> {{ offer.pricing }}</p>
+                <p><b>Location:</b> {{ offer.location }}</p>
+              </div>
+            </div>
+            <div class="post-image-side"><img [src]="offer.imageUrl" class="post-pet-img"></div>
+          </div>
+          <div class="post-footer-description">{{ offer.description }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="modal-overlay" *ngIf="showModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 9999;">
-  <div class="modal-card">
-    <h3>Edit Buddy</h3>
-    <form (submit)="savePost()" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
-      <div style="display: flex; flex-direction: column; gap: 5px;">
-        <label>Name</label>
-        <input [(ngModel)]="editableAnimal.name" name="name" type="text" class="modal-input" required>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 5px;">
-        <label>Species</label>
-        <input [(ngModel)]="editableAnimal.species" name="species" type="text" class="modal-input" required>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 5px;">
-        <label>Age</label>
-        <input [(ngModel)]="editableAnimal.age" name="age" type="text" class="modal-input">
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 5px;">
-        <label>Gender</label>
-        <select [(ngModel)]="editableAnimal.gender" name="gender" class="modal-input">
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 5px;">
-        <label>Location</label>
-        <input [(ngModel)]="editableAnimal.location" name="location" type="text" class="modal-input">
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 5px;">
-        <label>Image</label>
-        <input type="file" (change)="onFileSelected($event)">
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 5px;">
-        <label>Description</label>
-        <textarea [(ngModel)]="editableAnimal.description" name="description" class="modal-input"></textarea>
-      </div>
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+  <div class="modal-card" (click)="$event.stopPropagation()" style="background: white; padding: 30px; border-radius: 14px; width: 500px; max-height: 90vh; overflow-y: auto;">
+    
+    <h3>{{ isEditingSitting ? 'Edit Sitting Offer' : 'Edit Buddy' }}</h3>
+    
+    <form (submit)="isEditingSitting ? saveSittingPost() : savePost()" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+      
+      <ng-container *ngIf="!isEditingSitting">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Name</label>
+          <input [(ngModel)]="editableAnimal.name" name="name" type="text" class="modal-input" required>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Species</label>
+          <input [(ngModel)]="editableAnimal.species" name="species" type="text" class="modal-input" required>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Age</label>
+          <input [(ngModel)]="editableAnimal.age" name="age" type="text" class="modal-input">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Gender</label>
+          <select [(ngModel)]="editableAnimal.gender" name="gender" class="modal-input">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Location</label>
+          <input [(ngModel)]="editableAnimal.location" name="location" type="text" class="modal-input">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Image</label>
+          <input type="file" (change)="onFileSelected($event)">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Description</label>
+          <textarea [(ngModel)]="editableAnimal.description" name="description" class="modal-input"></textarea>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="isEditingSitting">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Offer Title</label>
+          <input [(ngModel)]="editableSittingPost.name" name="sitterName" type="text" class="modal-input" required>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Accepted Species</label>
+          <input [(ngModel)]="editableSittingPost.species" name="sitterSpecies" type="text" class="modal-input">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Experience</label>
+          <input [(ngModel)]="editableSittingPost.experience" name="sitterExp" type="text" class="modal-input">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Pricing Rate</label>
+          <input [(ngModel)]="editableSittingPost.pricing" name="sitterPrice" type="text" class="modal-input">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Location</label>
+          <input [(ngModel)]="editableSittingPost.location" name="sitterLoc" type="text" class="modal-input">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Image</label>
+          <input type="file" (change)="onFileSelected($event)">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label>Description</label>
+          <textarea [(ngModel)]="editableSittingPost.description" name="sitterDesc" class="modal-input"></textarea>
+        </div>
+      </ng-container>
+
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
-        <button type="button" (click)="showModal = false">Cancel</button>
+        <button type="button" (click)="showModal = false; isEditingSitting = false;">Cancel</button>
         <button type="submit">Save</button>
       </div>
     </form>

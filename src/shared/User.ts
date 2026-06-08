@@ -26,6 +26,9 @@ export class User {
   @Fields.string()
   description = ""; // Petsitterii își vor introduce descrierea/anunțul lor de profil aici!
 
+  @Fields.string()
+  experience = "";
+  
   @Fields.string({
     includeInApi: false 
   })

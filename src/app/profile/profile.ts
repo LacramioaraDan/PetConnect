@@ -7,6 +7,7 @@ import { User } from '../../shared/User';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
+import { SittingPost } from '../../shared/SittingPosts';
 
 @Component({
   selector: 'app-profile',
@@ -23,6 +24,9 @@ export class Profile implements OnInit, OnDestroy {
   showModal = false;
   editableAnimal: Partial<Animal> = {};
   tempImagePreview: string | null = null;
+  mySittingOffers: SittingPost[] = [];
+  editableSittingPost: Partial<SittingPost> = {}; // Pentru editare ofertele de sitting
+  isEditingSitting = false;
 
   constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {}
 
@@ -35,6 +39,7 @@ export class Profile implements OnInit, OnDestroy {
         });
       }
       await this.fetchMyAnimals();
+      await this.fetchMySittingOffers();
     }
   }
 
@@ -49,6 +54,15 @@ export class Profile implements OnInit, OnDestroy {
   async fetchMyAnimals() {
     if (this.currentUser) {
       this.myAnimals = await remult.repo(Animal).find({
+        where: { userId: this.currentUser.id, postType: 'adoption' },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+  }
+
+  async fetchMySittingOffers() {
+    if (this.currentUser) {
+      this.mySittingOffers = await remult.repo(SittingPost).find({
         where: { userId: this.currentUser.id },
         orderBy: { createdAt: 'desc' }
       });
@@ -69,12 +83,22 @@ export class Profile implements OnInit, OnDestroy {
     try {
       if (this.currentUser) {
         if (this.tempImagePreview) this.currentUser.imageUrl = this.tempImagePreview;
+        
+        // Save to database
         const savedUser = await remult.repo(User).save(this.currentUser);
-        if (remult.user) remult.user.imageUrl = savedUser.imageUrl;
+        
+        // FIX: Update the global user object so the navbar reflects the change
+        if (remult.user) {
+          remult.user.imageUrl = savedUser.imageUrl;
+          remult.user.name = savedUser.name; // <--- Add this line
+        }
+        
         this.tempImagePreview = null;
         this.isEditing = false;
       }
-    } catch (error: any) { alert(error.message); }
+    } catch (error: any) { 
+      alert(error.message); 
+    }
   }
 
   cancelEdit() {
@@ -102,24 +126,32 @@ export class Profile implements OnInit, OnDestroy {
   }
 
   onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        if (this.showModal) this.editableAnimal.imageUrl = e.target.result;
-        else if (this.currentUser) {
-          this.tempImagePreview = e.target.result;
-          this.currentUser.imageUrl = e.target.result;
-          if (remult.user) remult.user.imageUrl = e.target.result;
+  const file: File = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const base64Image = e.target.result;
+      
+      // Actualizează variabila în funcție de ce editezi
+      if (this.isEditingSitting) {
+        this.editableSittingPost.imageUrl = base64Image;
+      } else {
+        this.editableAnimal.imageUrl = base64Image;
+        // Dacă editezi profilul (nu postare), actualizează și currentUser
+        if (this.showModal === false && this.currentUser) {
+            this.tempImagePreview = base64Image;
+            this.currentUser.imageUrl = base64Image;
         }
-      };
-      reader.readAsDataURL(file);
-    }
+      }
+    };
+    reader.readAsDataURL(file);
   }
-
+}
   toggleMenu(post: any) {
     const currentState = !!post['_showMenu'];
+    // Închidem orice meniu deschis anterior
     this.myAnimals.forEach((p: any) => p['_showMenu'] = false);
+    this.mySittingOffers.forEach((p: any) => p['_showMenu'] = false);
     post['_showMenu'] = !currentState;
   }
 
@@ -147,5 +179,36 @@ export class Profile implements OnInit, OnDestroy {
       await remult.repo(Animal).delete(post);
       this.myAnimals = this.myAnimals.filter(a => a.id !== post.id);
     } catch (error: any) { alert(error.message); }
+  }
+
+    // Metoda pentru salvarea ofertelor de Sitting
+  async saveSittingPost() {
+    try {
+      await remult.repo(SittingPost).save(this.editableSittingPost);
+      this.showModal = false;
+      // Actualizăm lista locală
+      const index = this.mySittingOffers.findIndex(a => a.id === this.editableSittingPost.id);
+      if (index !== -1) {
+        this.mySittingOffers[index] = { ...this.mySittingOffers[index], ...this.editableSittingPost } as SittingPost;
+      }
+    } catch (error: any) { alert(error.message); }
+  }
+
+  // Metoda pentru ștergerea ofertelor de Sitting
+  async deleteSittingPost(post: SittingPost) {
+    (post as any)._showMenu = false;
+    if (!confirm(`Delete sitting offer ${post.name}?`)) return;
+    try {
+      await remult.repo(SittingPost).delete(post);
+      this.mySittingOffers = this.mySittingOffers.filter(a => a.id !== post.id);
+    } catch (error: any) { alert(error.message); }
+  }
+
+  // Metoda pentru a deschide modalul specific pentru sitting
+  openEditSittingModal(post: SittingPost) {
+    (post as any)._showMenu = false;
+    this.editableSittingPost = { ...post }; 
+    this.isEditingSitting = true; // Setăm flag-ul ca să știm ce salvăm
+    this.showModal = true;
   }
 }

@@ -1,26 +1,41 @@
 <div class="messenger-wrapper">
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2>Chat</h2>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2>Chat</h2>
+    
+    <input type="text" [(ngModel)]="searchText" (input)="filterConversations()" 
+           placeholder="Search existing chats..." class="search-input">
+
+    <input type="text" [(ngModel)]="searchUserQuery" (input)="onUserSearch()" 
+           placeholder="Search to start new chat..." class="search-input">
+           
+    <div *ngIf="searchUserQuery.trim() && filteredUsers.length > 0" class="search-dropdown">
+      <div *ngFor="let user of filteredUsers" (click)="startNewChat(user.id)" class="search-item">
+        <img [src]="user.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.name" class="mini-avatar">
+        <span>{{ user.name }}</span>
+      </div>
     </div>
-    <div class="conversation-list">
-      <div *ngFor="let conv of conversations" 
-           class="conv-item" 
-           [class.active]="conv.id === recipientId"
-           (click)="navigateToChat(conv.id)">
-        <div class="avatar-container">
-          <img [src]="conv.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + conv.name" class="list-avatar">
-          <div class="online-status"></div>
+  
+  </div>
+
+  <div class="conversation-list">
+    <div *ngFor="let conv of filteredConversations" 
+         class="conv-item" 
+         [class.active]="conv.id === recipientId"
+         (click)="navigateToChat(conv.id)">
+      <div class="avatar-container">
+        <img [src]="conv.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + conv.name" class="list-avatar">
+        <div class="online-status"></div>
+      </div>
+      <div class="conv-details">
+        <div class="conv-top">
+          <span class="user-name">{{ conv.name }}</span>
         </div>
-        <div class="conv-details">
-          <div class="conv-top">
-            <span class="user-name">{{ conv.name }}</span>
-          </div>
-          <p class="last-msg">Chat with {{ conv.name }}</p>
-        </div>
+        <p class="last-msg">Chat with {{ conv.name }}</p>
       </div>
     </div>
   </div>
+</div>
 
   <div class="chat-area">
     <ng-container *ngIf="recipientId; else noSelection">
@@ -29,6 +44,13 @@
           <img [src]="recipientUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + recipientId" class="header-avatar">
           <div>
             <h3>{{ recipientUser?.name || 'Pet connect user' }}</h3>
+          </div>
+        </div>
+        
+        <div class="menu-container" (click)="$event.stopPropagation()">
+          <button class="three-dots" (click)="toggleConvMenu()">•••</button>
+          <div class="dropdown-menu" *ngIf="showMenu">
+            <button (click)="deleteConversation(recipientId)">🗑️ Delete Chat</button>
           </div>
         </div>
       </div>
@@ -71,7 +93,7 @@
     <ng-template #noSelection>
       <div class="empty-state">
         <div class="empty-icon">💬</div>
-        <h3>Select an user to start a conversation</h3>
+        <h3>Select a user to start a conversation</h3>
       </div>
     </ng-template>
   </div>
