@@ -53,7 +53,7 @@ export class App implements OnInit {
     } catch (e) {}
   }
 
-
+  
  async fetchFullUser() {
   try {
     if (this.remult.user) {
@@ -77,6 +77,22 @@ export class App implements OnInit {
     window.location.reload(); 
   }
 }
+
+  async signIn() {
+    try {
+      this.remult.user = await lastValueFrom(
+        this.http.post<UserInfo>('/api/signIn', {
+          email: this.email,
+          password: this.password
+        })
+      );
+      await this.fetchFullUser();
+      this.email = '';
+      this.password = ''; 
+    } catch (e: any) {
+      alert(e.error?.message || "Sign in failed");
+    }
+  }
 
   async sendResetEmail() {
     try {
