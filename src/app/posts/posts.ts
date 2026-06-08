@@ -32,6 +32,10 @@ export class Posts implements OnInit, OnDestroy {
   showModal = false;
   editableAnimal: Partial<Animal> = {};
   unSub: () => void = () => {};
+  activeUserFilter: User | null = null;
+  isFilteringByUser = false;
+isUserMenuOpen = false;
+
 
   constructor(private route: ActivatedRoute, private router: Router, private cdr: ChangeDetectorRef) {}
 
@@ -70,11 +74,15 @@ export class Posts implements OnInit, OnDestroy {
     }
   }
 
-  selectUserFromSearch(user: User) {
-    this.selectedUser = user;
-    this.searchUserQuery = '';
-    this.filteredUsers = [];
-  }
+// Update your selection method
+selectUserFromSearch(user: User) {
+  this.selectedUser = user;
+  this.activeUserFilter = user;
+  this.searchUserQuery = '';
+  this.filteredUsers = [];
+  this.isUserMenuOpen = false;
+  // Do NOT call applyFilters() here automatically if you want to keep the current view
+}
 
   async fetchPosts() {
     try {
@@ -95,9 +103,26 @@ export class Posts implements OnInit, OnDestroy {
     }
   }
 
+  // Replace your toggleUserFilter logic with this:
+  filterByUserOnly() {
+    this.activeUserFilter = this.selectedUser; // Sets the filter to the profile user
+    this.isFilteringByUser = true; // Set to true to restrict posts
+    this.applyFilters();
+  }
+
+  showAllPosts() {
+    this.activeUserFilter = null; // Clears the filter
+    this.isFilteringByUser = false; 
+    this.applyFilters();
+  }
+
   applyFilters() {
     let temp = [...this.allPosts];
     temp = temp.filter(p => p.postType !== 'sitting');
+
+    if (this.isFilteringByUser && this.activeUserFilter) {
+      temp = temp.filter(p => p.userId === this.activeUserFilter!.id);
+    }
 
     if (this.filterSpecies.trim()) {
       const searchSpecies = this.filterSpecies.toLowerCase();
@@ -151,6 +176,25 @@ export class Posts implements OnInit, OnDestroy {
       reader.readAsDataURL(file);
     }
   }
+
+  // Inside Posts class in posts.ts
+  async deleteUser(user: User) {
+    if (!confirm(`Are you sure you want to delete the account for ${user.name}? This cannot be undone.`)) return;
+    try {
+      await User.deleteUserAccount(user.id);
+      this.selectedUser = null; // Clear view
+      alert("User account deleted.");
+      // Optionally: refresh user list
+      this.onUserSearch(); 
+    } catch (error: any) {
+      alert(error.message);
+    }
+  }
+
+  toggleUserMenu() {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
 
   toggleMenu(post: any) {
     const currentState = !!post['_showMenu'];

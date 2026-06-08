@@ -1,4 +1,5 @@
 import { Allow, Entity, Fields, Validators, BackendMethod, remult } from "remult";
+import { Animal } from "./Animal";
 
 // Adăugăm "petsitter" în tipurile de roluri posibile în aplicație
 export type UserRole = "user" | "shelter" | "petsitter" | "admin";
@@ -136,6 +137,30 @@ export class User {
     } else {
       console.error("User not found!");
     }
+  }
+
+  @BackendMethod({ allowed: Allow.authenticated })
+  static async deleteUserAccount(userId: string) {
+    const userRepo = remult.repo(User);
+    const postRepo = remult.repo(Animal);
+    
+    const user = await userRepo.findId(userId);
+    if (!user) throw new Error("User not found");
+
+    // SECURITY CHECK: Only allow if it's the user themselves OR an admin
+    if (remult.user?.id !== userId && remult.user?.role !== 'admin') {
+      throw new Error("Permission denied");
+    }
+
+    // Delete all posts owned by this user
+    const usersPosts = await postRepo.find({ where: { userId } });
+    for (const post of usersPosts) {
+      await postRepo.delete(post);
+    }
+
+    // Delete the user
+    await userRepo.delete(user);
+    return "Account and posts deleted successfully";
   }
 
   @BackendMethod({ allowed: Allow.everyone })

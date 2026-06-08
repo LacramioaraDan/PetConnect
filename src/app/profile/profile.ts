@@ -27,10 +27,12 @@ export class Profile implements OnInit, OnDestroy {
   mySittingOffers: SittingPost[] = [];
   editableSittingPost: Partial<SittingPost> = {}; // Pentru editare ofertele de sitting
   isEditingSitting = false;
+  fullUser: User | null | undefined = null;
 
   constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {}
 
   async ngOnInit() {
+    
     await this.fetchCurrentUser();
     if (this.currentUser) {
       if (this.currentUser.role === 'admin') {
@@ -47,7 +49,9 @@ export class Profile implements OnInit, OnDestroy {
 
   async fetchCurrentUser() {
     if (remult.user) {
+      // Populate BOTH to ensure your logic works
       this.currentUser = await remult.repo(User).findId(remult.user.id);
+      this.fullUser = this.currentUser; // Keep them synced
     }
   }
 
@@ -117,12 +121,19 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { remult.user = undefined; this.router.navigate(['/']); }
   }
 
+  // Inside your Profile.ts
   async deleteAccount() {
-    if (!this.currentUser || !confirm("Are you sure?")) return;
+    if (!this.fullUser || !confirm("Are you sure? This will permanently delete your account and all your posts.")) return;
+    
     try {
-      await remult.repo(User).delete(this.currentUser);
+      // Call the same backend method the Admin uses
+      await User.deleteUserAccount(this.fullUser.id);
+      
+      // Once the server confirms deletion, sign out the user
       await this.signOut(); 
-    } catch (error: any) { alert(error.message); }
+    } catch (error: any) { 
+      alert(error.message); 
+    }
   }
 
   onFileSelected(event: any) {
