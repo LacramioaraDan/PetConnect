@@ -53,27 +53,30 @@ export class App implements OnInit {
     } catch (e) {}
   }
 
-  async fetchFullUser() {
-    if (this.remult.user) {
-      this.fullUser = await this.remult.repo(User).findId(this.remult.user.id);
-    }
-  }
 
-  async signIn() {
-    try {
-      this.remult.user = await lastValueFrom(
-        this.http.post<UserInfo>('/api/signIn', {
-          email: this.email,
-          password: this.password
-        })
-      );
-      await this.fetchFullUser();
-      this.email = '';
-      this.password = ''; 
-    } catch (e: any) {
-      alert(e.error?.message || "Sign in failed");
+ async fetchFullUser() {
+  try {
+    if (this.remult.user) {
+      const user = await this.remult.repo(User).findId(this.remult.user.id);
+      
+      // If 'user' is undefined, it means the account was deleted in the DB
+      if (!user) {
+        throw new Error("Account no longer exists");
+      }
+      
+      this.fullUser = user;
     }
+  } catch (e) {
+    // 1. Clear the local user state
+    this.remult.user = undefined;
+    this.fullUser = null;
+    
+    // 2. Force the browser to refresh, which will redirect the user to the login screen
+    // because remult.authenticated() will now be false.
+    alert("Your account has been removed. You are being logged out.");
+    window.location.reload(); 
   }
+}
 
   async sendResetEmail() {
     try {
