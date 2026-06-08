@@ -19,5 +19,5 @@ export const routes: Routes = [
 
   { path: 'advisor', component: PetAdvisor },
 
-  { path: 'petsitting', component: PetSitting}
+  { path: 'petsitting', component: PetSitting },
 ];

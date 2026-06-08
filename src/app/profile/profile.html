@@ -81,12 +81,18 @@
       <h2 class="feed-heading">Shelter Approval Dashboard</h2>
       <div class="empty-feed" *ngIf="pendingShelters.length === 0"><p>No pending shelters at this time.</p></div>
       <div class="timeline-posts-container" *ngFor="let shelter of pendingShelters">
-        <div class="animal-card" style="padding: 20px; margin-bottom: 15px;">
-           <h3>{{ shelter.name }}</h3>
-           <button (click)="approveShelter(shelter.id)">Approve Shelter</button>
-        </div>
+    <div class="animal-card" style="padding: 20px; margin-bottom: 15px;">
+      <h3>{{ shelter.name }}</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <a [href]="shelter.verificationDocumentUrl" target="_blank" style="color: #8b2e8b; font-weight: bold; text-decoration: underline;">
+          View Verification Document
+        </a>
       </div>
+
+      <button (click)="approveShelter(shelter.id)">Approve Shelter</button>
     </div>
+  </div>
 
     <h2 class="feed-heading">Active Pet Adoption Posts</h2>
     <div class="empty-feed" *ngIf="myAnimals.length === 0">

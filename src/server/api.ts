@@ -8,7 +8,7 @@ import { AIBot } from "../shared/AIBot";
 import { SittingPost } from "../shared/SittingPosts";
 
 export const api = remultApi({
-  entities: [User, Message, Animal, SittingPost], 
+  entities: [User, Message, Animal, SittingPost], // 1. Register all entities here
   controllers: [AIBot], // 2. Updated registration
   getUser: (req) => req.session!['user'],
   subscriptionServer: new SseSubscriptionServer(), // SSE este suficient dacă optimizăm datele
