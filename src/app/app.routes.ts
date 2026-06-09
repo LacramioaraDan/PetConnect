@@ -4,6 +4,7 @@ import { Messages } from './messages/messages';
 import { Shelters } from './shelters/shelters';
 import { PetAdvisor } from './pet-advisor/pet-advisor';
 import { PetSitting } from './petsitting/petsitting';
+import { LostAndFound } from './lost-and-found/lost-and-found';
 
 
 export const routes: Routes = [
@@ -20,4 +21,6 @@ export const routes: Routes = [
   { path: 'advisor', component: PetAdvisor },
 
   { path: 'petsitting', component: PetSitting },
+
+  {path: 'lost-and-found', component: LostAndFound}
 ];

@@ -1,7 +1,8 @@
 import { Allow, Entity, Fields, Validators, BackendMethod, remult } from "remult";
 import { Animal } from "./Animal";
+import { LostAndFoundPost } from "./LostAndFoundPosts";
+import { SittingPost } from "./SittingPosts";
 
-// Adăugăm "petsitter" în tipurile de roluri posibile în aplicație
 export type UserRole = "user" | "shelter" | "petsitter" | "admin";
 
 @Entity("users", {
@@ -14,25 +15,19 @@ export class User {
   @Fields.uuid()
   id = "";
 
-  @Fields.string({
-    validate: Validators.required
-  })
+  @Fields.string({ validate: Validators.required })
   name = '';
 
-  @Fields.string({
-    validate: Validators.required
-  })
+  @Fields.string({ validate: Validators.required })
   email = "";
 
   @Fields.string()
-  description = ""; // Petsitterii își vor introduce descrierea/anunțul lor de profil aici!
+  description = ""; 
 
   @Fields.string()
   experience = "";
   
-  @Fields.string({
-    includeInApi: false 
-  })
+  @Fields.string({ includeInApi: false })
   password = "";
 
   @Fields.string()
@@ -41,23 +36,20 @@ export class User {
   @Fields.string({ includeInApi: false }) 
   resetToken = "";
 
-  // --- TIPUL DE CONT (SHELTER / USER SIMPLU / PETSITTER) ---
-
   @Fields.string<User>({
     validate: (user) => {
-      // Adăugăm "petsitter" în lista de validare
       if (user.role && !["user", "shelter", "petsitter", "admin"].includes(user.role)) {
         throw "Invalid role!";
       }
     }
   })
-  role: UserRole = "user"; // Implicit, toată lumea este utilizator normal
+  role: UserRole = "user";
 
   @Fields.string({ allowNull: true })
-  address = ""; // Adăposturile își trec adresa, iar petsitterii pot trece orașul/zona aici
+  address = ""; 
 
   @Fields.string({ allowNull: true })
-  phone = ""; // Număr de telefon pentru contact rapid
+  phone = ""; 
 
   @Fields.string()
   verificationDocumentUrl = "";
@@ -118,21 +110,19 @@ export class User {
       } catch (err: any) {
         console.error("=== RESEND HTTP FAILURE ===");
         console.error("Error message:", err?.message || err);
-        console.error("Full error object:", err);
       }
     }
 
     return "If an account exists for this email, a reset link has been sent.";
   }
 
-  // In User.ts
   @BackendMethod({ allowed: () => remult.user?.role === 'admin' })
   static async approveShelter(userId: string) {
     const userRepo = remult.repo(User);
     const user = await userRepo.findId(userId);
     if (user) {
       user.isVerified = true;
-      await userRepo.save(user); // If this fails silently, the change is lost
+      await userRepo.save(user);
       console.log("Database updated: isVerified is now true for", user.name);
     } else {
       console.error("User not found!");
@@ -142,25 +132,39 @@ export class User {
   @BackendMethod({ allowed: Allow.authenticated })
   static async deleteUserAccount(userId: string) {
     const userRepo = remult.repo(User);
-    const postRepo = remult.repo(Animal);
+    const animalRepo = remult.repo(Animal);
+    const lostRepo = remult.repo(LostAndFoundPost);
+    const sittingRepo = remult.repo(SittingPost); // Target repository assigned
     
     const user = await userRepo.findId(userId);
     if (!user) throw new Error("User not found");
 
-    // SECURITY CHECK: Only allow if it's the user themselves OR an admin
+    // SECURITY CHECK: Only allow if it's the account owner or an admin
     if (remult.user?.id !== userId && remult.user?.role !== 'admin') {
       throw new Error("Permission denied");
     }
 
-    // Delete all posts owned by this user
-    const usersPosts = await postRepo.find({ where: { userId } });
-    for (const post of usersPosts) {
-      await postRepo.delete(post);
+    // 1. Clean out standard listings/adoption posts
+    const usersAnimals = await animalRepo.find({ where: { userId } });
+    for (const animal of usersAnimals) {
+      await animalRepo.delete(animal);
     }
 
-    // Delete the user
+    // 2. Clean out lost and found posts
+    const usersLostPosts = await lostRepo.find({ where: { userId } });
+    for (const post of usersLostPosts) {
+      await lostRepo.delete(post);
+    }
+
+    // 3. Clean out all pet sitting offers/requests
+    const usersSittingPosts = await sittingRepo.find({ where: { userId } });
+    for (const post of usersSittingPosts) {
+      await sittingRepo.delete(post);
+    }
+
+    // 4. Finally drop core client login record
     await userRepo.delete(user);
-    return "Account and posts deleted successfully";
+    return "Account and all associated records deleted successfully";
   }
 
   @BackendMethod({ allowed: Allow.everyone })
@@ -178,15 +182,10 @@ export class User {
     const bcrypt = await import(/* @vite-ignore */ libraryName);
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     
-    console.log("OLD PASS IN DB:", user.password);
-    console.log("NEW HASHED PASS:", hashedPassword);
-    
     user.password = hashedPassword;
     user.resetToken = ""; 
     
-    const savedUser = await userRepo.save(user);
-    console.log("USER SAVED SUCCESSFULLY. NEW PASS STORED:", savedUser.password);
-
+    await userRepo.save(user);
     return "Your password has been successfully updated!";
   }
 }
