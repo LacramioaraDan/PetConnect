@@ -34,14 +34,23 @@ export class Posts implements OnInit, OnDestroy {
   unSub: () => void = () => {};
   activeUserFilter: User | null = null;
   isFilteringByUser = false;
-isUserMenuOpen = false;
-
+  isUserMenuOpen = false;
 
   constructor(private route: ActivatedRoute, private router: Router, private cdr: ChangeDetectorRef) {}
 
   async ngOnInit() {
     this.fetchPosts();
     await this.fetchCurrentUser();
+
+    // Catch parameter tokens coming from the advisor workflow redirect
+    this.route.queryParams.subscribe(params => {
+      if (params['species']) {
+        this.filterSpecies = params['species'];
+        if (this.allPosts.length > 0) {
+          this.applyFilters();
+        }
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -59,7 +68,6 @@ isUserMenuOpen = false;
     }
     try {
       const search = this.searchUserQuery.toLowerCase();
-      // Using $or to ensure only verified shelters or non-shelter users appear
       const results = await remult.repo(User).find({
         where: {
           $or: [
@@ -74,15 +82,13 @@ isUserMenuOpen = false;
     }
   }
 
-// Update your selection method
-selectUserFromSearch(user: User) {
-  this.selectedUser = user;
-  this.activeUserFilter = user;
-  this.searchUserQuery = '';
-  this.filteredUsers = [];
-  this.isUserMenuOpen = false;
-  // Do NOT call applyFilters() here automatically if you want to keep the current view
-}
+  selectUserFromSearch(user: User) {
+    this.selectedUser = user;
+    this.activeUserFilter = user;
+    this.searchUserQuery = '';
+    this.filteredUsers = [];
+    this.isUserMenuOpen = false;
+  }
 
   async fetchPosts() {
     try {
@@ -103,15 +109,14 @@ selectUserFromSearch(user: User) {
     }
   }
 
-  // Replace your toggleUserFilter logic with this:
   filterByUserOnly() {
-    this.activeUserFilter = this.selectedUser; // Sets the filter to the profile user
-    this.isFilteringByUser = true; // Set to true to restrict posts
+    this.activeUserFilter = this.selectedUser;
+    this.isFilteringByUser = true;
     this.applyFilters();
   }
 
   showAllPosts() {
-    this.activeUserFilter = null; // Clears the filter
+    this.activeUserFilter = null;
     this.isFilteringByUser = false; 
     this.applyFilters();
   }
@@ -124,9 +129,12 @@ selectUserFromSearch(user: User) {
       temp = temp.filter(p => p.userId === this.activeUserFilter!.id);
     }
 
+    // Find this block inside applyFilters() in posts.ts and update it:
     if (this.filterSpecies.trim()) {
-      const searchSpecies = this.filterSpecies.toLowerCase();
-      temp = temp.filter(p => p.species?.toLowerCase().includes(searchSpecies));
+      const searchSpecies = this.filterSpecies.toLowerCase().trim();
+      
+      // FIXED: Force the database item species field to lowercase before matching
+      temp = temp.filter(p => p.species && p.species.toLowerCase().trim().includes(searchSpecies));
     }
 
     if (this.filterGender) {
@@ -177,14 +185,12 @@ selectUserFromSearch(user: User) {
     }
   }
 
-  // Inside Posts class in posts.ts
   async deleteUser(user: User) {
     if (!confirm(`Are you sure you want to delete the account for ${user.name}? This cannot be undone.`)) return;
     try {
       await User.deleteUserAccount(user.id);
-      this.selectedUser = null; // Clear view
+      this.selectedUser = null;
       alert("User account deleted.");
-      // Optionally: refresh user list
       this.onUserSearch(); 
     } catch (error: any) {
       alert(error.message);
@@ -194,7 +200,6 @@ selectUserFromSearch(user: User) {
   toggleUserMenu() {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }
-
 
   toggleMenu(post: any) {
     const currentState = !!post['_showMenu'];

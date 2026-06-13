@@ -6,7 +6,8 @@
   </div>
 
   <div style="flex: 1; padding: 20px; overflow-y: auto; background: #fdfafc; display: flex; flex-direction: column; gap: 15px;">
-    <div *ngFor="let msg of messages" [style.display]="'flex'" [style.justify-content]="msg.sender === 'user' ? 'flex-end' : 'flex-start'">
+    
+    <div *ngFor="let msg of messages" style="display: flex; width: 100%;" [style.justify-content]="msg.sender === 'user' ? 'flex-end' : 'flex-start'">
       <div [style.background-color]="msg.sender === 'user' ? '#8b2e8b' : '#f0f0f0'"
            [style.color]="msg.sender === 'user' ? 'white' : '#333'"
            style="padding: 14px 20px; border-radius: 25px; max-width: 75%; font-size: 1.05rem; line-height: 1.4; box-shadow: 0 2px 5px rgba(0,0,0,0.02);"
@@ -19,6 +20,17 @@
         Buddy is typing...
       </div>
     </div>
+  </div>
+
+  <div *ngIf="finalPetMatch" style="padding: 10px 20px; background: #fdfafc; border-top: 1px solid #f0f2f5;">
+  
+    <!-- FIXED: Explicitly specify type="button" and add event stop propagation parameters -->
+    <button type="button" 
+            (click)="navigateToPosts(finalPetMatch); $event.preventDefault(); $event.stopPropagation();" 
+            style="background: #8b2e8b; color: white; border: none; padding: 14px 20px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; box-shadow: 0 4px 12px rgba(139,46,139,0.3); text-transform: capitalize;">
+      🔍 See available {{ finalPetMatch }}s for adoption here! →
+    </button>
+    
   </div>
 
   <div style="padding: 15px 20px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center;">

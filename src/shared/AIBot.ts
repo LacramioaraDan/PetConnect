@@ -64,17 +64,37 @@ export class AIBot {
   static async processAnswer(userId: string, currentQuestionIndex: number, answerText: string) {
     if (!isBackend()) return { question: "Error", final: true, index: currentQuestionIndex };
     
-    if (!userSessions[userId]) userSessions[userId] = { energy: 0, space: 0, social: 0, upkeep: 0, budget: 0, travel: false, awaitingInfo: false, bestPet: "" };
-    const scores = userSessions[userId];
     const text = answerText.toLowerCase();
 
+    // 1. FIXED: Hard session wipe on start-over command to prevent residual memory lockouts
     if (currentQuestionIndex === -1 && (text.includes("hi") || text.includes("hello") || text.includes("yes") || text.includes("ready") || text.includes("let's start"))) {
+      userSessions[userId] = { 
+        energy: 0, 
+        space: 0, 
+        social: 0, 
+        upkeep: 0, 
+        budget: 0, 
+        travel: false, 
+        awaitingInfo: false, 
+        bestPet: "" 
+      };
       return { question: CONVERSATIONAL_MAP[0].bridge, final: false, index: 0 };
     }
 
+    if (!userSessions[userId]) {
+      userSessions[userId] = { energy: 0, space: 0, social: 0, upkeep: 0, budget: 0, travel: false, awaitingInfo: false, bestPet: "" };
+    }
+    const scores = userSessions[userId];
+
+    // 2. FIXED: Keeps the recommendation context attached if user follows the info prompt route
     if (scores.awaitingInfo) {
       return text.match(/yes|sure|ok|please|yeah/) 
-        ? { question: `<b>Please Consider:</b> Adopting is a big commitment. ${PET_INFO[scores.bestPet].desc}`, final: true, index: 99 }
+        ? { 
+            question: `<b>Please Consider:</b> Adopting is a big commitment. ${PET_INFO[scores.bestPet].desc}`, 
+            final: true, 
+            index: 99,
+            recommendedSpecies: scores.bestPet // Preserves matching hook payload
+          }
         : { question: "No problem! Thanks for chatting with me. Bye!", final: true, index: 99 };
     }
 
@@ -121,10 +141,12 @@ export class AIBot {
       }
       scores.awaitingInfo = true;
       scores.bestPet = bestPet;
+      
       return { 
-        question: `I’d recommend a ${bestPet.toUpperCase()}!<br><br><img src="/${PET_INFO[bestPet].img}" width="200" alt="Pet Image" /><br><br>Would you like to know more?`, 
+        question: `I’d recommend a ${bestPet.toUpperCase()}!<br><br><img src="/${PET_INFO[bestPet].img}" width="200" alt="Pet Image" /><br><br>Would you like to read my expert guide breakdown rules for this animal?`, 
         final: false, 
-        index: nextIndex 
+        index: nextIndex,
+        recommendedSpecies: bestPet // Transmits matching category tag to frontend instantly
       };
     }
     
