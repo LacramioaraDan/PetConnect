@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { remult } from 'remult';
 import { LostAndFoundPost } from '../../shared/LostAndFoundPosts';
+import { User } from '../../shared/User'; // <--- Added User model import
 import { Router } from '@angular/router';
 
 @Component({
@@ -78,7 +79,7 @@ export class LostAndFound implements OnInit, OnDestroy {
   chatMessages: { sender: 'user' | 'bot', text: string }[] = [
     { 
       sender: 'bot', 
-      text: "Hello, I am Buddy, your virtual pet finder assistant! I can help look through the posts on our platform to see if any of them match your lost pet. Are you ready to look for your missing friend together! 🕵️‍♂️" 
+      text: "Hello, I am Buddy, your virtual pet finder assistant! I can help look through the posts on our platform to see if any of them match your lost pet. Are you ready to look for your missing friend together? 🕵️‍♂️" 
     }
   ];
   userChatInput = '';
@@ -90,10 +91,23 @@ export class LostAndFound implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.fetchPosts();
+    await this.fetchFullUserContext(); // <--- Added to sync user image and verification info
   }
 
   ngOnDestroy() { 
     if (this.unSub) this.unSub(); 
+  }
+
+  // --- New Helper to Load Full User context ---
+  async fetchFullUserContext() {
+    if (remult.user) {
+      try {
+        this.fullUser = await remult.repo(User).findId(remult.user.id);
+        this.cdr.markForCheck();
+      } catch (error) {
+        console.error("Could not load full user profile context details:", error);
+      }
+    }
   }
 
   async fetchPosts() {
@@ -233,7 +247,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     this.cdr.markForCheck();
 
     // NEW INTERCEPTOR: Handle polite thank you phrases gracefully
-    if (lowerText.includes('thank you') || lowerText === 'thanks' || lowerText === 'thank u' || lowerText.includes('thank you')) {
+    if (lowerText.includes('thank you') || lowerText === 'thanks' || lowerText === 'thank u') {
       setTimeout(() => {
         this.chatMessages.push({
           sender: 'bot',
@@ -241,7 +255,7 @@ export class LostAndFound implements OnInit, OnDestroy {
         });
         this.cdr.markForCheck();
       }, 600);
-      return; // Stop execution here so it doesn't trigger a new database search loop
+      return; 
     }
 
     // 2. GREETING STAGE (Step -1)
@@ -294,8 +308,6 @@ export class LostAndFound implements OnInit, OnDestroy {
 
   executeSmartMatch() {
     const traits = this.collectedTraits;
-    
-    // Only look inside 'found' posts
     const foundOnlyPosts = this.allPosts.filter(p => p.postType === 'found');
 
     const scoredPosts = foundOnlyPosts.map(p => {
@@ -310,7 +322,6 @@ export class LostAndFound implements OnInit, OnDestroy {
         return matches ? parseFloat(matches[0]) : null;
       };
 
-      // Critical Requirement Validation: Species Match
       if (traits['species'] && traits['species'].trim()) {
         totalQueriedCriteria++;
         if (clean(p.species).includes(clean(traits['species']))) {
@@ -334,7 +345,6 @@ export class LostAndFound implements OnInit, OnDestroy {
           
         const targetDesc = clean(p.description);
 
-        // SMART APPROXIMATE WEIGHTS
         if (traitKey === 'weightRange') {
           const userNum = extractNumber(queryRaw);
           const postNum = extractNumber(postFieldVal) || extractNumber(p.description);
@@ -349,7 +359,6 @@ export class LostAndFound implements OnInit, OnDestroy {
           }
         }
 
-        // STANDARD FALLBACK
         if (targetField.includes(queryVal)) {
           score += weight;
           matchedCriteriaCount++;
@@ -359,7 +368,6 @@ export class LostAndFound implements OnInit, OnDestroy {
         }
       };
 
-      // Scan post data points
       checkTrait(p.breed, 'breed', 5);
       checkTrait(p.gender, 'gender', 4);
       checkTrait(p.lastSeenLocation, 'lastSeenLocation', 6);
@@ -371,7 +379,6 @@ export class LostAndFound implements OnInit, OnDestroy {
       checkTrait(p.distinguishingFeatures, 'distinguishingFeatures', 5);
       checkTrait(p.age, 'age', 3);
 
-      // Colors intersection handler
       if (traits['colors'] && traits['colors'].trim()) {
         const searchColors = traits['colors'].toLowerCase().split(',').map(c => c.trim()).filter(c => c);
         if (searchColors.length > 0) {
@@ -419,7 +426,6 @@ export class LostAndFound implements OnInit, OnDestroy {
           text: "I checked all active alerts, but I couldn't find a matching trail with those exact words yet. 😢 Let's look again! What **species** are we hunting for? 🐶🐱" 
         });
         
-        // Reset full parameter map collection on memory overflow failure
         this.collectedTraits = {
           species: '', breed: '', age: '', gender: '', lastSeenLocation: '',
           size: '', colors: '', pattern: '', weightRange: '', microchipped: '',

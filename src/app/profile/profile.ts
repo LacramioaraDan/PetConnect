@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { remult } from 'remult';
 import { Animal } from '../../shared/Animal';
 import { User } from '../../shared/User';
+import { LostAndFoundPost } from '../../shared/LostAndFoundPosts';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
@@ -25,14 +26,19 @@ export class Profile implements OnInit, OnDestroy {
   editableAnimal: Partial<Animal> = {};
   tempImagePreview: string | null = null;
   mySittingOffers: SittingPost[] = [];
-  editableSittingPost: Partial<SittingPost> = {}; // Pentru editare ofertele de sitting
+  editableSittingPost: Partial<SittingPost> = {};
+  
+  // Lost and Found Additions
+  myLostAndFoundPosts: LostAndFoundPost[] = [];
+  editableLostFoundPost: Partial<LostAndFoundPost> = {};
+  isEditingLostFound = false;
   isEditingSitting = false;
+
   fullUser: User | null | undefined = null;
 
   constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {}
 
   async ngOnInit() {
-    
     await this.fetchCurrentUser();
     if (this.currentUser) {
       if (this.currentUser.role === 'admin') {
@@ -42,6 +48,7 @@ export class Profile implements OnInit, OnDestroy {
       }
       await this.fetchMyAnimals();
       await this.fetchMySittingOffers();
+      await this.fetchMyLostAndFoundPosts();
     }
   }
 
@@ -49,9 +56,8 @@ export class Profile implements OnInit, OnDestroy {
 
   async fetchCurrentUser() {
     if (remult.user) {
-      // Populate BOTH to ensure your logic works
       this.currentUser = await remult.repo(User).findId(remult.user.id);
-      this.fullUser = this.currentUser; // Keep them synced
+      this.fullUser = this.currentUser;
     }
   }
 
@@ -73,6 +79,15 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  async fetchMyLostAndFoundPosts() {
+    if (this.currentUser) {
+      this.myLostAndFoundPosts = await remult.repo(LostAndFoundPost).find({
+        where: { userId: this.currentUser.id },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+  }
+
   async approveShelter(id: string) {
     try {
       await User.approveShelter(id);
@@ -87,14 +102,11 @@ export class Profile implements OnInit, OnDestroy {
     try {
       if (this.currentUser) {
         if (this.tempImagePreview) this.currentUser.imageUrl = this.tempImagePreview;
-        
-        // Save to database
         const savedUser = await remult.repo(User).save(this.currentUser);
         
-        // FIX: Update the global user object so the navbar reflects the change
         if (remult.user) {
           remult.user.imageUrl = savedUser.imageUrl;
-          remult.user.name = savedUser.name; // <--- Add this line
+          remult.user.name = savedUser.name;
         }
         
         this.tempImagePreview = null;
@@ -121,15 +133,10 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { remult.user = undefined; this.router.navigate(['/']); }
   }
 
-  // Inside your Profile.ts
   async deleteAccount() {
     if (!this.fullUser || !confirm("Are you sure? This will permanently delete your account and all your posts.")) return;
-    
     try {
-      // Call the same backend method the Admin uses
       await User.deleteUserAccount(this.fullUser.id);
-      
-      // Once the server confirms deletion, sign out the user
       await this.signOut(); 
     } catch (error: any) { 
       alert(error.message); 
@@ -137,32 +144,33 @@ export class Profile implements OnInit, OnDestroy {
   }
 
   onFileSelected(event: any) {
-  const file: File = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      const base64Image = e.target.result;
-      
-      // Actualizează variabila în funcție de ce editezi
-      if (this.isEditingSitting) {
-        this.editableSittingPost.imageUrl = base64Image;
-      } else {
-        this.editableAnimal.imageUrl = base64Image;
-        // Dacă editezi profilul (nu postare), actualizează și currentUser
-        if (this.showModal === false && this.currentUser) {
-            this.tempImagePreview = base64Image;
-            this.currentUser.imageUrl = base64Image;
+    const file: File = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const base64Image = e.target.result;
+        
+        if (this.isEditingSitting) {
+          this.editableSittingPost.imageUrl = base64Image;
+        } else if (this.isEditingLostFound) {
+          this.editableLostFoundPost.imageUrl = base64Image;
+        } else {
+          this.editableAnimal.imageUrl = base64Image;
+          if (this.showModal === false && this.currentUser) {
+              this.tempImagePreview = base64Image;
+              this.currentUser.imageUrl = base64Image;
+          }
         }
-      }
-    };
-    reader.readAsDataURL(file);
+      };
+      reader.readAsDataURL(file);
+    }
   }
-}
+
   toggleMenu(post: any) {
     const currentState = !!post['_showMenu'];
-    // Închidem orice meniu deschis anterior
     this.myAnimals.forEach((p: any) => p['_showMenu'] = false);
     this.mySittingOffers.forEach((p: any) => p['_showMenu'] = false);
+    this.myLostAndFoundPosts.forEach((p: any) => p['_showMenu'] = false);
     post['_showMenu'] = !currentState;
   }
 
@@ -171,6 +179,8 @@ export class Profile implements OnInit, OnDestroy {
   openEditModal(post: Animal) {
     (post as any)._showMenu = false;
     this.editableAnimal = { ...post }; 
+    this.isEditingSitting = false;
+    this.isEditingLostFound = false;
     this.showModal = true;
   }
 
@@ -192,12 +202,10 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { alert(error.message); }
   }
 
-    // Metoda pentru salvarea ofertelor de Sitting
   async saveSittingPost() {
     try {
       await remult.repo(SittingPost).save(this.editableSittingPost);
       this.showModal = false;
-      // Actualizăm lista locală
       const index = this.mySittingOffers.findIndex(a => a.id === this.editableSittingPost.id);
       if (index !== -1) {
         this.mySittingOffers[index] = { ...this.mySittingOffers[index], ...this.editableSittingPost } as SittingPost;
@@ -205,7 +213,6 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { alert(error.message); }
   }
 
-  // Metoda pentru ștergerea ofertelor de Sitting
   async deleteSittingPost(post: SittingPost) {
     (post as any)._showMenu = false;
     if (!confirm(`Delete sitting offer ${post.name}?`)) return;
@@ -215,11 +222,38 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { alert(error.message); }
   }
 
-  // Metoda pentru a deschide modalul specific pentru sitting
   openEditSittingModal(post: SittingPost) {
     (post as any)._showMenu = false;
     this.editableSittingPost = { ...post }; 
-    this.isEditingSitting = true; // Setăm flag-ul ca să știm ce salvăm
+    this.isEditingSitting = true; 
+    this.isEditingLostFound = false;
     this.showModal = true;
+  }
+
+  // Lost and Found Action Methods
+  openEditLostFoundModal(post: LostAndFoundPost) {
+    (post as any)._showMenu = false;
+    this.editableLostFoundPost = { ...post };
+    this.isEditingLostFound = true;
+    this.isEditingSitting = false;
+    this.showModal = true;
+  }
+
+  async saveLostFoundPost() {
+    try {
+      await remult.repo(LostAndFoundPost).save(this.editableLostFoundPost);
+      this.showModal = false;
+      this.isEditingLostFound = false;
+      await this.fetchMyLostAndFoundPosts(); // Refresh client view safely
+    } catch (error: any) { alert(error.message); }
+  }
+
+  async deleteLostFoundPost(post: LostAndFoundPost) {
+    (post as any)._showMenu = false;
+    if (!confirm(`Delete lost & found report for ${post.species}?`)) return;
+    try {
+      await remult.repo(LostAndFoundPost).delete(post);
+      this.myLostAndFoundPosts = this.myLostAndFoundPosts.filter(p => p.id !== post.id);
+    } catch (error: any) { alert(error.message); }
   }
 }
