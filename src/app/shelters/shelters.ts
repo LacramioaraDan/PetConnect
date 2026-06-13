@@ -119,6 +119,27 @@ export class Shelters implements OnInit {
     this.shelterAnimals = tempAnimals;
   }
 
+  // --- Filter System Operations ---
+  resetFilters() {
+    // 1. Reset shelter-specific search text inputs
+    this.filterLocation = '';
+    this.filterShelterName = '';
+
+    // 2. Reset animal-specific filter criteria variables
+    this.filterSpecies = '';
+    this.filterAge = '';
+    this.filterGender = '';
+
+    // 3. Clear selected shelter active focus context if any
+    this.selectedShelterName = '';
+    this.shelterImageUrl = '';
+    this.allShelterAnimals = [];
+    this.shelterAnimals = [];
+
+    // 4. Force list views back to their initial un-filtered master datasets
+    this.sheltersList = this.allShelters;
+  }
+
   openChatWithShelter(shelterId: string) {
     if (!shelterId) {
       alert("Error: Missing owner ID for chat.");

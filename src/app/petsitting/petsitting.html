@@ -24,6 +24,10 @@
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Location</label>
       <input type="text" [(ngModel)]="filterLocation" (input)="onFilterChange()" placeholder="e.g. Timisoara" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: white;">
     </div>
+
+    <button (click)="resetFilters()" style="width: 100%; background: transparent; color: #784b83; border: 2px solid #784b83; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 15px; transition: all 0.2s; margin-top: 5px; flex-shrink: 0;">
+      🔄 Reset Filters
+    </button>
   </div>
 
   <!-- COLOANA 2: LISTA PET SITTERS GRID COMPLET (MIJLOC) -->

@@ -101,6 +101,21 @@ export class PetSitting implements OnInit {
     }
   }
 
+  // --- Filter System Operations ---
+  resetFilters() {
+    // 1. Reset text input filter values back to empty strings
+    this.filterLocation = '';
+    this.filterPetsitterName = '';
+    this.filterExperience = '';
+
+    // 2. Clear out the focused pet sitter card selection and active posts
+    this.selectedUser = null;
+    this.sitterPosts = [];
+
+    // 3. Restore the display list to reflect the raw array of loaded sitters
+    this.petsittersList = this.allPetsitters;
+  }
+
   openChatWithPetsitter(petsitterId: string) {
     if (!petsitterId) return;
     this.router.navigate(['/messages', petsitterId]);

@@ -34,37 +34,40 @@
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Location</label>
       <input type="text" [(ngModel)]="filterLocation" (input)="applyFilters()" placeholder="e.g. Timisoara" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: white;">
     </div>
+
+    <button (click)="resetFilters()" style="width: 100%; background: transparent; color: #784b83; border: 2px solid #784b83; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 15px; transition: all 0.2s; margin-top: 5px; flex-shrink: 0;">
+      🔄 Reset Filters
+    </button>
   </div>
 
   <div class="table-column-posts" style="padding: 30px 40px; flex-shrink: 0; box-sizing: border-box; border-left: 1px solid rgba(0,0,0,0.15); border-right: 1px solid rgba(0,0,0,0.15); background: transparent; max-height: calc(100vh - 70px); overflow-y: auto;">
     
     <div style="max-width: 800px; margin: 0 auto; display: block;">
 
-     <div *ngIf="remult.user?.role !== 'shelter' || (remult.user?.role === 'shelter' && fullUser?.isVerified)" 
-        class="create-post-card" (click)="openAddModal()" style="cursor: pointer;">
-      <img [src]="fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user?.name" class="user-pic-small">
-      <div class="fake-input">
-        Got a new buddy to introduce, {{ remult.user?.name }}? 🐾
+      <div *ngIf="remult.user !== undefined && (remult.user.role !== 'shelter' || (remult.user.role === 'shelter' && fullUser?.isVerified))" 
+           class="create-post-card" (click)="openAddModal()" style="cursor: pointer;">
+        <img [src]="fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user?.name" class="user-pic-small">
+        <div class="fake-input">
+          Got a new buddy to introduce, {{ remult.user?.name }}? 🐾
+        </div>
       </div>
-    </div>
 
-  <div *ngIf="remult.user?.role === 'shelter' && fullUser && !fullUser.isVerified" 
-       style="padding: 20px; background: #fff3f3; border: 1px solid #ffcccc; border-radius: 12px; color: #a94442; text-align: center; font-weight: 600;">
-    ⚠️ Your shelter is pending verification. Once an administrator approves your account, you will be able to create adoption posts.
-  </div>
+      <div *ngIf="remult.user?.role === 'shelter' && fullUser && !fullUser.isVerified" 
+           style="padding: 20px; background: #fff3f3; border: 1px solid #ffcccc; border-radius: 12px; color: #a94442; text-align: center; font-weight: 600;">
+        ⚠️ Your shelter is pending verification. Once an administrator approves your account, you will be able to create adoption posts.
+      </div>
 
-
-      <div *ngFor="let post of posts" class="animal-card" style="display: block !important; overflow: visible; margin-bottom: 35px; background: white; border: 1px solid #ddd; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+      <div *ngFor="let post of posts; trackBy: identify" class="animal-card" style="display: block !important; overflow: visible; margin-bottom: 35px; background: white; border: 1px solid #ddd; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
         
         <div (click)="viewUserProfile(post.user)" style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid #f0f2f5; width: 100%; box-sizing: border-box; cursor: pointer;">
           <img [src]="post.user?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + post.user?.name" 
-                style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 18px; border: 1px solid #eee;">
+               style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 18px; border: 1px solid #eee;">
           <div style="flex-grow: 1;">
             <div style="font-weight: 800; font-size: 19px; color: #050505;">{{ post.user?.name }}</div>
             <div style="font-size: 15px; color: #65676b; margin-top: 2px;">Posted on {{ post.createdAt | date:'MMMM d, y' }}</div>
           </div>
           
-          <div class="menu-container" *ngIf="remult.user?.id == post.userId || remult.user?.role === 'admin'" style="position: relative;" (click)="$event.stopPropagation()">
+          <div class="menu-container" *ngIf="remult.user && (remult.user.id == post.userId || remult.user.role === 'admin')" style="position: relative;" (click)="$event.stopPropagation()">
             <button class="three-dots" (click)="toggleMenu(post); $event.stopPropagation()">•••</button>
             <div class="dropdown-menu" *ngIf="isMenuOpen(post)" style="position: absolute; right: 0; top: 40px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); width: 170px; padding: 10px; z-index: 100;">
               <button (click)="openEditModal(post)" style="width: 100%; text-align: left; background: none; border: none; padding: 12px; cursor: pointer; font-size: 16px; font-weight: 600;">✏️ Edit</button>
@@ -93,7 +96,7 @@
           {{ post.description }}
         </div>
 
-        <div style="padding: 0 30px 30px 30px; display: block !important;" *ngIf="remult.user?.id !== post.userId">
+        <div style="padding: 0 30px 30px 30px; display: block !important;" *ngIf="remult.user !== undefined && remult.user.id !== post.userId">
             <button (click)="startChat(post.userId); $event.stopPropagation()" 
               style="position: relative; z-index: 10; width: 100%; background: #784b83; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 10px;">
               <span>💬</span> Send a message to {{ post.user?.name }}
@@ -144,65 +147,65 @@
     </div>
 
     <div class="profile-container" *ngIf="selectedUser" 
-     style="position: relative; background: white; border: 1px solid #ddd; border-radius: 14px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 20px; box-sizing: border-box;">
+         style="position: relative; background: white; border: 1px solid #ddd; border-radius: 14px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 20px; box-sizing: border-box;">
   
-  <div *ngIf="remult.user?.role === 'admin' && remult.user?.id !== selectedUser.id" 
-       style="position: absolute; top: 15px; right: 15px; z-index: 100;">
-    
-    <button (click)="toggleUserMenu(); $event.stopPropagation()" 
-            style="background: none; border: none; font-size: 20px; cursor: pointer; color: #65676b;">
-      •••
-    </button>
-    
-    <div *ngIf="isUserMenuOpen" 
-         style="position: absolute; right: 0; top: 35px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 170px; padding: 5px; z-index: 100;">
-      
-      <button (click)="deleteUser(selectedUser); isUserMenuOpen = false; $event.stopPropagation()" 
-              style="width: 100%; text-align: left; padding: 10px; border: none; background: none; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 15px;">
-        🗑️ Delete Account
-      </button>
+      <div *ngIf="remult.user !== undefined && remult.user.role === 'admin' && remult.user.id !== selectedUser.id" 
+           style="position: absolute; top: 15px; right: 15px; z-index: 100;">
+        
+        <button (click)="toggleUserMenu(); $event.stopPropagation()" 
+                style="background: none; border: none; font-size: 20px; cursor: pointer; color: #65676b;">
+          •••
+        </button>
+        
+        <div *ngIf="isUserMenuOpen" 
+             style="position: absolute; right: 0; top: 35px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 170px; padding: 5px; z-index: 100;">
+          
+          <button (click)="deleteUser(selectedUser); isUserMenuOpen = false; $event.stopPropagation()" 
+                  style="width: 100%; text-align: left; padding: 10px; border: none; background: none; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 15px;">
+            🗑️ Delete Account
+          </button>
+        </div>
+      </div>
+
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+        <div style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; border: 2px solid #784b83; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+          <img [src]="selectedUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + selectedUser.name" 
+               style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <h1 style="font-size: 28px; font-weight: 900; margin: 0; color: #1c1e21;">{{ selectedUser.name }}</h1>
+        <span style="background: #f0f2f5; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 14px; color: #784b83; text-transform: uppercase;">
+          {{ selectedUser.role ? selectedUser.role : 'User' }}
+        </span>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid #f0f2f5; margin: 5px 0;">
+
+      <div>
+        <h3 style="font-size: 18px; font-weight: 800; color: #4b4f56; margin: 0 0 10px 0;">About Me</h3>
+        <p style="font-size: 16px; line-height: 1.5; color: #1c1e21; margin: 0; background: #fafafa; padding: 14px; border-radius: 8px; border: 1px solid #f0f2f5; font-style: italic;">
+          {{ selectedUser.description || 'This user has no description added yet.' }}
+        </p>
+      </div>
+
+      <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;" *ngIf="remult.user !== undefined && remult.user.id !== selectedUser.id">
+        
+        <button (click)="startChat(selectedUser.id)" 
+                style="width: 100%; background: #784b83; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
+          💬 Chat with {{ selectedUser.name }}
+        </button>
+
+        <button (click)="filterByUserOnly()"
+                style="width: 100%; background: #9a6d9e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
+          📍 Show only {{ selectedUser.name }}'s posts
+        </button>
+
+        <button (click)="showAllPosts()"
+                style="width: 100%; background: transparent; color: #784b83; border: 2px solid #784b83; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
+          🌍 Show all posts
+        </button>
+      </div>
     </div>
   </div>
-
-  <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-    <div style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; border: 2px solid #784b83; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-      <img [src]="selectedUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + selectedUser.name" 
-           style="width: 100%; height: 100%; object-fit: cover;">
-    </div>
-    <h1 style="font-size: 28px; font-weight: 900; margin: 0; color: #1c1e21;">{{ selectedUser.name }}</h1>
-    <span style="background: #f0f2f5; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 14px; color: #784b83; text-transform: uppercase;">
-      {{ selectedUser.role ? selectedUser.role : 'User' }}
-    </span>
-  </div>
-
-  <hr style="border: 0; border-top: 1px solid #f0f2f5; margin: 5px 0;">
-
-  <div>
-    <h3 style="font-size: 18px; font-weight: 800; color: #4b4f56; margin: 0 0 10px 0;">About Me</h3>
-    <p style="font-size: 16px; line-height: 1.5; color: #1c1e21; margin: 0; background: #fafafa; padding: 14px; border-radius: 8px; border: 1px solid #f0f2f5; font-style: italic;">
-      {{ selectedUser.description || 'This user has no description added yet.' }}
-    </p>
-  </div>
-
-  <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;" *ngIf="remult.user?.id !== selectedUser.id">
-    
-    <button (click)="startChat(selectedUser.id)" 
-            style="width: 100%; background: #784b83; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
-      💬 Chat with {{ selectedUser.name }}
-    </button>
-
-    <button (click)="filterByUserOnly()"
-            style="width: 100%; background: #9a6d9e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
-      📍 Show only {{ selectedUser.name }}'s posts
-    </button>
-
-    <button (click)="showAllPosts()"
-            style="width: 100%; background: transparent; color: #784b83; border: 2px solid #784b83; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
-      🌍 Show all posts
-    </button>
-  </div>
-</div>
-</div>
 
   <div class="modal-overlay" *ngIf="showModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 9999;">
     <div class="modal-card" style="box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; box-sizing: border-box; display: flex !important; flex-direction: column !important; gap: 15px !important; background: white; padding: 30px; border-radius: 14px; width: 90%; max-width: 500px;">
@@ -227,16 +230,7 @@
           <select [(ngModel)]="editableAnimal.gender" 
                   name="gender" 
                   class="modal-input" 
-                  style="width: 100%; 
-                         box-sizing: border-box; 
-                         padding: 12px 14px; 
-                         border: 1px solid #ccd0d5; 
-                         border-radius: 8px; 
-                         font-size: 15px; 
-                         background-color: white; 
-                         outline: none; 
-                         cursor: pointer;
-                         height: auto;">
+                  style="width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background-color: white; outline: none; cursor: pointer; height: auto;">
             <option value="" disabled selected hidden>Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
@@ -262,3 +256,4 @@
       </form>
     </div>
   </div>
+</div>

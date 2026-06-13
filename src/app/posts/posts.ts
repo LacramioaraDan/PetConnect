@@ -168,6 +168,23 @@ export class Posts implements OnInit, OnDestroy {
     this.posts = temp;
   }
 
+  // --- Filter System Operations ---
+  resetFilters() {
+    this.filterSpecies = '';
+    this.filterAge = '';
+    this.filterGender = '';
+    this.filterLocation = '';
+    
+    // Clear the active user filter contexts if applicable
+    this.selectedUser = null;
+    this.activeUserFilter = null;
+    this.isFilteringByUser = false;
+    this.searchUserQuery = '';
+    this.filteredUsers = [];
+
+    this.applyFilters();
+  }
+
   viewUserProfile(user: User | undefined) { if (user) this.selectedUser = user; }
 
   async fetchCurrentUser() {
