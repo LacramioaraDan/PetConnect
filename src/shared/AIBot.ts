@@ -66,7 +66,6 @@ export class AIBot {
     
     const text = answerText.toLowerCase();
 
-    // 1. FIXED: Hard session wipe on start-over command to prevent residual memory lockouts
     if (currentQuestionIndex === -1 && (text.includes("hi") || text.includes("hello") || text.includes("yes") || text.includes("ready") || text.includes("let's start"))) {
       userSessions[userId] = { 
         energy: 0, 
@@ -86,14 +85,13 @@ export class AIBot {
     }
     const scores = userSessions[userId];
 
-    // 2. FIXED: Keeps the recommendation context attached if user follows the info prompt route
     if (scores.awaitingInfo) {
       return text.match(/yes|sure|ok|please|yeah/) 
         ? { 
             question: `<b>Please Consider:</b> Adopting is a big commitment. ${PET_INFO[scores.bestPet].desc}`, 
             final: true, 
             index: 99,
-            recommendedSpecies: scores.bestPet // Preserves matching hook payload
+            recommendedSpecies: scores.bestPet 
           }
         : { question: "No problem! Thanks for chatting with me. Bye!", final: true, index: 99 };
     }
@@ -135,9 +133,28 @@ export class AIBot {
     const nextIndex = currentQuestionIndex + 1;
     if (nextIndex >= CONVERSATIONAL_MAP.length) {
       let bestPet = "", minDiff = Infinity;
+      let bestPetProfile: any = null;
+
       for (const [pet, profile] of Object.entries(PET_PROFILES)) {
-        const diff = Math.abs(scores.energy - profile.energy) + Math.abs(scores.space - profile.space) + Math.abs(scores.social - profile.social) + Math.abs(scores.upkeep - profile.upkeep) + Math.abs(scores.budget - profile.budget);
-        if (diff < minDiff) { minDiff = diff; bestPet = pet; }
+        const diff = Math.abs(scores.energy - profile.energy) + 
+                     Math.abs(scores.space - profile.space) + 
+                     Math.abs(scores.social - profile.social) + 
+                     Math.abs(scores.upkeep - profile.upkeep) + 
+                     Math.abs(scores.budget - profile.budget);
+        
+        // Check if we found a strictly better profile match
+        if (diff < minDiff) { 
+          minDiff = diff; 
+          bestPet = pet; 
+          bestPetProfile = profile;
+        } 
+        // FIXED TIEBREAKER fallback metric: if variance yields an identical split, select the lower upkeep pet
+        else if (diff === minDiff && bestPetProfile) {
+          if (profile.upkeep < bestPetProfile.upkeep) {
+            bestPet = pet;
+            bestPetProfile = profile;
+          }
+        }
       }
       scores.awaitingInfo = true;
       scores.bestPet = bestPet;
@@ -146,7 +163,7 @@ export class AIBot {
         question: `I’d recommend a ${bestPet.toUpperCase()}!<br><br><img src="/${PET_INFO[bestPet].img}" width="200" alt="Pet Image" /><br><br>Would you like to read my expert guide breakdown rules for this animal?`, 
         final: false, 
         index: nextIndex,
-        recommendedSpecies: bestPet // Transmits matching category tag to frontend instantly
+        recommendedSpecies: bestPet 
       };
     }
     

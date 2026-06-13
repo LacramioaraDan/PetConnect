@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AIBot } from '../../shared/AIBot';
 import { Router } from '@angular/router';
+import { remult } from 'remult'; // <--- Confirmed remult framework import
 
 interface Message { 
   sender: 'user' | 'bot'; 
@@ -22,7 +23,7 @@ export class PetAdvisor {
   userInput = '';
   isLoading = false;
   currentQuestionIndex = -1;
-  finalPetMatch?: string; // <--- Tracks the result globally across the chat session
+  finalPetMatch?: string; 
 
   constructor(private router: Router) {}
 
@@ -37,12 +38,14 @@ export class PetAdvisor {
     await new Promise(resolve => setTimeout(resolve, 800));
 
     try {
-      const response = await AIBot.processAnswer("user123", this.currentQuestionIndex, userText);
+      // FIXED: Swapped out hardcoded string for uniquely tracking session IDs dynamically
+      const uniqueSessionId = remult.user?.id || "anonymous-guest-token";
+      
+      const response = await AIBot.processAnswer(uniqueSessionId, this.currentQuestionIndex, userText);
       
       if (response) {
         this.currentQuestionIndex = response.index;
         
-        // Save the recommendation to our global tracker variable if it arrives
         if (response.recommendedSpecies) {
           this.finalPetMatch = response.recommendedSpecies;
         }
@@ -63,10 +66,9 @@ export class PetAdvisor {
   navigateToPosts(species: string) {
     let searchToken = species;
 
-    // Normalization Map: Translates backend profile keys into your site's data keywords
     if (species === 'guinea_pig') searchToken = 'guinea';
     
-    // FIXED: Changed '/Posts' to '/posts' (lowercase) or use an empty string array if it is your home path
+    // Lowercase home base router targeting path redirect package
     this.router.navigate(['/'], { 
       queryParams: { species: searchToken }
     });
