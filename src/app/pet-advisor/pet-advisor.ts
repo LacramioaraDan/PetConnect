@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AIBot } from '../../shared/AIBot';
 import { Router } from '@angular/router';
-import { remult } from 'remult'; // <--- Confirmed remult framework import
-
+import { remult } from 'remult';
 interface Message { 
   sender: 'user' | 'bot'; 
   text: string; 
@@ -57,7 +56,7 @@ export class PetAdvisor {
         });
       }
     } catch (err) {
-      this.messages.push({ sender: 'bot', text: 'I hit a snag! Could you try that again?' });
+      this.messages.push({ sender: 'bot', text: 'Could you try that again?' });
     } finally {
       this.isLoading = false;
     }

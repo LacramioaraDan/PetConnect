@@ -31,19 +31,19 @@ const CONVERSATIONAL_MAP: { bridge: string }[] = [
   { bridge: "Cool. And what's your vibe like—are you more high-energy or laid-back?" }, // 1
   { bridge: "Got it. What kind of home setup are you working with?" }, // 2
   { bridge: "Nice. Are you the type to want a super cuddly pet, or do you prefer some space?" }, // 3
-  { bridge: "Fair enough. Do you find yourself traveling a lot?" }, // 4 (Mapped to travel boolean)
-  { bridge: "That makes sense. What kind of budget are you thinking for your new buddy?" }, // 5 (Mapped to budget value parse)
-  { bridge: "No worries! How do you feel about cleaning up after a pet?" }, // 6
-  { bridge: "Haha, totally get that. What’s your biggest pet peeve when it comes to animals?" }, // 7
+  { bridge: "Got it. Do you find yourself traveling a lot?" }, // 4 (Mapped to travel boolean)
+  { bridge: "Understood! What kind of budget are you thinking for your new buddy?" }, // 5 (Mapped to budget value parse)
+  { bridge: "Awesome! How do you feel about cleaning up after a pet?" }, // 6
+  { bridge: "Noted! What’s your biggest pet peeve when it comes to animals?" }, // 7
   { bridge: "Makes sense. How much time do you realistically have for a pet each week?" }, // 8
   { bridge: "Good to know! Do you have any kids or other pets already?" }, // 9
-  { bridge: "Fun stuff. Do you want a pet that learns tricks?" }, // 10 (Mapped to upkeep)
+  { bridge: "Great! Do you want a pet that learns tricks?" }, // 10 (Mapped to upkeep)
   { bridge: "Got it! When hanging out at home, do you want a pet that’s active or one that’s happy chilling?" }, // 11
-  { bridge: "Understood. How often is the place empty during the day?" }, // 12 (Mapped to hours logic)
-  { bridge: "Lifespans vary a lot. Does that matter much to you?" }, // 13
-  { bridge: "Some people love a noisy house! Are you into that?" }, // 14 (Mapped to energy)
+  { bridge: "Understood! How often is the place empty during the day?" }, // 12 (Mapped to hours logic)
+  { bridge: "Lifespans vary a lot, does that matter much to you?" }, // 13
+  { bridge: "Some people love a noisy house, are you into that?" }, // 14 (Mapped to energy)
   { bridge: "Regarding snacks and meals, do you want something simple?" }, // 15
-  { bridge: "Just being real—are you cool with occasional surprise vet bills?" }, // 16 (Mapped to budget)
+  { bridge: "Just being real, are you cool with occasional surprise vet bills?" }, // 16 (Mapped to budget)
   { bridge: "Do you want a pet that can be handled easily?" }, // 17
   { bridge: "Big step! Are you ready for a long-term commitment?" }, // 18 (Mapped to upkeep)
   { bridge: "Almost done! What’s the main reason you’re looking for a pet?" } // 19
@@ -207,7 +207,7 @@ export class AIBot {
       scores.bestPet = bestPet;
       
       return { 
-        question: `I’d recommend a ${bestPet.toUpperCase()}!<br><br><img src="/${PET_INFO[bestPet].img}" width="200" alt="Pet Image" /><br><br>Would you like to read my expert guide breakdown rules for this animal?`, 
+        question: `I’d recommend a ${bestPet.toUpperCase()}!<br><br><img src="/${PET_INFO[bestPet].img}" width="200" alt="Pet Image" /><br><br>Would you like to read some general info about this type of animals?`, 
         final: false, 
         index: nextIndex,
         recommendedSpecies: bestPet 
