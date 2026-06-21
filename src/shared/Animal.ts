@@ -86,7 +86,4 @@ export class Animal {
 
     @Fields.date({ allowApiUpdate: false })
     createdAt = new Date();
-
-    @Fields.string()
-    postType = 'adoption'; 
 }
