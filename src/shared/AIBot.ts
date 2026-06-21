@@ -96,7 +96,7 @@ export class AIBot {
             index: 99,
             recommendedSpecies: scores.bestPet 
           }
-        : { question: "No problem! Thanks for chatting with me. Bye!", final: true, index: 99 };
+        : { question: "No problem! Thanks for chatting with me. Have a nice day!", final: true, index: 99 };
     }
 
     let inputMatched = false;

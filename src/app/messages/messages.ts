@@ -247,7 +247,7 @@ startNewChat(userId: string) {
             createdAt: new Date()
           });
         } catch (err) {
-          console.error("Eroare la trimitere imagine:", err);
+          console.error("The image could not be send:", err);
           this.zone.run(() => {
             this.messages = this.messages.filter(m => m.id !== tempId);
           });

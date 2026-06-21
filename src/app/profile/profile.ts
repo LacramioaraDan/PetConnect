@@ -62,14 +62,13 @@ export class Profile implements OnInit, OnDestroy {
   }
 
   async fetchMyAnimals() {
-    if (this.currentUser) {
-      this.myAnimals = await remult.repo(Animal).find({
-        where: { userId: this.currentUser.id, postType: 'adoption' },
-        orderBy: { createdAt: 'desc' }
-      });
-    }
+  if (this.currentUser) {
+    this.myAnimals = await remult.repo(Animal).find({
+      where: { userId: this.currentUser.id },
+      orderBy: { createdAt: 'desc' }
+    });
   }
-
+}
   async fetchMySittingOffers() {
     if (this.currentUser) {
       this.mySittingOffers = await remult.repo(SittingPost).find({
