@@ -93,7 +93,6 @@ export class Posts implements OnInit, OnDestroy {
   async fetchPosts() {
     try {
       this.unSub = this.postRepo.liveQuery({
-        where: { postType: 'adoption' },
         include: { user: true },
         orderBy: { createdAt: "desc" }
       }).subscribe((info) => {
@@ -123,7 +122,6 @@ export class Posts implements OnInit, OnDestroy {
 
   applyFilters() {
     let temp = [...this.allPosts];
-    temp = temp.filter(p => p.postType !== 'sitting');
 
     if (this.isFilteringByUser && this.activeUserFilter) {
       temp = temp.filter(p => p.userId === this.activeUserFilter!.id);

@@ -1,4 +1,4 @@
-import { Allow, Entity, Fields, Relations, Validators, remult, isBackend } from 'remult'; // <--- Make sure isBackend is imported here
+import { Allow, Entity, Fields, Relations, Validators, remult, isBackend } from 'remult';
 import { User } from './User';
 
 @Entity('animals', {
@@ -19,9 +19,7 @@ import { User } from './User';
         return animal?.userId === remult?.user?.id;
     },
 
-    // FIXED: Using Remult's top-level isBackend() function and standard lifecycle arguments
     saving: async (animal, e) => {
-        // Only enforce this validation logic strictly on the backend when creating a new record
         if (isBackend() && e.isNew) {
             const sessionUser = remult.user;
             if (!sessionUser) throw new Error("Forbidden: Not authenticated");
