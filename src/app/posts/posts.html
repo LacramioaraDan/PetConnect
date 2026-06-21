@@ -46,9 +46,9 @@
 
       <div *ngIf="remult.user !== undefined && (remult.user.role !== 'shelter' || (remult.user.role === 'shelter' && fullUser?.isVerified))" 
            class="create-post-card" (click)="openAddModal()" style="cursor: pointer;">
-        <img [src]="fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user?.name" class="user-pic-small">
+        <img [src]="fullUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user.name" class="user-pic-small">
         <div class="fake-input">
-          Got a new buddy to introduce, {{ remult.user?.name }}? 🐾
+          Got a new buddy to introduce, {{ remult.user.name }}? 🐾
         </div>
       </div>
 
