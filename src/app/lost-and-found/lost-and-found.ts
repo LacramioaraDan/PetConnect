@@ -131,10 +131,12 @@ export class LostAndFound implements OnInit, OnDestroy {
   }
 
   // --- Grabs the logged-in user's existing active 'lost' post details ---
-  getMyExistingLostPost(): LostAndFoundPost | null {
-    if (!remult.user) return null;
-    return this.allPosts.find(p => p.userId === remult.user?.id && p.postType === 'lost') || null;
-  }
+  get myExistingLostPost(): LostAndFoundPost | null {
+  const targetUser = this.fullUser || remult.user;
+  if (!targetUser) return null;
+  
+  return this.allPosts.find(p => p.userId === targetUser.id && p.postType === 'lost') || null;
+}
 
   // --- Automatically feeds post attributes into the chatbot matching grid ---
   async useExistingPostData(post: LostAndFoundPost) {
