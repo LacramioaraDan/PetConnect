@@ -91,7 +91,7 @@
 .received .bubble { background: #f0f2f5; color: #050505; }
 
 .sent { justify-content: flex-end; }
-.sent .bubble { background: #0084ff; color: #fff; }
+.sent .bubble { background: #8b2e8b; color: #fff; }
 
 /* INPUT */
 .input-container {
