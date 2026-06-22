@@ -507,7 +507,7 @@ export class LostAndFound implements OnInit, OnDestroy {
 
     setTimeout(() => {
       if (finalMatches.length > 0) {
-        this.chatMessages.push({ sender: 'bot', text: `<b>Good news!<b> I evaluated the properties of your post records. I found <b>${finalMatches.length}<b> highly probable matches in the database!` });
+        this.chatMessages.push({ sender: 'bot', text: `<b>Good news!</b> I evaluated the properties of your post records. I found <b>${finalMatches.length}</b> highly probable matches in the database!` });
         this.posts = finalMatches;
       } else {
         this.chatMessages.push({ sender: 'bot', text: "I finished scanning the database, but couldn't find an exact matching pattern in the records yet. Feel free to use the reset button to try again if needed!" });

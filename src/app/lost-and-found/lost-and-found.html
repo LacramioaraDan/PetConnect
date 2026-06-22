@@ -97,7 +97,7 @@
               <p style="margin: 0;"><b>Age:</b> {{ post.age }}</p>
               <p style="margin: 0;"><b>Gender:</b> {{ post.gender }}</p>
               <p style="margin: 0;"><b>Location:</b> {{ post.lastSeenLocation }}</p>
-              <p style="margin: 0;" *ngIf="post.colors?.length"><b>Colors:</b> {{ post.colors.join(', ') }}</p>
+              <p style="margin: 0;" *ngIf="post.colors.length"><b>Colors:</b> {{ post.colors.join(', ') }}</p>
               <p style="margin: 0;" *ngIf="post.collarDetails"><b>Collar:</b> {{ post.collarDetails }}</p>
               <p style="margin: 0;"><b>Microchipped:</b> {{ post.microchipped ? 'Yes' : 'No' }}</p>
             </div>
