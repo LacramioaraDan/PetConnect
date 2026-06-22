@@ -140,7 +140,7 @@ export class LostAndFound implements OnInit, OnDestroy {
   async useExistingPostData(post: LostAndFoundPost) {
     this.chatMessages.push({
       sender: 'user',
-      text: `🤖 Please run a smart match scan using my existing post for my ${post.species}!`
+      text: `Please run a smart match scan using my existing post for my ${post.species}!`
     });
     this.cdr.markForCheck();
 
