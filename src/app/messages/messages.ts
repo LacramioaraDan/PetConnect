@@ -54,20 +54,15 @@ export class Messages implements OnInit, OnDestroy {
       orderBy: { createdAt: "asc" }
     }).subscribe(info => {
       this.zone.run(() => {
-        // 1. Luăm mesajele oficiale venite de pe server
         const serverMessages = info.items;
         
-        // 2. Filtram mesajele locale temporare: le păstrăm DOAR pe cele care 
-        // nu au apucat încă să fie salvate pe server (verificăm duplicarea conținutului)
         const pendingTempMessages = this.messages.filter(m => 
           m.id.startsWith('temp-') && 
           !serverMessages.some(sm => sm.imageUrl === m.imageUrl && sm.senderId === m.senderId)
         );
         
-        // 3. Combinăm listele (oficial + ce e încă în curs de trimitere)
         const allMessages = [...serverMessages, ...pendingTempMessages];
         
-        // 4. Sortăm cronologic
         allMessages.sort((a, b) => 
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
@@ -135,7 +130,6 @@ export class Messages implements OnInit, OnDestroy {
       where: { id: Array.from(partnerIds) as string[] }
     });
     
-    // Initialize filter
     this.filteredConversations = this.conversations;
   }
 
@@ -146,51 +140,48 @@ export class Messages implements OnInit, OnDestroy {
   }
 
   async onUserSearch() {
-  if (!this.searchUserQuery.trim()) {
-    this.filteredUsers = [];
-    return;
-  }
-  const search = this.searchUserQuery.toLowerCase();
-  // Fetch all users to search through
-  const allUsers = await remult.repo(User).find();
-  this.filteredUsers = allUsers.filter(u => 
-    u.name?.toLowerCase().includes(search) && u.id !== remult.user?.id
-  );
-}
-
-toggleConvMenu() {
-  this.showMenu = !this.showMenu;
-}
-
-async deleteConversation(userId: string | null) {
-  if (!userId || !confirm('Are you sure you want to delete this conversation?')) return;
-  
-  // Close menu
-  this.showMenu = false;
-  
-  const messagesToDelete = await remult.repo(Message).find({
-    where: {
-      $or: [
-        { senderId: remult.user!.id, recipientId: userId },
-        { senderId: userId, recipientId: remult.user!.id }
-      ]
+    if (!this.searchUserQuery.trim()) {
+      this.filteredUsers = [];
+      return;
     }
-  });
-
-  for (const msg of messagesToDelete) {
-    await remult.repo(Message).delete(msg);
+    const search = this.searchUserQuery.toLowerCase();
+    const allUsers = await remult.repo(User).find();
+    this.filteredUsers = allUsers.filter(u => 
+      u.name?.toLowerCase().includes(search) && u.id !== remult.user?.id
+    );
   }
-  
-  // Reset view
-  this.recipientId = null;
-  await this.loadConversations();
-}
 
-startNewChat(userId: string) {
-  this.searchUserQuery = '';
-  this.filteredUsers = [];
-  this.navigateToChat(userId);
-}
+  toggleConvMenu() {
+    this.showMenu = !this.showMenu;
+  }
+
+  async deleteConversation(userId: string | null) {
+    if (!userId || !confirm('Are you sure you want to delete this conversation?')) return;
+    
+    this.showMenu = false;
+    
+    const messagesToDelete = await remult.repo(Message).find({
+      where: {
+        $or: [
+          { senderId: remult.user!.id, recipientId: userId },
+          { senderId: userId, recipientId: remult.user!.id }
+        ]
+      }
+    });
+
+    for (const msg of messagesToDelete) {
+      await remult.repo(Message).delete(msg);
+    }
+    
+    this.recipientId = null;
+    await this.loadConversations();
+  }
+
+  startNewChat(userId: string) {
+    this.searchUserQuery = '';
+    this.filteredUsers = [];
+    this.navigateToChat(userId);
+  }
 
   async onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -220,7 +211,6 @@ startNewChat(userId: string) {
         ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.3);
 
-        // Generăm un ID temporar unic
         const tempId = 'temp-' + Date.now();
         const tempMsg: Message = {
           id: tempId,
@@ -231,7 +221,6 @@ startNewChat(userId: string) {
           createdAt: new Date()
         };
 
-        // UI-ul reacționează instant pentru utilizator
         this.zone.run(() => {
           this.messages = [...this.messages, tempMsg];
           setTimeout(() => this.scrollToBottom(), 100);
@@ -247,7 +236,7 @@ startNewChat(userId: string) {
             createdAt: new Date()
           });
         } catch (err) {
-          console.error("The image could not be send:", err);
+          console.error("The image could not be sent:", err);
           this.zone.run(() => {
             this.messages = this.messages.filter(m => m.id !== tempId);
           });
@@ -256,7 +245,6 @@ startNewChat(userId: string) {
     };
   }
   
-
   viewImage(url: string) {
     window.open(url, '_blank');
   }
