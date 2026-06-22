@@ -38,7 +38,7 @@
 }
 
 .conv-item:hover { background: #f5f5f5; }
-.conv-item.active { background: #e7f3ff; }
+.conv-item.active { background: #f3ebf6; }
 
 .list-avatar { width: 56px; height: 56px; border-radius: 50%; }
 
