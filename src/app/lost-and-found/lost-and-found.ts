@@ -62,7 +62,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     imageColorProfile: null // Stores the 16x16 spatial RGB array data of the animal picture
   };
 
-  chatSteps = [
+   chatSteps = [
     { field: 'species', question: "What <b>species</b> of animal are we looking for? (e.g., Dog, Cat, Rabbit)" },
     { field: 'imageFile', question: "Please <b>upload a photo</b> of your pet using the + button below! Or type 'skip' if you don't have one available." },
     { field: 'breed', question: "Do you know their <b>breed</b>? If you're not sure, just type 'no' or 'unknown'." },

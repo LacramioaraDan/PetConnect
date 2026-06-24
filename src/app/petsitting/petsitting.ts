@@ -147,14 +147,20 @@ export class PetSitting implements OnInit {
 
   async savePost() {
     try {
-      if (remult.user) {
+      // If it's a completely new post, assign the currently logged-in user's ID as the author
+      if (!this.editableSittingPost.id && remult.user) {
         this.editableSittingPost.userId = remult.user.id;
       }
       
-      // Salvare directă în SittingPost
       const saved = await remult.repo(SittingPost).save(this.editableSittingPost as SittingPost);
       
-      if (this.selectedUser && this.selectedUser.id === remult.user?.id) {
+      // Sync local collection state cleanly
+      const index = this.sitterPosts.findIndex(p => p.id === saved.id);
+      if (index !== -1) {
+        // Update existing item values in the timeline view
+        this.sitterPosts[index] = saved;
+      } else if (this.selectedUser && this.selectedUser.id === saved.userId) {
+        // Add new item if viewing the active targeted profile feed
         this.sitterPosts = [saved, ...this.sitterPosts];
       }
       

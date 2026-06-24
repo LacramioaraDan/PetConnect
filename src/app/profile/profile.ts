@@ -97,6 +97,18 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  // Add this method alongside approveShelter(id: string)
+  async denyShelter(id: string) {
+    if (!confirm("Are you sure you want to deny and permanently delete this shelter request?")) return;
+    try {
+      await User.denyShelter(id);
+      this.pendingShelters = this.pendingShelters.filter(s => s.id !== id);
+      alert("Shelter request denied and account deleted.");
+    } catch (err: any) {
+      alert("Denial failed: " + err.message);
+    }
+  }
+
   async saveProfile() {
     try {
       if (this.currentUser) {

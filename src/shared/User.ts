@@ -129,6 +129,15 @@ export class User {
     }
   }
 
+  // Add this method inside your User class alongside approveShelter
+  @BackendMethod({ allowed: () => remult.user?.role === 'admin' })
+  static async denyShelter(userId: string) {
+    // We reuse the existing deleteUserAccount logic since it handles 
+    // wiping data and removing the core user record cleanly.
+    await User.deleteUserAccount(userId);
+    console.log(`Shelter with ID ${userId} has been denied access and their account has been deleted.`);
+  }
+
   @BackendMethod({ allowed: Allow.authenticated })
   static async deleteUserAccount(userId: string) {
     const userRepo = remult.repo(User);
@@ -166,6 +175,8 @@ export class User {
     await userRepo.delete(user);
     return "Account and all associated records deleted successfully";
   }
+
+
 
   @BackendMethod({ allowed: Allow.everyone })
   static async resetPassword(token: string, newPassword: string) {

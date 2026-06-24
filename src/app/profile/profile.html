@@ -93,7 +93,10 @@
               View Verification Document
             </a>
           </div>
-          <button (click)="approveShelter(shelter.id)">Approve Shelter</button>
+          <div style="display: flex; gap: 10px;">
+            <button (click)="approveShelter(shelter.id)">Approve Shelter</button>
+            <button (click)="denyShelter(shelter.id)" style="background-color: #ef4444; color: white;">Deny & Delete</button>
+          </div>
         </div>
       </div>
     </div>
@@ -169,37 +172,40 @@
       </div>
     </div>
 
-    <div *ngIf="mySittingOffers.length > 0" style="margin-top: 40px;">
-      <h2 class="feed-heading">Active Sitting Offers</h2>
-      <div class="timeline-posts-container">
-        <div *ngFor="let offer of mySittingOffers" class="animal-card">
-          <div class="post-meta-header">
-            <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
-            <div style="flex-grow: 1;">
-              <div class="post-meta-name">{{ currentUser.name }}</div>
-              <div class="post-meta-sub">Posted on {{ offer.createdAt | date:'MMMM d, y' }}</div>
-            </div>
-            <button class="three-dots" (click)="toggleMenu(offer)">•••</button>
-            <div class="dropdown-menu" *ngIf="isMenuOpen(offer)">
-              <button (click)="openEditSittingModal(offer)">✏️ Edit</button>
-              <button (click)="deleteSittingPost(offer)" class="menu-delete-btn">🗑️ Delete</button>
-            </div>
-          </div>
-          <div class="post-body-layout">
-            <div class="post-details-side">
-              <h2>{{ offer.name }}</h2>
-              <div class="details-spec-list">
-                <p><b>Species:</b> {{ offer.species }}</p>
-                <p><b>Experience:</b> {{ offer.experience }}</p>
-                <p><b>Pricing:</b> {{ offer.pricing }}</p>
-                <p><b>Location:</b> {{ offer.location }}</p>
-              </div>
-            </div>
-            <div class="post-image-side"><img [src]="offer.imageUrl" class="post-pet-img"></div>
-          </div>
-          <div class="post-footer-description">{{ offer.description }}</div>
+  <div *ngIf="currentUser.role === 'petsitter'" style="margin-top: 40px;">
+    <h2 class="feed-heading">Active Sitting Offers</h2>
+  
+  <div class="empty-feed" *ngIf="mySittingOffers.length === 0">
+    <p>No active sitting offers posted yet.</p>
+  </div>
+
+  <div class="timeline-posts-container" *ngIf="mySittingOffers.length > 0">
+    <div *ngFor="let offer of mySittingOffers" class="animal-card">
+      <div class="post-meta-header">
+        <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
+        <div style="flex-grow: 1;">
+          <div class="post-meta-name">{{ currentUser.name }}</div>
+          <div class="post-meta-sub">Posted on {{ offer.createdAt | date:'MMMM d, y' }}</div>
+        </div>
+        <button class="three-dots" (click)="toggleMenu(offer)">•••</button>
+        <div class="dropdown-menu" *ngIf="isMenuOpen(offer)">
+          <button (click)="openEditSittingModal(offer)">✏️ Edit</button>
+          <button (click)="deleteSittingPost(offer)" class="menu-delete-btn">🗑️ Delete</button>
         </div>
       </div>
+      <div class="post-body-layout">
+        <div class="post-details-side">
+          <h2>{{ offer.name }}</h2>
+          <div class="details-spec-list">
+            <p><b>Species:</b> {{ offer.species }}</p>
+            <p><b>Experience:</b> {{ offer.experience }}</p>
+            <p><b>Pricing:</b> {{ offer.pricing }}</p>
+            <p><b>Location:</b> {{ offer.location }}</p>
+          </div>
+        </div>
+        <div class="post-image-side"><img [src]="offer.imageUrl" class="post-pet-img"></div>
+      </div>
+      <div class="post-footer-description">{{ offer.description }}</div>
     </div>
   </div>
 </div>

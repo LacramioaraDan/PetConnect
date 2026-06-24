@@ -169,7 +169,7 @@
       <div *ngFor="let post of sitterPosts" class="animal-card" 
         style="background: white; border: 1px solid #ddd; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: visible; width: 100%; box-sizing: border-box; display: block !important; position: relative; margin-bottom: 20px; padding: 20px;">
       
-      <div *ngIf="remult.user?.id === post.userId" style="position: absolute; right: 15px; top: 15px; z-index: 10;">
+      <div *ngIf="remult.user && (remult.user.id === post.userId || remult.user.role === 'admin')" style="position: absolute; right: 15px; top: 15px; z-index: 10;">
         <button (click)="toggleMenu(post); $event.stopPropagation()" style="background:none; border:none; cursor:pointer; font-size: 20px;">•••</button>
         <div *ngIf="isMenuOpen(post)" style="background: white; border: 1px solid #ddd; position: absolute; right: 0; padding: 5px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 100px;"> 
           <button (click)="openEditSittingModal(post)" style="display: flex; align-items: center; gap: 8px; width: 100%; border: none; background: none; cursor: pointer; padding: 8px; font-size: 14px; font-weight: 500;">
