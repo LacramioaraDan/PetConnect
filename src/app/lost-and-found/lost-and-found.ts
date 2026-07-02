@@ -16,14 +16,14 @@ import { Router } from '@angular/router';
 export class LostAndFound implements OnInit, OnDestroy {
   remult = remult;
 
+  // Lists of posts
   posts: LostAndFoundPost[] = [];
   allPosts: LostAndFoundPost[] = [];
   postRepo = remult.repo(LostAndFoundPost);
   
-  // Single backing model for modal bindings
   editablePost: Partial<LostAndFoundPost> = {};
 
-  // Filters grouping configuration
+  // Filter Details
   filters = {
     species: '',
     gender: '',
@@ -39,13 +39,14 @@ export class LostAndFound implements OnInit, OnDestroy {
     collarDetails: ''
   };
 
-  // Modal / Visibility State
+ // Modal State
   showModal = false;
   unSub: () => void = () => {};
 
-  // --- Virtual Chatbot State Tracker ---
+  // Chatbot State
   currentStep = -1; 
 
+  // Collected traits from the user for smart matching
   collectedTraits: { [key: string]: any } = {
     species: '',
     breed: '',
@@ -59,10 +60,11 @@ export class LostAndFound implements OnInit, OnDestroy {
     microchipped: '',
     collarDetails: '',
     distinguishingFeatures: '',
-    imageColorProfile: null // Stores the 16x16 spatial RGB array data of the animal picture
+    imageColorProfile: null
   };
 
-   chatSteps = [
+  // Chatbot conversation steps
+  chatSteps = [
     { field: 'species', question: "What <b>species</b> of animal are we looking for? (e.g., Dog, Cat, Rabbit)" },
     { field: 'imageFile', question: "Please <b>upload a photo</b> of your pet using the + button below! Or type 'skip' if you don't have one available." },
     { field: 'breed', question: "Do you know their <b>breed</b>? If you're not sure, just type 'no' or 'unknown'." },
@@ -78,24 +80,28 @@ export class LostAndFound implements OnInit, OnDestroy {
     { field: 'distinguishingFeatures', question: "Do they have any <b>distinguishing features</b>? (e.g., white socks on paws, torn left ear)" }
   ];
 
+  // Chatbot conversation history
   chatMessages: { sender: 'user' | 'bot', text: string, imageUrl?: string }[] = [];
   userChatInput = '';
 
-  // Core authenticated logging profile context
+  // Logged-in user details
   fullUser: any;
 
   constructor(private cdr: ChangeDetectorRef, private router: Router) {}
 
+  // Loads page data
   async ngOnInit() {
     this.fetchPosts();
     await this.fetchFullUserContext();
     this.initGreetingMessage();
   }
 
+  // Cleans up subscriptions when the component is destroyed
   ngOnDestroy() { 
     if (this.unSub) this.unSub(); 
   }
 
+  // Greeting message for the chatbot
   initGreetingMessage() {
     this.chatMessages = [
       { 
@@ -105,7 +111,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     ];
   }
 
-  // --- Wipes Chat Engine back to Square One ---
+  // Resets the chatbot and collected traits to start a new search
   resetChat() {
     this.currentStep = -1;
     this.userChatInput = '';
@@ -119,6 +125,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  // Fetches the full user data for the logged-in user
   async fetchFullUserContext() {
     if (remult.user) {
       try {
@@ -130,13 +137,13 @@ export class LostAndFound implements OnInit, OnDestroy {
     }
   }
 
-  // --- Grabs the logged-in user's existing active 'lost' post details ---
+  // Returns the existing lost post for the logged-in user
   getMyExistingLostPost(): LostAndFoundPost | null {
     if (!remult.user) return null;
     return this.allPosts.find(p => p.userId === remult.user?.id && p.postType === 'lost') || null;
   }
 
-  // --- Automatically feeds post attributes into the chatbot matching grid ---
+  // Uses the existing lost post data to make the smart match
   async useExistingPostData(post: LostAndFoundPost) {
     this.chatMessages.push({
       sender: 'user',
@@ -150,6 +157,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     });
     this.cdr.markForCheck();
 
+    // Completes the needed details with the existing post data
     this.collectedTraits['species'] = post.species || '';
     this.collectedTraits['breed'] = post.breed || '';
     this.collectedTraits['age'] = post.age || '';
@@ -163,6 +171,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     this.collectedTraits['distinguishingFeatures'] = post.distinguishingFeatures || '';
     this.collectedTraits['colors'] = post.colors ? post.colors.join(', ') : '';
 
+    // Extracting picture color profile for matching
     if (post.imageUrl) {
       try {
         this.collectedTraits['imageColorProfile'] = await this.getPictureColorProfile(post.imageUrl);
@@ -171,6 +180,7 @@ export class LostAndFound implements OnInit, OnDestroy {
       }
     }
 
+    // Skips the chatbot steps and directly executes the smart match
     this.currentStep = this.chatSteps.length;
     
     setTimeout(() => {
@@ -178,6 +188,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  // Fetches all posts from the database
   async fetchPosts() {
     this.unSub = this.postRepo.liveQuery({
       include: { user: true },
@@ -189,7 +200,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     });
   }
 
-  // --- Filter System Operations ---
+  // Resets all filters
   resetFilters() {
     this.filters = {
       species: '', gender: '', lastSeenLocation: '', postType: '',
@@ -199,11 +210,13 @@ export class LostAndFound implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
+  // Applies the current filters to the list of posts
   applyFilters() {
     this.posts = this.allPosts.filter(p => {
       const match = (val: string, filter: string) => 
         !filter || !filter.trim() || (val && val.toLowerCase().includes(filter.toLowerCase()));
 
+      // Special handling for colors filtering, allowing multiple colors to be specified  
       const colorsMatch = !this.filters.colors || !this.filters.colors.trim() || 
         (p.colors && this.filters.colors.toLowerCase().split(',')
           .map((c: string) => c.trim())
@@ -226,7 +239,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     });
   }
 
-  // --- CRUD Modals & Operations ---
+  // Opens the card for adding a new post
   openAddModal() { 
     this.editablePost = { 
       species: '', breed: '', age: '', gender: '', postType: 'lost',
@@ -237,11 +250,13 @@ export class LostAndFound implements OnInit, OnDestroy {
     this.showModal = true; 
   }
 
+  // Opens the card for editing an existing post
   openEditModal(post: LostAndFoundPost) { 
     this.editablePost = { ...post }; 
     this.showModal = true; 
   }
 
+  // Saves the post to the database
   async savePost() {
     try {
       if (!this.editablePost.id && remult.user) {
@@ -254,6 +269,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     }
   }
 
+  // Deletes a post after user confirmation
   async deletePost(post: LostAndFoundPost) {
     if (!confirm(`Are you sure you want to delete this ${post.species} post?`)) return;
     try { 
@@ -263,7 +279,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     }
   }
 
-  // --- Layout Helper Accessors ---
+  // Toggle menu for a specific post
   toggleMenu(post: LostAndFoundPost) {
     (post as any)._showMenu = !(post as any)._showMenu;
   }
@@ -272,6 +288,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     return !!(post as any)._showMenu;
   }
 
+  // Handles file selection for image upload and converts it to a base64 URL
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -281,7 +298,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     }
   }
 
-  // --- Communication Services ---
+  // Navigates to the chat page with the owner of a post
   startChat(userId: string) {
     if (!userId) {
       alert("Error: This post has no owner ID!");
@@ -290,7 +307,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     this.router.navigate(['/messages', userId]);
   }
 
-  // --- HTML5 Canvas Color Profiler Engine ---
+  // Extracts a color profile from an image (base64 or URL) for comparison
   private getPictureColorProfile(base64OrUrl: string): Promise<number[][]> {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -301,14 +318,17 @@ export class LostAndFound implements OnInit, OnDestroy {
         const ctx = canvas.getContext('2d');
         if (!ctx) return reject("Canvas failure");
 
+        // Resize the image to a 16x16 pixel representation for color profiling
         canvas.width = 16;
         canvas.height = 16;
+        // Draw the image onto the canvas and extract pixel data
         ctx.drawImage(img, 0, 0, 16, 16);
 
         const imgData = ctx.getImageData(0, 0, 16, 16);
         const data = imgData.data;
         const pixelProfiles: number[][] = [];
 
+        // Extract RGB values for each pixel and store them in an array
         for (let i = 0; i < data.length; i += 4) {
           pixelProfiles.push([data[i], data[i+1], data[i+2]]);
         }
@@ -318,46 +338,56 @@ export class LostAndFound implements OnInit, OnDestroy {
     });
   }
 
+  // Compares the two pictures color profiles and returns a similarity score between 0 and 1
   private compareColorProfiles(profile1: number[][], profile2: number[][]): number {
     if (profile1.length !== profile2.length) return 0;
     let totalSimilarity = 0;
+
+    // Calculate the Euclidean distance between each corresponding pixel's RGB values
     for (let i = 0; i < profile1.length; i++) {
       const rDiff = profile1[i][0] - profile2[i][0];
       const gDiff = profile1[i][1] - profile2[i][1];
       const bDiff = profile1[i][2] - profile2[i][2];
       const distance = Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+      // Normalize the distance to a similarity score between 0 and 1, where 1 is identical and 0 is completely different
       totalSimilarity += (1 - (distance / 442));
     }
     return totalSimilarity / profile1.length;
   }
 
+  // Handles image selection in the chatbot and extracts its color profile for matching
   async onChatImageSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Read the image file and convert it to a base64 data URL
     const reader = new FileReader();
     reader.onload = async (e: any) => {
       const dataUrl = e.target.result;
       this.chatMessages.push({ sender: 'user', text: 'Sent a picture for scanning.', imageUrl: dataUrl });
       this.cdr.markForCheck();
+      // Extract the color profile from the uploaded image and store it in the collected traits 
       try {
         this.collectedTraits['imageColorProfile'] = await this.getPictureColorProfile(dataUrl);
       } catch (err) {
         console.error(err);
       }
+      // Move to the next step in the chatbot sequence 
       if (this.chatSteps[this.currentStep]?.field === 'imageFile') this.currentStep++;
       this.progressChatSequence();
     };
+    // Start reading the file as a data URL
     reader.readAsDataURL(file);
   }
 
-  // --- Step-by-Step Chat Bot Logic ---
+  // Chatbot conversation logic
   async sendMessage() {
     if (!this.userChatInput.trim()) return;
 
     const userText = this.userChatInput.trim();
     const lowerText = userText.toLowerCase();
     
+    // Add the user's message to the chat history and clear the input field
     this.chatMessages.push({ sender: 'user', text: userText });
     this.userChatInput = '';
     this.cdr.markForCheck();
@@ -371,6 +401,7 @@ export class LostAndFound implements OnInit, OnDestroy {
       return; 
     }
 
+    // Store the user's response for the current step and move to the next step
     if (this.currentStep < this.chatSteps.length) {
       const currentField = this.chatSteps[this.currentStep].field;
       if (lowerText === 'no' || lowerText === 'skip' || lowerText === 'unknown') {
@@ -383,6 +414,7 @@ export class LostAndFound implements OnInit, OnDestroy {
     this.progressChatSequence();
   }
 
+  // Progresses the chatbot conversation to the next step or executes the smart match if all steps are completed
   progressChatSequence() {
     if (this.currentStep < this.chatSteps.length) {
       setTimeout(() => {
@@ -398,28 +430,32 @@ export class LostAndFound implements OnInit, OnDestroy {
     }
   }
 
+  // Smart matching logic
   async executeSmartMatch() {
     const traits = this.collectedTraits;
     const foundOnlyPosts = this.allPosts.filter(p => p.postType === 'found');
     const scoredPosts: any[] = [];
 
+    // Iterate through each found post and calculate a score based on how well they match the user's description
     for (const p of foundOnlyPosts) {
       let score = 0;
       let matchedCriteriaCount = 0;
       let totalQueriedCriteria = 0;
 
+      // Helper functions for string cleaning and number extraction
       const clean = (str: string) => (str || '').toLowerCase().trim();
       const extractNumber = (str: string): number | null => {
         const matches = str.match(/\d+(\.\d+)?/);
         return matches ? parseFloat(matches[0]) : null;
       };
 
-      // --- ADVANCED METRIC: RGB COAT COLOR MATCHING SYSTEM ---
+      // Image color profile matching logic
       if (traits['imageColorProfile'] && p.imageUrl) {
         totalQueriedCriteria += 3;
         try {
           const dbPostProfile = await this.getPictureColorProfile(p.imageUrl);
           const colorSimilarityScore = this.compareColorProfiles(traits['imageColorProfile'], dbPostProfile);
+          // If the color similarity score is above a certain threshold, increase the score and matched criteria count
           if (colorSimilarityScore >= 0.70) {
             score += (colorSimilarityScore * 30); 
             matchedCriteriaCount += 3;
@@ -429,30 +465,36 @@ export class LostAndFound implements OnInit, OnDestroy {
         }
       }
 
+      // Species matching logic
       if (traits['species'] && traits['species'].trim()) {
         totalQueriedCriteria++;
         if (clean(p.species).includes(clean(traits['species']))) {
           score += 10;
           matchedCriteriaCount++;
         } else {
+          // If the species doesn't match, skip this post entirely as it's a critical criteria
           continue; 
         }
       }
 
+      // Checking each trait and updating the score and matched criteria count accordingly
       const checkTrait = (postFieldVal: any, traitKey: string, weight: number) => {
         const queryRaw = traits[traitKey];
         const queryVal = clean(queryRaw);
         if (!queryVal || queryVal === 'no' || queryVal === 'skip' || queryVal === 'unknown') return;
 
         totalQueriedCriteria++;
+        // For boolean fields like microchipped, convert to 'yes' or 'no' for comparison
         const targetField = typeof postFieldVal === 'boolean' ? (postFieldVal ? 'yes' : 'no') : clean(postFieldVal);
+        // Clean the description for searching
         const targetDesc = clean(p.description);
 
+        // If the database number is within 5 kilograms of what the user typed, count it as a match
         if (traitKey === 'weightRange') {
           const userNum = extractNumber(queryRaw);
           const postNum = extractNumber(postFieldVal) || extractNumber(p.description);
           if (userNum !== null && postNum !== null) {
-            if (Math.abs(userNum - postNum) <= 3) {
+            if (Math.abs(userNum - postNum) <= 5) {
               score += weight; 
               matchedCriteriaCount++;
               return;
@@ -469,6 +511,7 @@ export class LostAndFound implements OnInit, OnDestroy {
         }
       };
 
+      // Check each trait using the helper function
       checkTrait(p.breed, 'breed', 5);
       checkTrait(p.gender, 'gender', 4);
       checkTrait(p.lastSeenLocation, 'lastSeenLocation', 6);
@@ -480,6 +523,7 @@ export class LostAndFound implements OnInit, OnDestroy {
       checkTrait(p.distinguishingFeatures, 'distinguishingFeatures', 5);
       checkTrait(p.age, 'age', 3);
 
+      // Special handling for colors, allowing multiple colors to be specified and matched
       if (traits['colors'] && traits['colors'].trim()) {
         const searchColors = (traits['colors'] as string).toLowerCase().split(',').map((c: string) => c.trim()).filter((c: string) => !!c);
         if (searchColors.length > 0) {
@@ -491,15 +535,23 @@ export class LostAndFound implements OnInit, OnDestroy {
             if (inColorsArray || inDescription) colorMatches++;
           });
           if (colorMatches > 0) {
+            // Give 3 points for each color word that is a match
             score += (colorMatches * 3);
             matchedCriteriaCount++;
           }
         }
       }
 
-      scoredPosts.push({ post: p, score: score, confidence: totalQueriedCriteria > 0 ? (matchedCriteriaCount / totalQueriedCriteria) : 0 });
+      // After evaluating all criteria, store the post along with its score and confidence level
+      scoredPosts.push({ 
+        post: p, 
+        score: score,
+        confidence: totalQueriedCriteria > 0 ? (matchedCriteriaCount / totalQueriedCriteria) : 0 
+      });
+
     }
 
+    // Filter out posts with low scores or low confidence, sort by score, and extract the final matching posts
     const finalMatches = scoredPosts
       .filter(item => item.score > 0 && item.confidence >= 0.25)
       .sort((a, b) => b.score - a.score)
