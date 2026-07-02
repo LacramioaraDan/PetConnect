@@ -1,15 +1,19 @@
+/* Lost and Found Page Styles */
 <div class="posts-full-layout" style="display: grid; grid-template-columns: 360px 2fr 1.2fr; width: 100vw; max-height: calc(100vh - 70px); background: transparent; box-sizing: border-box; margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); padding: 0 25px; position: relative; overflow: hidden;">
 
+  /* Filters Column */
   <div class="table-column-filters" style="padding: 30px 24px 30px 10px; box-sizing: border-box; background: transparent; display: flex; flex-direction: column; position: sticky; top: 0; max-height: calc(100vh - 70px); overflow: hidden;">
     <h3 style="margin-top: 0; margin-bottom: 24px; font-size: 25px; font-weight: 800; color: #8b2e8b; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 12px; letter-spacing: -0.5px; text-align: center;">
       Filters 🔍
     </h3>
     
+    /* Species Filter */
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Species</label>
       <input type="text" [(ngModel)]="filters.species" (input)="applyFilters()" placeholder="e.g. Rabbit, Dog, Cat" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: white;">
     </div>
 
+    /* Age Group Filter */
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Age Group</label>
       <select [(ngModel)]="filters.age" (change)="applyFilters()" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background: white; outline: none; cursor: pointer;">
@@ -21,6 +25,7 @@
       </select>
     </div>
 
+    /* Gender Filter */
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Gender</label>
       <select [(ngModel)]="filters.gender" (change)="applyFilters()" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background: white; outline: none; cursor: pointer;">
@@ -30,11 +35,13 @@
       </select>
     </div>
 
+    /* Location Filter */
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Location</label>
       <input type="text" [(ngModel)]="filters.lastSeenLocation" (input)="applyFilters()" placeholder="e.g. Timisoara" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: white;">
     </div>
 
+    /* Post Type Filter */
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Post Type</label>
       <select [(ngModel)]="filters.postType" (change)="applyFilters()" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background: white; outline: none; cursor: pointer;">
@@ -44,32 +51,39 @@
       </select>
     </div>
 
+    /* Reset Filters Button */
     <button (click)="resetFilters()" style="width: 100%; background: transparent; color: #784b83; border: 2px solid #784b83; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 15px; transition: all 0.2s;">
       🔄 Reset Filters
     </button>
   </div>
 
+  /* Posts Column */
   <div class="table-column-posts" style="padding: 30px 40px; flex-shrink: 0; box-sizing: border-box; border-left: 1px solid rgba(0,0,0,0.15); border-right: 1px solid rgba(0,0,0,0.15); background: transparent; max-height: calc(100vh - 70px); overflow-y: auto;">
     
     <div style="max-width: 800px; margin: 0 auto; display: block;">
 
+      /* Create post card */
       <div *ngIf="remult.user !== undefined && (remult.user.role !== 'shelter' || (remult.user.role === 'shelter' && fullUser?.isVerified))" 
           class="create-post-card" (click)="openAddModal()" style="cursor: pointer;">
           
        <img [src]="(fullUser && fullUser.imageUrl) ? fullUser.imageUrl : (remult.user && remult.user.imageUrl) ? remult.user.imageUrl : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + remult.user.name" class="user-pic-small">
         
+        /* Create a new post button */
         <div class="fake-input">
           Lost or found a buddy, {{ remult.user.name }}? 🐾
         </div>
       </div>
 
+      /* Shelter verification warning */
       <div *ngIf="remult.user?.role === 'shelter' && fullUser && !fullUser.isVerified" 
            style="padding: 20px; background: #fff3f3; border: 1px solid #ffcccc; border-radius: 12px; color: #a94442; text-align: center; font-weight: 600;">
         ⚠️ Your shelter is pending verification. Once an administrator approves your account, you will be able to create adoption posts.
       </div>
 
+      /* Posts List */
       <div *ngFor="let post of posts" class="animal-card" style="display: block !important; overflow: visible; margin-bottom: 35px; background: white; border: 1px solid #ddd; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
         
+        /* Post Header */
         <div style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid #f0f2f5; width: 100%; box-sizing: border-box;">
           <img [src]="post.user?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + post.user?.name" 
                 style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 18px; border: 1px solid #eee;">
@@ -78,6 +92,7 @@
             <div style="font-size: 15px; color: #65676b; margin-top: 2px;">Posted on {{ post.createdAt | date:'MMMM d, y' }}</div>
           </div>
           
+          /* Edit/Delete Menu for Post Owner or Admin */
           <div class="menu-container" *ngIf="remult.user?.id == post.userId || remult.user?.role === 'admin'" style="position: relative;" (click)="$event.stopPropagation()">
             <button class="three-dots" (click)="toggleMenu(post); $event.stopPropagation()">•••</button>
             <div class="dropdown-menu" *ngIf="isMenuOpen(post)" style="position: absolute; right: 0; top: 40px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); width: 170px; padding: 10px; z-index: 100;">
@@ -87,6 +102,7 @@
           </div>
         </div>
 
+        /* Post Content */
         <div style="display: flex !important; flex-direction: row !important; padding: 30px; gap: 35px; align-items: flex-start; width: 100%; box-sizing: border-box;">
           <div style="flex: 1;">
             <h2 style="font-size: 34px; font-weight: 900; margin: 0 0 18px 0; color: #1c1e21; letter-spacing: -0.8px; text-transform: capitalize;">
@@ -103,15 +119,18 @@
             </div>
           </div>
           
+          /* Post Image Section */
           <div style="width: 250px; height: 250px; border-radius: 14px; overflow: hidden; border: 1px solid #eee; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
             <img [src]="post.imageUrl || 'https://placehold.co/250x250?text=No+Pet+Image'" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
         </div>
 
+        /* Post Description Section */
         <div style="padding: 0 30px 20px 30px; font-size: 20px; line-height: 1.6; color: #1c1e21; display: block !important;">
           {{ post.description }}
         </div>
 
+        /* Send Message Button */
         <div style="padding: 0 30px 30px 30px; display: block !important;" *ngIf="remult.user?.id !== post.userId">
             <button (click)="startChat(post.userId); $event.stopPropagation()" 
               style="position: relative; z-index: 10; width: 100%; background: #784b83; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 10px;">
@@ -120,25 +139,28 @@
         </div>
       </div>
 
+      /* No Posts Found Message */
       <div style="padding: 40px 20px; text-align: center; color: #65676b; font-size: 18px; background: white; border-radius: 14px; border: 1px solid #ddd;" *ngIf="posts.length === 0">
         No buddies found matching your selected filters. 🐾
       </div>
 
     </div>
+
   </div>
 
 
+  /* Chatbot Column */
   <div class="table-column-chatbot" style="padding: 30px 10px 30px 35px; box-sizing: border-box; background: transparent; position: sticky; top: 0; height: calc(100vh - 70px); display: flex; flex-direction: column; overflow: hidden;">
     
     <div style="width: 100%; background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: calc(100vh - 160px); overflow: hidden; border: 1px solid #eee;">
       
-      <!-- FIXED HEADER: Completely clean, no awkward floating button -->
+      /* Chatbot Description */
       <div style="background-color: #8b2e8b; color: white; padding: 20px; text-align: center; flex-shrink: 0;">
         <h2 style="margin: 0; font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px;">🐾 Buddy, Your Virtual Pet Finder</h2>
         <p style="margin: 3px 0 0 0; opacity: 0.9; font-size: 0.85rem;">Let's search for your missing friend together!</p>
       </div>
 
-      <!-- Chat Timeline Body Section -->
+      /* Chat Messages Section */
       <div style="flex: 1; padding: 20px; overflow-y: auto; background: #fdfafc; display: flex; flex-direction: column; gap: 15px;">
         <div *ngFor="let msg of chatMessages" style="display: flex;" [style.justify-content]="msg.sender === 'user' ? 'flex-end' : 'flex-start'">
           <div [style.background-color]="msg.sender === 'user' ? '#8b2e8b' : '#f0f0f0'"
@@ -150,7 +172,7 @@
           </div>
         </div>
 
-        <!-- Quick Reply Pill -->
+        /* Use Existing Lost Post Suggestion */
         <div *ngIf="currentStep === -1 && getMyExistingLostPost() as myPost" style="display: flex; gap: 8px; justify-content: flex-start; padding-left: 15px; margin-top: -5px;">
           <button type="button" (click)="useExistingPostData(myPost)" 
                   style="background: white; color: #8b2e8b; border: 1px solid #8b2e8b; padding: 10px 18px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(139,46,139,0.1); display: flex; align-items: center; gap: 6px;"
@@ -161,10 +183,10 @@
         </div>
       </div>
 
-      <!-- FIXED FOOTER: Matches styling with the black solid pill shapes from image_af84a4.png -->
+      /* Chat Input Section */
       <div style="padding: 15px 20px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center; flex-shrink: 0;">
         
-        <!-- Reset Button: Styled identically to Send, but scaled to fit "Reset Chat" text -->
+        /* Reset Chat Button */
         <button type="button" (click)="resetChat()" 
                 style="background: #ef4444; color: #fff; padding: 12px 18px; border-radius: 30px; border: none; font-weight: 800; cursor: pointer; font-size: 0.7rem; transition: opacity 0.2s; flex-shrink: 0; white-space: nowrap;"
                 onmouseover="this.style.opacity='0.85';"
@@ -172,16 +194,18 @@
           Reset Chat
         </button>
 
+        /* Chat Input Box */
         <input [(ngModel)]="userChatInput" name="chatbotInputBox" (keyup.enter)="sendMessage()" placeholder="Type in your answer..." 
               style="flex: 1; padding: 16px 25px; border: 1px solid #ddd; border-radius: 50px; outline: none; font-size: 1rem; background: #fafafa;" />
         
-        <!-- File Upload Label Interceptor -->
+        /* Image Upload Button*/
         <label *ngIf="chatSteps[currentStep]?.field === 'imageFile'" 
               style="background: #e1bee7; color: #4a148c; padding: 14px 20px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 5px; transition: background 0.2s; flex-shrink: 0;">
           +
           <input type="file" (change)="onChatImageSelected($event)" style="display: none;" accept="image/*" />
         </label>
 
+        /* Send Message Button */
         <button type="button" (click)="sendMessage()" 
                 style="background: #000; color: #fff; padding: 14px 28px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; font-size: 1rem; transition: opacity 0.2s; flex-shrink: 0;">
           Send
@@ -191,27 +215,32 @@
     </div>
   </div>
 
+  /* Add/Edit Post Card */
   <div class="modal-overlay" *ngIf="showModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 9999;">
     <div class="modal-card" style="box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; box-sizing: border-box; display: flex !important; flex-direction: column !important; gap: 15px !important; background: white; padding: 30px; border-radius: 14px; width: 95%; max-width: 800px;">
       <h3 style="margin: 0; color: #784b83; font-size: 26px; font-weight: 800; margin-bottom: 5px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px;">
         {{ editablePost.id ? 'Edit Buddy Post' : 'Introduce a New Buddy' }}
       </h3>
       
+      /* Add/Edit Post Form */
       <form (submit)="savePost()" style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; box-sizing: border-box;">
           
+          /* Species Section */
           <div style="display: flex; flex-direction: column; gap: 15px;">
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Species *</label>
               <input [(ngModel)]="editablePost.species" name="species" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. Dog, Cat" required>
             </div>
 
+            /* Breed Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Breed (if applicable)</label>
               <input [(ngModel)]="editablePost.breed" name="breed" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. Golden Retriever">
             </div>
 
+            /* Age Group Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Age Group *</label>
               <select [(ngModel)]="editablePost.age" name="age" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background: white;" required>
@@ -223,6 +252,7 @@
               </select>
             </div>
 
+            /* Gender Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Gender *</label>
               <select [(ngModel)]="editablePost.gender" name="gender" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background: white;" required>
@@ -232,6 +262,7 @@
               </select>
             </div>
 
+            /* Post Type Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Classification Type</label>
               <select [(ngModel)]="editablePost.postType" name="postType" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background: white;">
@@ -240,38 +271,45 @@
               </select>
             </div>
 
+            /* Last Seen Location Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Last Seen Location</label>
               <input [(ngModel)]="editablePost.lastSeenLocation" name="lastSeenLocation" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. Timisoara">
             </div>
           </div>
 
+          /* Additional Details Section */
           <div style="display: flex; flex-direction: column; gap: 15px;">
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Size Scale</label>
               <input [(ngModel)]="editablePost.size" name="size" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. Small, Medium, Large">
             </div>
 
+            /* Colors Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Pet Colors (separated by commas)</label>
               <input [ngModel]="editablePost.colors ? editablePost.colors.join(', ') : ''" (ngModelChange)="editablePost.colors = $event.split(',')" name="colors" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. Brown, White, Black">
             </div>
 
+            /* Fur Pattern Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Fur Pattern Configuration (if applicable)</label>
               <input [(ngModel)]="editablePost.pattern" name="pattern" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. Spotted, Brindle, Solid">
             </div>
 
+            /* Weight Range Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Weight Metric Range</label>
               <input [(ngModel)]="editablePost.weightRange" name="weightRange" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. 5-10 kg">
             </div>
 
+            /* Collar Details Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Collar Visual Details</label>
               <input [(ngModel)]="editablePost.collarDetails" name="collarDetails" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. Blue nylon collar">
             </div>
 
+            /* Distinguishing Features Section */
             <div style="display: flex; flex-direction: column; gap: 5px;">
               <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Distinguishing Features</label>
               <input [(ngModel)]="editablePost.distinguishingFeatures" name="distinguishingFeatures" type="text" class="modal-input" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box;" placeholder="e.g. White socks on front paws, torn left ear">
@@ -280,24 +318,30 @@
 
         </div>
 
+        /* Additional Information Section */
         <div style="display: flex; flex-direction: column; gap: 15px; border-top: 1px solid #f0f2f5; padding-top: 15px;">
+
+          /* Microchipped Section */
           <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;">
             <input [(ngModel)]="editablePost.microchipped" name="microchipped" type="checkbox" id="modalMicrochipped" style="transform: scale(1.3); cursor: pointer;">
             <label for="modalMicrochipped" style="font-weight: 700; font-size: 15px; color: #333; cursor: pointer;">This pet is microchipped</label>
           </div>
 
+          /* Image Attachment Section */
           <div style="display: flex; flex-direction: column; gap: 5px;">
             <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Pet Image Attachment</label>
             <input type="file" (change)="onFileSelected($event)" style="font-size: 14px; color: #4b4f56;">
             <img *ngIf="editablePost.imageUrl" [src]="editablePost.imageUrl" style="width: 120px; height: 120px; object-fit: cover; margin-top: 8px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
           </div>
 
+          /* Description Section */
           <div style="display: flex; flex-direction: column; gap: 5px;">
             <label style="font-weight: 700; font-size: 14px; color: #4b4f56;">Comprehensive Description *</label>
             <textarea [(ngModel)]="editablePost.description" name="description" class="modal-input" style="width: 100%; height: 90px; box-sizing: border-box; resize: vertical; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; font-family: inherit;" placeholder="Provide behavior patterns, detailed timeline, notes, etc." required></textarea>
           </div>
         </div>
 
+        /* Cancel and Save Post Buttons */
         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px; border-top: 1px solid #f0f2f5; padding-top: 15px;">
           <button type="button" (click)="showModal = false" style="padding: 12px 28px; background: #f0f2f5; color: #050505; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 16px;">Cancel</button>
           <button type="submit" style="padding: 12px 28px; background: #784b83; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 16px;">Save Post</button>
