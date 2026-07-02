@@ -5,7 +5,7 @@
     <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 1rem;">From hamsters to birds, let's find your perfect match!</p>
   </div>
 
-  <div style="flex: 1; padding: 20px; overflow-y: auto; background: #fdfafc; display: flex; flex-direction: column; gap: 15px;">
+ <div class="messages-viewport" style="flex: 1; padding: 20px; overflow-y: auto; background: #fdfafc; display: flex; flex-direction: column; gap: 15px;">
     
     <div *ngFor="let msg of messages" style="display: flex; width: 100%;" [style.justify-content]="msg.sender === 'user' ? 'flex-end' : 'flex-start'">
       <div [style.background-color]="msg.sender === 'user' ? '#8b2e8b' : '#f0f0f0'"

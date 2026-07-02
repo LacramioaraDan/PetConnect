@@ -34,6 +34,8 @@ export class PetAdvisor {
     this.userInput = '';
     this.isLoading = true;
 
+    this.scrollToBottom();
+
     await new Promise(resolve => setTimeout(resolve, 800));
 
     try {
@@ -54,12 +56,27 @@ export class PetAdvisor {
           text: response.question,
           recommendedSpecies: response.recommendedSpecies
         });
+
+        this.scrollToBottom();
       }
     } catch (err) {
       this.messages.push({ sender: 'bot', text: 'Could you try that again?' });
     } finally {
       this.isLoading = false;
     }
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+
+      const viewport = document.querySelector('.messages-viewport');
+      if (viewport) {
+        viewport.scrollTo({
+          top: viewport.scrollHeight,
+          behavior: 'smooth' 
+        });
+      }
+    }, 100);
   }
 
   navigateToPosts(species: string) {
