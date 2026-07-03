@@ -1,7 +1,4 @@
-/* ==========================================================================
-   1. LAPTOP SPLIT-COLUMN LAYOUT
-   ========================================================================== */
-
+/* The main container holding both sides of the page */
 .profile-full-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); 
@@ -38,14 +35,12 @@
   overflow-y: auto;
 }
 
-/* ==========================================================================
-   2. ALIGNMENT & TEXT-BREAKING UTILITIES
-   ========================================================================== */
-
+/* Forcefully center-align text elements */
 .text-center-align {
   text-align: center !important;
 }
 
+/* Handle massive bio descriptions or links without breaking cards */
 .wrapped-text-block {
   word-break: break-word !important; 
   white-space: pre-wrap !important;  
@@ -53,10 +48,7 @@
   width: 100%;
 }
 
-/* ==========================================================================
-   3. PROFILE CARD COMPONENT (LEFT COLUMN)
-   ========================================================================== */
-
+/* Transparent box holding the profile picture */
 .profile-avatar-floating-zone {
   display: flex;
   justify-content: center;
@@ -66,12 +58,14 @@
   position: relative;
 }
 
+/* Rigid box establishing width/height for the round portrait */
 .avatar-wrapper-large {
   position: relative;
   width: 180px;  
   height: 180px; 
 }
 
+/* The physical avatar image tag */
 .main-avatar-large {
   width: 100%;
   height: 100%;
@@ -81,6 +75,7 @@
   object-fit: cover;
 }
 
+/* Change profile picture button */
 .custom-file-upload {
   position: absolute;
   bottom: 4px;
@@ -101,10 +96,12 @@
   z-index: 12;
 }
 
+/* Hover effect for photo upload button */
 .custom-file-upload:hover {
   background: #8b2e8b;
 }
 
+/* White profile box */
 .unified-profile-master-card {
   background: white;
   border-radius: 16px;
@@ -118,6 +115,7 @@
   gap: 24px; 
 }
 
+/* Centers the name and badge */
 .identity-card-block-centered {
   text-align: center;
   width: 100%;
@@ -127,6 +125,7 @@
   gap: 6px;
 }
 
+/* User's name */
 .identity-card-block-centered h1 {
   margin: 0;
   font-size: 26px; 
@@ -135,6 +134,7 @@
   letter-spacing: -0.5px;
 }
 
+/* Role badge */
 .account-role-badge {
   background: #f0f2f5;
   padding: 4px 12px;
@@ -146,6 +146,7 @@
   display: inline-block;
 }
 
+/* Separating line */
 .card-divider-line {
   border: 0;
   border-top: 1px dashed rgba(0, 0, 0, 0.12);
@@ -153,6 +154,7 @@
   width: 100%;
 }
 
+/* Wrapper for sections inside the card */
 .card-inner-section {
   display: flex;
   flex-direction: column;
@@ -160,6 +162,7 @@
   width: 100%;
 }
 
+/* Section headers */
 .section-title {
   font-size: 18px;
   font-weight: 800;
@@ -167,6 +170,7 @@
   margin: 0;
 }
 
+/* Background box for the bio */
 .bio-display-card {
   background: #fafafa;
   border: 1px solid #f0f2f5;
@@ -176,6 +180,7 @@
   justify-content: center;
 }
 
+/* Bio text */
 .bio-text {
   margin: 0;
   font-size: 15px;
@@ -183,7 +188,7 @@
   color: #1c1e21;
 }
 
-/* Edit State Controls */
+/* Container for fields when editing */
 .edit-field {
   display: flex;
   flex-direction: column;
@@ -192,6 +197,7 @@
   box-sizing: border-box;
 }
 
+/* Small label above edit fields */
 .edit-label {
   font-size: 12px;
   font-weight: 800;
@@ -199,6 +205,7 @@
   text-transform: uppercase;
 }
 
+/* Limits width when editing username */
 .header-edit-input {
   max-width: 320px;
   width: 100%;
@@ -206,6 +213,7 @@
   margin: 0 auto;
 }
 
+/* Normal text input boxes */
 .edit-input {
   width: 100%;
   padding: 12px;
@@ -217,6 +225,7 @@
   background: white;
 }
 
+/* Large text area for editing bio */
 .edit-textarea {
   width: 100%;
   min-height: 85px;
@@ -231,6 +240,7 @@
   background: white;
 }
 
+/* Stacks contact information links */
 .contact-view-stack,
 .contact-edit-stack {
   display: flex;
@@ -238,6 +248,7 @@
   gap: 10px;
 }
 
+/* Individual contact detail box */
 .contact-item {
   background: #fafafa;
   padding: 12px 14px;
@@ -250,6 +261,7 @@
   box-sizing: border-box;
 }
 
+/* Contact label */
 .contact-item label {
   display: block;
   font-size: 11px;
@@ -259,6 +271,7 @@
   margin-bottom: 4px;
 }
 
+/* Contact text value */
 .contact-item p {
   margin: 0;
   font-size: 14px;
@@ -266,7 +279,7 @@
   color: #1c1e21;
 }
 
-/* Actions Toolbar & Buttons */
+/* Container for profile buttons */
 .profile-actions-toolbar {
   display: flex;
   flex-direction: column;
@@ -275,6 +288,7 @@
   box-sizing: border-box;
 }
 
+/* Puts buttons side-by-side */
 .edit-actions, 
 .danger-zone-actions {
   display: flex;
@@ -282,11 +296,13 @@
   width: 100%;
 }
 
+/* Separator for delete account area */
 .danger-zone-actions {
   border-top: 1px dashed #eee;
   padding-top: 12px;
 }
 
+/* Base style for all buttons */
 button {
   padding: 12px 20px;
   border-radius: 30px;
@@ -297,20 +313,14 @@ button {
   transition: opacity 0.2s, transform 0.1s;
 }
 
-button:active {
-  transform: scale(0.98);
-}
-
+/* Button colors */
 .btn-primary { background: #8b2e8b; color: white; width: 100%; }
 .btn-save { background: #6200ea; color: white; flex: 1; }
 .btn-cancel { background: #f0f2f5; color: #4b4f56; flex: 1; }
 .btn-logout { background: #f0f2f5; color: #1c1e21; flex: 1; }
 .btn-delete { background: #ffebe9; color: #dc2626; flex: 1; }
 
-/* ==========================================================================
-   4. ACTIVE POST FEEDS & DROPDOWNS (RIGHT COLUMN)
-   ========================================================================== */
-
+/* Feed column main title */
 .feed-heading {
   font-size: 32px;
   font-weight: 900;
@@ -323,6 +333,7 @@ button:active {
   text-align: center;
 }
 
+/* Stacks feed posts vertically */
 .timeline-posts-container {
   display: flex;
   flex-direction: column;
@@ -330,6 +341,7 @@ button:active {
   width: 100%;
 }
 
+/* Individual post card box */
 .animal-card {
   display: block !important;
   background: white;
@@ -340,6 +352,7 @@ button:active {
   box-sizing: border-box;
 }
 
+/* Header inside a post card */
 .post-meta-header {
   display: flex;
   align-items: center;
@@ -350,6 +363,7 @@ button:active {
   position: relative;
 }
 
+/* User avatar in a post header */
 .post-meta-avatar {
   width: 55px;
   height: 55px;
@@ -359,19 +373,21 @@ button:active {
   border: 1px solid #eee;
 }
 
+/* Username text in post header */
 .post-meta-name {
   font-weight: 800;
   font-size: 19px;
   color: #050505;
 }
 
+/* Post timestamp and subtext */
 .post-meta-sub {
   font-size: 15px;
   color: #65676b;
   margin-top: 2px;
 }
 
-/* Header Context Action Button */
+/* Three-dots menu button */
 .three-dots {
   background: none !important;
   border: none !important;
@@ -385,11 +401,12 @@ button:active {
   width: auto !important;
 }
 
+/* Hover background for the three-dots */
 .three-dots:hover {
   background-color: #f2f2f2 !important;
 }
 
-/* Action Dropdown Menu Overlay */
+/* Dropdown menu container */
 .dropdown-menu {
   position: absolute;
   right: 24px;
@@ -406,6 +423,7 @@ button:active {
   gap: 2px;
 }
 
+/* Individual buttons inside the dropdown */
 .dropdown-menu button {
   width: 100% !important;
   text-align: left !important;
@@ -419,19 +437,22 @@ button:active {
   border-radius: 6px !important;
 }
 
+/* Hover effect for dropdown buttons */
 .dropdown-menu button:hover {
   background-color: #f2f2f2 !important;
 }
 
+/* Red delete option in the menu */
 .dropdown-menu button.menu-delete-btn {
   color: #ef4444 !important;
 }
 
+/* Hover background for the delete option */
 .dropdown-menu button.menu-delete-btn:hover {
   background-color: #fef2f2 !important;
 }
 
-/* Post Layout Internal Details Block */
+/* Post body split */
 .post-body-layout {
   display: flex !important;
   flex-direction: row !important;
@@ -442,10 +463,12 @@ button:active {
   box-sizing: border-box;
 }
 
+/* Left side text container of a post */
 .post-details-side {
   flex: 1;
 }
 
+/* Main title of the post */
 .post-details-side h2 {
   font-size: 34px;
   font-weight: 900;
@@ -454,16 +477,19 @@ button:active {
   letter-spacing: -0.8px;
 }
 
+/* Info lines inside the post text side */
 .details-spec-list p {
   margin: 0 0 10px 0;
   font-size: 19px;
   color: #4b4f56;
 }
 
+/* Removes extra spacing from the last line */
 .details-spec-list p:last-child {
   margin-bottom: 0;
 }
 
+/* Box container for the post image */
 .post-image-side {
   width: 180px;
   height: 180px;
@@ -474,12 +500,14 @@ button:active {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Picture inside a post card */
 .post-pet-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+/* Description paragraph at the bottom of a post */
 .post-footer-description {
   padding: 0 30px 30px 30px;
   font-size: 20px;
@@ -488,6 +516,7 @@ button:active {
   display: block !important;
 }
 
+/* Box displayed when the feed has no posts */
 .empty-feed {
   padding: 40px 20px;
   text-align: center;
@@ -501,10 +530,7 @@ button:active {
   box-sizing: border-box;
 }
 
-/* ==========================================================================
-   5. DIALOG MODAL FRAMEWORK
-   ========================================================================== */
-
+/* Dark screen covering everything when a popup is open */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -518,6 +544,7 @@ button:active {
   z-index: 9999;
 }
 
+/* The pop up box container */
 .modal-card {
   background: white !important; 
   padding: 35px !important; 
@@ -529,6 +556,7 @@ button:active {
   gap: 15px !important;
 }
 
+/* Input text fields inside pop up*/
 .modal-input { 
   padding: 14px !important; 
   font-size: 16px !important; 
@@ -538,6 +566,7 @@ button:active {
   width: 100%;
 }
 
+/* Button formatting rules inside modals */
 .modal-card button {
   border: none !important;
   border-radius: 10px !important;
@@ -547,11 +576,13 @@ button:active {
   padding: 12px 20px;
 }
 
+/* Cancel option buttoninside modals */
 .modal-card button[type="button"] {
   background: #f0f2f5 !important;
   color: #050505 !important;
 }
 
+/* Save option button inside modals */
 .modal-card button[type="submit"] {
   background: #784b83 !important;
   color: white !important;
