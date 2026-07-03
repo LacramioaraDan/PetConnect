@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. SCREEN BREAKOUT GRID OVERRIDES (SHELTERS MIRROR LAYOUT METHOD)
+   1. LAPTOP SPLIT-COLUMN LAYOUT
    ========================================================================== */
 
 .profile-full-layout {
@@ -9,7 +9,6 @@
   max-height: calc(100vh - 70px); 
   background: transparent;
   box-sizing: border-box;
-  
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
   padding: 0 25px;
@@ -17,20 +16,9 @@
   overflow: hidden; 
 }
 
-@media (max-width: 1024px) {
-  .profile-full-layout {
-    grid-template-columns: 1fr;
-    max-height: none;
-    overflow: visible;
-    margin-left: 0;
-    margin-right: 0;
-    padding: 0 15px;
-  }
-}
-
-/* --- LEFT COLUMN: Isolated Scrolling Left Data Stack --- */
+/* Left side profile layout container */
 .table-column-profile-left {
-  padding: 5px 40px 30px 10px; /* Reduced padding pulls elements up perfectly toward the navbar */
+  padding: 5px 40px 30px 10px;
   box-sizing: border-box;
   background: transparent;
   display: flex;
@@ -40,7 +28,7 @@
   position: relative;
 }
 
-/* --- RIGHT COLUMN: Isolated Scrolling Right Listing Feed --- */
+/* Right side active post feeds layout container */
 .table-column-posts-right {
   padding: 30px 10px 30px 40px;
   box-sizing: border-box;
@@ -50,17 +38,8 @@
   overflow-y: auto;
 }
 
-@media (max-width: 1024px) {
-  .table-column-profile-left, .table-column-posts-right {
-    max-height: none;
-    overflow: visible;
-    border-left: none;
-    padding: 20px 10px;
-  }
-}
-
 /* ==========================================================================
-   2. ALIGNMENT & TEXT-BREAKING UTILITY PLUGINS
+   2. ALIGNMENT & TEXT-BREAKING UTILITIES
    ========================================================================== */
 
 .text-center-align {
@@ -68,14 +47,14 @@
 }
 
 .wrapped-text-block {
-  word-break: break-word !important; /* Breaks long continuous text paths downward safely */
-  white-space: pre-wrap !important;  /* Retains carriage returns and structural breaks */
+  word-break: break-word !important; 
+  white-space: pre-wrap !important;  
   text-align: center !important;     
   width: 100%;
 }
 
 /* ==========================================================================
-   3. UNIFIED CONTAINER PANEL DESIGN WITH OVERLAPPING AVATAR
+   3. PROFILE CARD COMPONENT (LEFT COLUMN)
    ========================================================================== */
 
 .profile-avatar-floating-zone {
@@ -89,7 +68,7 @@
 
 .avatar-wrapper-large {
   position: relative;
-  width: 180px;  /* Upscaled centerpiece avatar structure size properties */
+  width: 180px;  
   height: 180px; 
 }
 
@@ -100,34 +79,6 @@
   border: 5px solid white; 
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   object-fit: cover;
-}
-
-/* FIXED: Unified single-piece white panel wrapping all profile parameters */
-.unified-profile-master-card {
-  background: white;
-  border-radius: 16px;
-  padding: 110px 30px 30px 30px; 
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid #ddd;
-  width: 100%; /* Keeps layout broad and expansive across the fractional grid column width */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 24px; 
-}
-
-.card-inner-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-
-.card-divider-line {
-  border: 0;
-  border-top: 1px dashed rgba(0, 0, 0, 0.12);
-  margin: 0;
-  width: 100%;
 }
 
 .custom-file-upload {
@@ -154,6 +105,19 @@
   background: #8b2e8b;
 }
 
+.unified-profile-master-card {
+  background: white;
+  border-radius: 16px;
+  padding: 110px 30px 30px 30px; 
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid #ddd;
+  width: 100%; 
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; 
+}
+
 .identity-card-block-centered {
   text-align: center;
   width: 100%;
@@ -171,13 +135,6 @@
   letter-spacing: -0.5px;
 }
 
-.header-edit-input {
-  max-width: 320px;
-  width: 100%;
-  text-align: center;
-  margin: 0 auto;
-}
-
 .account-role-badge {
   background: #f0f2f5;
   padding: 4px 12px;
@@ -187,6 +144,20 @@
   color: #65676b;
   text-transform: uppercase;
   display: inline-block;
+}
+
+.card-divider-line {
+  border: 0;
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  margin: 0;
+  width: 100%;
+}
+
+.card-inner-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 }
 
 .section-title {
@@ -212,6 +183,40 @@
   color: #1c1e21;
 }
 
+/* Edit State Controls */
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.edit-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #8b2e8b;
+  text-transform: uppercase;
+}
+
+.header-edit-input {
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccd0d5;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  background: white;
+}
+
 .edit-textarea {
   width: 100%;
   min-height: 85px;
@@ -226,21 +231,23 @@
   background: white;
 }
 
+.contact-view-stack,
+.contact-edit-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .contact-item {
   background: #fafafa;
   padding: 12px 14px;
   border-radius: 8px;
-  margin-bottom: 10px;
   border: 1px solid #f0f2f5;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-}
-
-.contact-item:last-child {
-  margin-bottom: 0;
 }
 
 .contact-item label {
@@ -259,33 +266,7 @@
   color: #1c1e21;
 }
 
-.edit-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.edit-label {
-  font-size: 12px;
-  font-weight: 800;
-  color: #8b2e8b;
-  text-transform: uppercase;
-}
-
-.edit-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccd0d5;
-  border-radius: 8px;
-  outline: none;
-  box-sizing: border-box;
-  font-size: 14px;
-  background: white;
-}
-
+/* Actions Toolbar & Buttons */
 .profile-actions-toolbar {
   display: flex;
   flex-direction: column;
@@ -294,7 +275,8 @@
   box-sizing: border-box;
 }
 
-.edit-actions, .danger-zone-actions {
+.edit-actions, 
+.danger-zone-actions {
   display: flex;
   gap: 12px;
   width: 100%;
@@ -326,7 +308,7 @@ button:active {
 .btn-delete { background: #ffebe9; color: #dc2626; flex: 1; }
 
 /* ==========================================================================
-   4. ACTIVE POST FEEDS & DROP-DOWN OVERLAY MENU DESIGN (RIGHT COL)
+   4. ACTIVE POST FEEDS & DROPDOWNS (RIGHT COLUMN)
    ========================================================================== */
 
 .feed-heading {
@@ -350,7 +332,6 @@ button:active {
 
 .animal-card {
   display: block !important;
-  overflow: visible;
   background: white;
   border: 1px solid #ddd;
   border-radius: 14px;
@@ -390,6 +371,7 @@ button:active {
   margin-top: 2px;
 }
 
+/* Header Context Action Button */
 .three-dots {
   background: none !important;
   border: none !important;
@@ -402,10 +384,12 @@ button:active {
   transition: background-color 0.2s;
   width: auto !important;
 }
+
 .three-dots:hover {
   background-color: #f2f2f2 !important;
 }
 
+/* Action Dropdown Menu Overlay */
 .dropdown-menu {
   position: absolute;
   right: 24px;
@@ -434,16 +418,20 @@ button:active {
   color: #1c1e21 !important;
   border-radius: 6px !important;
 }
+
 .dropdown-menu button:hover {
   background-color: #f2f2f2 !important;
 }
+
 .dropdown-menu button.menu-delete-btn {
   color: #ef4444 !important;
 }
+
 .dropdown-menu button.menu-delete-btn:hover {
   background-color: #fef2f2 !important;
 }
 
+/* Post Layout Internal Details Block */
 .post-body-layout {
   display: flex !important;
   flex-direction: row !important;
@@ -514,7 +502,7 @@ button:active {
 }
 
 /* ==========================================================================
-   5. MODAL REBUILT GRAPHICS AXIS SYSTEM
+   5. DIALOG MODAL FRAMEWORK
    ========================================================================== */
 
 .modal-overlay {
@@ -530,17 +518,12 @@ button:active {
   z-index: 9999;
 }
 
-/* ==========================================================================
-   5. NATIVE MODAL REBUILT STYLING FRAMEWORK (COPIED FROM POSTS)
-   ========================================================================== */
-
-/* Modal Scale-up */
 .modal-card {
   background: white !important; 
   padding: 35px !important; 
   border-radius: 20px !important;
   width: 95% !important; 
-  max-width: 550px !important; /* Wider modal */
+  max-width: 550px !important; 
   display: flex !important; 
   flex-direction: column !important; 
   gap: 15px !important;
@@ -552,15 +535,7 @@ button:active {
   border: 1px solid #ddd !important; 
   border-radius: 10px !important; 
   box-sizing: border-box !important;
-  height: auto !important;
-}
-
-/* Specific styling overrides for modal footer actions row buttons */
-.modal-actions-row {
-  display: flex !important;
-  gap: 12px !important;
-  justify-content: flex-end !important;
-  margin-top: 10px !important;
+  width: 100%;
 }
 
 .modal-card button {
@@ -569,7 +544,7 @@ button:active {
   cursor: pointer !important;
   font-weight: 600 !important;
   font-size: 16px !important;
-  transition: opacity 0.2s !important;
+  padding: 12px 20px;
 }
 
 .modal-card button[type="button"] {
