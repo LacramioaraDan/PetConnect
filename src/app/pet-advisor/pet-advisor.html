@@ -1,12 +1,16 @@
+/* Styles for the main container of the pet advisor chat interface */
 <div style="width: 100%; max-width: 600px; margin: 20px auto; background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 75vh; overflow: hidden; border: 1px solid #eee;">
   
+  /* Header section with title and description */
   <div style="background-color: #8b2e8b; color: white; padding: 20px; text-align: center;">
     <h2 style="margin: 0; font-size: 1.8rem; font-weight: 900;">🐾 Buddy, Your Virtual Pet Advisor</h2>
     <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 1rem;">From hamsters to birds, let's find your perfect match!</p>
   </div>
 
- <div class="messages-viewport" style="flex: 1; padding: 20px; overflow-y: auto; background: #fdfafc; display: flex; flex-direction: column; gap: 15px;">
+  /* Messages viewport where chat messages are displayed */
+  <div class="messages-viewport" style="flex: 1; padding: 20px; overflow-y: auto; background: #fdfafc; display: flex; flex-direction: column; gap: 15px;">
     
+    /* Loop through messages and display them with different styles based on the sender */
     <div *ngFor="let msg of messages" style="display: flex; width: 100%;" [style.justify-content]="msg.sender === 'user' ? 'flex-end' : 'flex-start'">
       <div [style.background-color]="msg.sender === 'user' ? '#8b2e8b' : '#f0f0f0'"
            [style.color]="msg.sender === 'user' ? 'white' : '#333'"
@@ -15,6 +19,7 @@
       </div>
     </div>
     
+    /* Display a loading indicator when Buddy is typing */
     <div *ngIf="isLoading" style="display: flex; justify-content: flex-start;">
       <div style="background-color: #f0f0f0; color: #777; padding: 14px 20px; border-radius: 25px; font-size: 1.05rem; font-style: italic;">
         Buddy is typing...
@@ -22,21 +27,21 @@
     </div>
   </div>
 
+  /* Button to navigate to available pets for adoption based on the final pet match */
   <div *ngIf="finalPetMatch" style="padding: 10px 20px; background: #fdfafc; border-top: 1px solid #f0f2f5;">
-  
-    <!-- FIXED: Explicitly specify type="button" and add event stop propagation parameters -->
     <button type="button" 
             (click)="navigateToPosts(finalPetMatch); $event.preventDefault(); $event.stopPropagation();" 
             style="background: #8b2e8b; color: white; border: none; padding: 14px 20px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; box-shadow: 0 4px 12px rgba(139,46,139,0.3); text-transform: capitalize;">
        See available {{ finalPetMatch }}s for adoption here! →
     </button>
-    
   </div>
 
+  /* Input area for user to type messages and send them */
   <div style="padding: 15px 20px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
     <input [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type in your answer..." [disabled]="isLoading" 
-           style="flex: 1; padding: 16px 25px; border: 1px solid #ddd; border-radius: 50px; outline: none; font-size: 1rem; background: #fafafa;" />
+      style="flex: 1; padding: 16px 25px; border: 1px solid #ddd; border-radius: 50px; outline: none; font-size: 1rem; background: #fafafa;" />
     
+    // Send button for user messages
     <button (click)="sendMessage()" [disabled]="isLoading" 
             style="background: #000; color: #fff; padding: 14px 28px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; font-size: 1rem; transition: opacity 0.2s;">
       Send
