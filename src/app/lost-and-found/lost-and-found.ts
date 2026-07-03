@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
   templateUrl: './lost-and-found.html',
   styleUrl: './lost-and-found.css',
 })
+
 export class LostAndFound implements OnInit, OnDestroy {
   remult = remult;
 
