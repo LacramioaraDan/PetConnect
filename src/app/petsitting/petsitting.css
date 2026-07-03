@@ -1,11 +1,10 @@
+/* Host container styling */
 :host {
   width: 100%;
   display: block;
 }
 
-/* ==========================================================================
-   1. MASTER LAYOUT STRUCTURE (SPLIT GRID 3 COLOANE)
-   ========================================================================== */
+/* Posts page layout with three columns: filters, posts, and profile */
 .posts-full-layout {
   display: grid;
   grid-template-columns: 360px 2fr 1.2fr;
@@ -15,21 +14,21 @@
   box-sizing: border-box;
 }
 
+/* Column styling for filters, posts, and profile sections with max height and overflow handling */
 .table-column-filters, .table-column-posts, .table-column-profile {
   max-height: calc(100vh - 70px);
   overflow-y: auto;
   box-sizing: border-box;
 }
 
-/* ==========================================================================
-   2. COLOANA 1: FILTRE (STÂNGA)
-   ========================================================================== */
+/* Filter column styling */
 .table-column-filters {
   padding: 30px 24px 30px 10px;
   display: flex;
   flex-direction: column;
 }
 
+/* Filter column header styling */
 .table-column-filters h3 {
   margin: 0 0 24px 0;
   font-size: 25px;
@@ -40,10 +39,12 @@
   text-align: center;
 }
 
+/* Filter input group styling */
 .filter-input-group {
   margin-bottom: 24px;
 }
 
+/* Label styling for filter input groups */
 .filter-input-group label {
   display: block;
   font-weight: 700;
@@ -52,6 +53,7 @@
   color: #4b4f56;
 }
 
+/* Input styling for filter input groups */
 .filter-input-group input {
   width: 100%;
   padding: 12px 14px;
@@ -63,22 +65,22 @@
   background: white;
 }
 
-/* ==========================================================================
-   3. COLOANA 2: SITTER CARDS GRID (MIJLOC)
-   ========================================================================== */
+/* Posts column styling */
 .table-column-posts {
   padding: 30px 40px;
   border-left: 1px solid rgba(0,0,0,0.15);
   border-right: 1px solid rgba(0,0,0,0.15);
 }
 
+/* Profile column styling */
 .sitter-grid-layout {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Aliniat perfect la 3 coloane ca la Shelters */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 100%;
 }
 
+/* Individual animal card styling */
 .animal-card {
   background: white;
   border: 1px solid #ddd;
@@ -91,11 +93,13 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Hover effect for animal cards to lift them slightly and add a shadow */
 .interactive-sitter-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
 }
 
+/* Cover thumbnail for sitter cards */
 .sitter-cover-thumb {
   width: 100%;
   height: 160px;
@@ -103,12 +107,14 @@
   background: #fafafa;
 }
 
+/* Image styling for sitter cover thumbnails */
 .sitter-cover-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+/* Body section of the sitter card containing details and actions */
 .sitter-card-body {
   padding: 20px;
   flex-grow: 1;
@@ -118,6 +124,7 @@
   gap: 12px;
 }
 
+/* Meta details section of the sitter card */
 .sitter-meta-details h2 {
   font-size: 20px;
   font-weight: 800;
@@ -126,6 +133,7 @@
   cursor: pointer;
 }
 
+/* Badge rows section of the sitter card for displaying additional information */
 .sitter-badge-rows {
   display: flex;
   flex-direction: column;
@@ -135,6 +143,7 @@
   font-weight: 600;
 }
 
+/* Short bio section of the sitter card with text truncation for overflow */
 .sitter-short-bio {
   margin: 10px 0 0 0;
   font-size: 14px;
@@ -147,12 +156,14 @@
   overflow: hidden;
 }
 
+/* Actions section of the sitter card containing buttons for viewing offers and messaging */
 .sitter-card-actions {
   display: flex;
   gap: 8px;
   width: 100%;
 }
 
+/* Button styling for actions in the sitter card */
 .sitter-card-actions button {
   flex: 1;
   border: none;
@@ -167,12 +178,11 @@
   white-space: nowrap;
 }
 
+/* Specific button styling for viewing offers and messaging sitters */
 .btn-view-offers { background: #8b2e8b; color: white; }
 .btn-message-sitter { background: #784b83; color: white; }
 
-/* ==========================================================================
-   4. COLOANA 3: PROFIL DETALIAT & TIMELINE (DREAPTA)
-   ========================================================================== */
+/* Profile column styling */
 .table-column-profile {
   padding: 30px 10px 30px 35px;
   display: flex;
@@ -180,6 +190,7 @@
   gap: 20px;
 }
 
+/* Profile card styling with white background, rounded corners, and shadow for depth */
 .create-sitting-post-trigger {
   cursor: pointer;
   background: white;
@@ -194,6 +205,7 @@
   box-sizing: border-box;
 }
 
+/* Profile image styling */
 .create-sitting-post-trigger img {
   width: 45px;
   height: 45px;
@@ -201,6 +213,7 @@
   object-fit: cover;
 }
 
+/* Text styling for the create sitting post*/
 .fake-input-pill {
   background-color: #f0f2f5;
   border-radius: 25px;
@@ -211,6 +224,7 @@
   font-weight: 600;
 }
 
+/* Offer post card styling */
 .horizontal-offer-post {
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.06);
@@ -219,6 +233,7 @@
   gap: 14px;
 }
 
+/* Header section of the offer post card */
 .offer-post-header h3 {
   font-size: 22px;
   font-weight: 900;
@@ -226,6 +241,7 @@
   margin: 0 0 10px 0;
 }
 
+/* Subheader section of the offer post card */
 .offer-post-image {
   width: 100%;
   height: 150px;
@@ -235,12 +251,14 @@
   margin-bottom: 12px;
 }
 
+/* Image styling for the offer post */
 .offer-post-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+/* Grid layout for displaying offer specifications in a structured manner */
 .offer-spec-grid {
   display: flex;
   flex-direction: column;
@@ -249,6 +267,7 @@
   color: #4b4f56;
 }
 
+/* Individual specification row styling within the offer spec grid */
 .offer-post-description {
   background: #fafafa;
   border: 1px solid #f0f2f5;
@@ -260,15 +279,13 @@
   word-break: break-word;
 }
 
-/* Custom Scrollbar */
+/* Scrollbar styling for the posts column to match the app's aesthetic */
 .table-column-posts::-webkit-scrollbar { width: 8px; }
 .table-column-posts::-webkit-scrollbar-track { background: transparent; }
 .table-column-posts::-webkit-scrollbar-thumb { background-color: #ccd0d5; border-radius: 10px; }
 .table-column-posts::-webkit-scrollbar-thumb:hover { background-color: #8b2e8b; }
 
-/* ==========================================================================
-   5. NATIVE MODAL REBUILT STYLING FRAMEWORK (COPIED FROM POSTS)
-   ========================================================================== */
+/* Modal overlay styling */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
@@ -277,6 +294,7 @@
   z-index: 9999;
 }
 
+/* Modal card styling */
 .modal-card {
   background: white !important; 
   padding: 35px !important; 
@@ -288,6 +306,7 @@
   gap: 15px !important;
 }
 
+/* Modal header styling */
 .modal-vertical-stack {
   display: flex !important;
   flex-direction: column !important;
@@ -295,6 +314,7 @@
   width: 100%;
 }
 
+/* Modal title styling */
 .modal-input-group {
   display: flex !important;
   flex-direction: column !important;
@@ -302,12 +322,14 @@
   width: 100%;
 }
 
+/* Label styling for modal input groups */
 .modal-input-group label {
   font-weight: 600;
   font-size: 15px;
   color: #333;
 }
 
+/* Input styling for modal input groups */
 .modal-input { 
   padding: 14px !important; 
   font-size: 16px !important; 
@@ -318,12 +340,14 @@
   outline: none;
 }
 
+/* Textarea styling for modal input groups */
 .edit-textarea-modal {
   height: 80px;
   resize: vertical;
   font-family: inherit;
 }
 
+/* Thumbnail styling for modal previews */
 .modal-preview-thumbnail {
   width: 100px;
   height: 100px;
@@ -333,6 +357,7 @@
   border: 1px solid #eee;
 }
 
+/* Actions row styling for modal buttons */
 .modal-actions-row {
   display: flex !important;
   gap: 12px !important;
@@ -340,6 +365,7 @@
   margin-top: 10px !important;
 }
 
+/* Button styling for modal actions */
 .modal-actions-row button {
   padding: 12px 24px !important;
   border: none !important;
@@ -349,14 +375,18 @@
   font-size: 16px !important;
 }
 
+/* Specific button styling for modal cancel and save actions */
 .btn-modal-cancel { background: #f0f2f5 !important; color: #050505 !important; }
 .btn-modal-save { background: #784b83 !important; color: white !important; }
 
+/* Styles for the dropdown menu */
 .dropdown-menu {
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* Styles for the dropdown menu button */
 .dropdown-menu button:hover {
   background-color: #f2f2f2;
 }
