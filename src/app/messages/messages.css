@@ -1,3 +1,4 @@
+/* General layout */
 .messenger-wrapper {
   display: flex;
   width: 95vw;
@@ -8,16 +9,19 @@
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
-/* Sidebar-ul rămâne la o lățime fixă, Chat-ul se extinde */
+
+/* Sidebar */
 .sidebar {
-  width: 320px; /* Sidebar-ul rămâne fix */
+  width: 320px;
   background: #f7f8fa;
   border-right: 1px solid #e5e5e5;
 }
 
+/* Sidebar header */
 .sidebar-header { padding: 15px 20px; }
 .sidebar-header h2 { font-size: 24px; font-weight: 800; }
 
+/* Search bar */
 .search-bar { padding: 0 15px 15px; }
 .search-bar input {
   width: 100%;
@@ -27,7 +31,7 @@
   background: #f0f2f5;
   outline: none;
 }
-
+/* Conversation list */
 .conv-item {
   display: flex;
   padding: 12px 15px;
@@ -36,24 +40,27 @@
   align-items: center;
   gap: 12px;
 }
-
+/* Hover and active states */
 .conv-item:hover { background: #f5f5f5; }
 .conv-item.active { background: #f3ebf6; }
 
+/* Avatar List */
 .list-avatar { width: 56px; height: 56px; border-radius: 50%; }
 
+/* Conversation details */
 .conv-details { flex: 1; overflow: hidden; }
 .conv-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
 .user-name { font-weight: 600; color: #050505; }
 .last-msg { color: #65676b; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* CHAT AREA */
+/* Chat area */
 .chat-area {
-  flex: 1; /* Ocupă tot restul spațiului */
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
 
+/* Chat header */
 .chat-header {
   padding: 10px 15px;
   display: flex;
@@ -63,12 +70,13 @@
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
+/* User info in the chat header */
 .header-user { display: flex; align-items: center; gap: 10px; }
 .header-avatar { width: 40px; height: 40px; border-radius: 50%; }
 .header-user h3 { font-size: 16px; margin: 0; }
 .header-user span { font-size: 12px; color: #65676b; }
 
-/* BUBBLES */
+/* Messages viewport */
 .messages-viewport {
   flex: 1;
   padding: 20px;
@@ -78,6 +86,7 @@
   gap: 8px;
 }
 
+/* Message bubbles */
 .message { display: flex; width: 100%; }
 .bubble {
   max-width: 65%;
@@ -87,13 +96,14 @@
   line-height: 1.4;
 }
 
+/* Differentiate sent and received messages */
 .received { justify-content: flex-start; }
 .received .bubble { background: #f0f2f5; color: #050505; }
 
 .sent { justify-content: flex-end; }
 .sent .bubble { background: #8b2e8b; color: #fff; }
 
-/* INPUT */
+/* Input area */
 .input-container {
   padding: 15px;
   display: flex;
@@ -101,6 +111,7 @@
   gap: 10px;
 }
 
+/* Input field */
 .input-container input {
   flex: 1;
   background: #f0f2f5;
@@ -110,8 +121,10 @@
   outline: none;
 }
 
+/* Send button */
 .send-btn { background: none; border: none; font-size: 24px; cursor: pointer; }
 
+/* Empty state for no messages */
 .empty-state {
   flex: 1;
   display: flex;
@@ -121,21 +134,25 @@
   color: #8e8e8e;
 }
 
+/* Empty state icon */
 .empty-icon { font-size: 80px; margin-bottom: 20px; }
 
+/* Ensure the messages viewport can anchor its content */
 .messages-viewport {
   contain: content;
-  overflow-anchor: auto; /* Ajută browserul să păstreze scroll-ul jos la mesaje noi */
+  overflow-anchor: auto;
 }
 
+/* Image styling in chat */
 .chat-img {
   width: 100%;
-  max-width: 400px; /* Limitează mărimea pozei în chat */
+  max-width: 400px;
   display: block;
   border-radius: 12px;
   object-fit: contain;
 }
 
+/* Attachment button styling */
 .attachment-btn {
   display: flex;
   align-items: center;
@@ -145,11 +162,12 @@
   transition: opacity 0.2s;
 }
 
+/* Hover effect for attachment button */
 .attachment-btn:hover {
   opacity: 0.7;
 }
 
-/* Ajustare input-container pentru a face loc agrafelor */
+/* Input container for message input and send button */
 .input-container {
   display: flex;
   gap: 10px;
@@ -157,21 +175,23 @@
   align-items: center;
 }
 
+/* Image wrapper for attachments */
 .image-wrapper {
-  background: #f0f0f0; /* Un fundal gri până se încarcă poza */
+  background: #f0f0f0;
   min-width: 100px;
   min-height: 100px;
 }
 
-/* Ensure the parent container can anchor the absolute dropdown */
+/* Sidebar header styling */
 .sidebar-header {
   padding: 20px;
-  position: relative; /* This is crucial for the dropdown to "stick" here */
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* Search input styling */
 .search-input {
   width: 100%;
   padding: 8px 12px;
@@ -183,20 +203,21 @@
 
 /* Dropdown styling */
 .search-dropdown {
-  position: absolute; /* Anchored to .sidebar-header */
-  top: 100%;          /* Forces it to start exactly below the header */
-  left: 20px;         /* Align with your padding */
-  right: 20px;        /* Align with your padding */
+  position: absolute; 
+  top: 100%;       
+  left: 20px;
+  right: 20px;
   background: white;
   border: 1px solid #ddd;
   border-radius: 12px;
-  margin-top: 5px;    /* Small gap between input and list */
+  margin-top: 5px;
   max-height: 300px;
   overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 1000;      /* Ensure it sits on top of chat area */
+  z-index: 1000;
 }
 
+/* Individual search item styling */
 .search-item {
   padding: 12px 14px;
   display: flex;
@@ -205,10 +226,12 @@
   cursor: pointer;
 }
 
+/* Hover effect for search items */
 .search-item:hover {
   background: #fdf2f8;
 }
 
+/* Image styling for search items */
 .search-item img {
   width: 35px;
   height: 35px;
@@ -217,18 +240,22 @@
   flex-shrink: 0;
 }
 
+/* Text styling for search items */
 .conv-item {
   display: flex;
   align-items: center;
   padding: 10px;
-  position: relative; /* Anchor for the menu */
+  position: relative;
 }
 
+/* Menu container for the three dots */
 .menu-container {
-  position: relative; /* <--- CRITICAL: Ensures the dropdown knows where the button is */
+  position: relative;
   display: flex;
   align-items: center;
 }
+
+/* Three dots button styling */
 .three-dots {
   background: none;
   border: none;
@@ -237,28 +264,31 @@
   padding: 5px;
 }
 
+/* Chat header styling */
 .chat-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px;
   border-bottom: 1px solid #eee;
-  position: relative; /* <--- CRITICAL: This anchors the menu to the header */
+  position: relative; 
 }
 
+/* Dropdown menu styling */
 .dropdown-menu {
   position: absolute;
-  top: 100%;   /* Starts right below the header */
-  right: 0;    /* Aligns to the right of the menu-container */
-  margin-top: 10px; /* Adds a clear gap so it doesn't touch the messages */
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
   background: white;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 8px;
-  z-index: 9999; /* Higher than message bubbles */
+  z-index: 9999;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
+/* Dropdown menu button styling */
 .dropdown-menu button {
   background: none;
   border: none;
