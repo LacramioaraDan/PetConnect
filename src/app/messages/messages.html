@@ -1,18 +1,18 @@
-/Sidebar for conversations and search */
+<!-- Sidebar for conversations and search -->
 <div class="messenger-wrapper">
   <div class="sidebar">
     <div class="sidebar-header">
       <h2>Chat</h2>
       
-      /* Search input for existing conversations */
+      <!-- Search input for existing conversations -->
       <input type="text" [(ngModel)]="searchText" (input)="filterConversations()" 
              placeholder="Search existing chats..." class="search-input">
 
-      /* Search input for new users */
+      <!-- Search input for new users -->
       <input type="text" [(ngModel)]="searchUserQuery" (input)="onUserSearch()" 
              placeholder="Search to start new chat..." class="search-input">
       
-      /* Dropdown for filtered users */
+      <!-- Dropdown for filtered users -->
       <div *ngIf="searchUserQuery.trim() && filteredUsers.length > 0" class="search-dropdown">
         <div *ngFor="let user of filteredUsers" (click)="startNewChat(user.id)" class="search-item">
           <img [src]="user.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.id" class="mini-avatar">
@@ -22,7 +22,7 @@
     
     </div>
 
-    /* List of existing conversations */
+    <!-- List of existing conversations -->
     <div class="conversation-list">
       <div *ngFor="let conv of filteredConversations" 
            class="conv-item" 
@@ -42,10 +42,10 @@
     </div>
   </div>
 
-  /* Main chat area */
+  <!-- Main chat area -->
   <div class="chat-area">
     <ng-container *ngIf="recipientId; else noSelection">
-      /* Chat header with recipient info and menu */
+      <!-- Chat header with recipient info and menu -->
       <div class="chat-header">
         <div class="header-user">
           <img [src]="recipientUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + recipientId" class="header-avatar">
@@ -54,7 +54,7 @@
           </div>
         </div>
         
-        /* Dropdown menu for conversation actions */
+        <!-- Dropdown menu for conversation actions -->
         <div class="menu-container" (click)="$event.stopPropagation()">
           <button class="three-dots" (click)="toggleConvMenu()">•••</button>
           <div class="dropdown-menu" *ngIf="showMenu">
@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      /* Messages display area */
+      <!-- Messages display area -->
       <div class="messages-viewport">
         <div *ngFor="let msg of messages" 
              [class]="msg.senderId === remult.user?.id ? 'message sent' : 'message received'">
@@ -76,22 +76,22 @@
         </div>
       </div>
 
-      /* Input area for sending messages and attachments */
+      <!-- Input area for sending messages and attachments -->
       <div class="input-container">
         <label class="attachment-btn">
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+          <input type="file" (change)="onFileSelected($event)" accept="image<!--" hidden>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="#784b83">
             <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.48-2.02-4.5-4.5-4.5S6 2.52 6 5v12.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5V6h-2.5z"/>
           </svg>
         </label>
 
-        /* Input field for typing messages */
+        <!-- Input field for typing messages -->
         <input [(ngModel)]="newMessage" 
                (keyup.enter)="sendMessage()" 
                placeholder="Type a message..."
                autocomplete="off">
         
-        /* Send button for messages */
+        <!-- Send button for messages -->
         <button class="send-btn" 
                 (click)="sendMessage()" 
                 [disabled]="!newMessage.trim()">
@@ -102,7 +102,7 @@
       </div>
     </ng-container>
 
-    /* Placeholder for when no conversation is selected */
+    <!-- Placeholder for when no conversation is selected -->
     <ng-template #noSelection>
       <div class="empty-state">
         <div class="empty-icon">💬</div>
