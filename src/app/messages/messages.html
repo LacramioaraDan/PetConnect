@@ -1,14 +1,18 @@
+/Sidebar for conversations and search */
 <div class="messenger-wrapper">
   <div class="sidebar">
     <div class="sidebar-header">
       <h2>Chat</h2>
       
+      /* Search input for existing conversations */
       <input type="text" [(ngModel)]="searchText" (input)="filterConversations()" 
              placeholder="Search existing chats..." class="search-input">
 
+      /* Search input for new users */
       <input type="text" [(ngModel)]="searchUserQuery" (input)="onUserSearch()" 
              placeholder="Search to start new chat..." class="search-input">
-             
+      
+      /* Dropdown for filtered users */
       <div *ngIf="searchUserQuery.trim() && filteredUsers.length > 0" class="search-dropdown">
         <div *ngFor="let user of filteredUsers" (click)="startNewChat(user.id)" class="search-item">
           <img [src]="user.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.id" class="mini-avatar">
@@ -18,6 +22,7 @@
     
     </div>
 
+    /* List of existing conversations */
     <div class="conversation-list">
       <div *ngFor="let conv of filteredConversations" 
            class="conv-item" 
@@ -37,8 +42,10 @@
     </div>
   </div>
 
+  /* Main chat area */
   <div class="chat-area">
     <ng-container *ngIf="recipientId; else noSelection">
+      /* Chat header with recipient info and menu */
       <div class="chat-header">
         <div class="header-user">
           <img [src]="recipientUser?.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + recipientId" class="header-avatar">
@@ -47,6 +54,7 @@
           </div>
         </div>
         
+        /* Dropdown menu for conversation actions */
         <div class="menu-container" (click)="$event.stopPropagation()">
           <button class="three-dots" (click)="toggleConvMenu()">•••</button>
           <div class="dropdown-menu" *ngIf="showMenu">
@@ -55,6 +63,7 @@
         </div>
       </div>
 
+      /* Messages display area */
       <div class="messages-viewport">
         <div *ngFor="let msg of messages" 
              [class]="msg.senderId === remult.user?.id ? 'message sent' : 'message received'">
@@ -67,6 +76,7 @@
         </div>
       </div>
 
+      /* Input area for sending messages and attachments */
       <div class="input-container">
         <label class="attachment-btn">
           <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
@@ -75,11 +85,13 @@
           </svg>
         </label>
 
+        /* Input field for typing messages */
         <input [(ngModel)]="newMessage" 
                (keyup.enter)="sendMessage()" 
                placeholder="Type a message..."
                autocomplete="off">
         
+        /* Send button for messages */
         <button class="send-btn" 
                 (click)="sendMessage()" 
                 [disabled]="!newMessage.trim()">
@@ -90,6 +102,7 @@
       </div>
     </ng-container>
 
+    /* Placeholder for when no conversation is selected */
     <ng-template #noSelection>
       <div class="empty-state">
         <div class="empty-icon">💬</div>
