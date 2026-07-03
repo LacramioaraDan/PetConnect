@@ -54,6 +54,12 @@ export class PetSitting implements OnInit {
   onFilterChange() {
     let tempPetsitters = [...this.allPetsitters];
 
+    if (this.filterPetsitterName.trim()) {
+      tempPetsitters = tempPetsitters.filter(sitter => 
+        sitter.name?.toLowerCase().includes(this.filterPetsitterName.toLowerCase())
+      );
+    }
+
     if (this.filterLocation.trim()) {
       tempPetsitters = tempPetsitters.filter(sitter => 
         sitter.address?.toLowerCase().includes(this.filterLocation.toLowerCase())
