@@ -1,63 +1,101 @@
 <div class="profile-full-layout" *ngIf="currentUser">
+
+  <!-- Profile Column on the left side -->
   <div class="table-column-profile-left">
+
+    <!-- Profile picture -->
     <div class="profile-avatar-floating-zone">
       <div class="avatar-wrapper-large">
+
+        <!-- Shows uploaded image, or an auto-generated cartoon if image is blank -->
         <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="main-avatar-large">
+        
+        <!-- "Change Photo" button that only shows up when editing profile -->
         <label class="custom-file-upload" *ngIf="isEditing">
           <input type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
           Change Photo
         </label>
       </div>
     </div>
+
+    <!-- Profile Info Card Container -->
     <div class="unified-profile-master-card">
+
+      <!-- Name and Account Type Header -->
       <div class="identity-card-block-centered">
+
+        <!-- Displays user name -->
         <h1 *ngIf="!isEditing">{{ currentUser.name }}</h1>
+
+        <!-- Shows text box to rename username -->
         <div class="edit-field" *ngIf="isEditing" style="align-items: center; width: 100%;">
           <label class="edit-label">Display Name</label>
           <input [(ngModel)]="currentUser.name" class="edit-input header-edit-input" placeholder="Enter name..." />
         </div>
+
+        <!-- Account Type Badge -->
         <span class="account-role-badge">
           <span *ngIf="currentUser.role === 'shelter'">{{ currentUser.isVerified ? 'Verified Shelter' : 'Pending Shelter Verification' }}</span>
           <span *ngIf="currentUser.role !== 'shelter'">{{ currentUser.role === 'petsitter' ? 'Pet Sitter' : 'Individual Account' }}</span>
         </span>
       </div>
       
+      <!-- Separator line -->
       <hr class="card-divider-line" *ngIf="currentUser.role === 'shelter' || currentUser.role === 'petsitter' || isEditing">
+      
+      <!-- About section -->
       <div class="card-inner-section">
         <h3 class="section-title text-center-align">{{ currentUser.role === 'shelter' ? 'About Us' : 'About Me' }}</h3>
+        
+        <!-- Displays about section -->
         <div class="bio-display-card" *ngIf="!isEditing">
           <p class="bio-text wrapped-text-block">{{ currentUser.description || 'No description added yet. Edit your profile to introduce yourself.' }}</p>
         </div>
+
+        <!-- Displays editing option for about section -->
         <textarea *ngIf="isEditing" [(ngModel)]="currentUser.description" class="edit-textarea"></textarea>
       </div>
       
+      <!-- Contact Details Block -->
       <ng-container *ngIf="currentUser.role === 'shelter' || currentUser.role === 'petsitter'">
         <hr class="card-divider-line">
         <div class="card-inner-section">
           <h3 class="section-title text-center-align">{{ currentUser.role === 'shelter' ? 'Shelter Contact Details' : 'Sitter Contact Details' }}</h3>
           <div class="contact-view-stack" *ngIf="!isEditing">
+            
+            <!-- Location field -->
             <div class="contact-item text-center-align">
               <label class="edit-label">Address / Location</label>
               <p class="wrapped-text-block">{{ currentUser.address || 'No location specified' }}</p>
             </div>
+
+            <!-- Experience field -->
             <div class="contact-item text-center-align" *ngIf="currentUser.role === 'petsitter'">
               <label class="edit-label">Experience</label>
               <p class="wrapped-text-block">{{ currentUser.experience || 'No experience specified' }}</p>
             </div>
+
+            <!-- Contact field -->
             <div class="contact-item text-center-align">
               <label class="edit-label">Phone Number</label>
               <p class="wrapped-text-block">{{ currentUser.phone || 'No phone specified' }}</p>
             </div>
           </div>
+
+          <!-- Editable adress field -->
           <div class="contact-edit-stack" *ngIf="isEditing">
             <div class="edit-field">
               <label class="edit-label">Physical Address</label>
               <input [(ngModel)]="currentUser.address" class="edit-input" placeholder="City, Street, Number" />
             </div>
+
+            <!-- Editable experience field -->
             <div class="edit-field" *ngIf="currentUser.role === 'petsitter'">
               <label class="edit-label">Pet Sitting Experience</label>
               <input [(ngModel)]="currentUser.experience" class="edit-input" placeholder="e.g., 5 years with dogs..." />
             </div>
+
+            <!-- Editable contact field -->
             <div class="edit-field">
               <label class="edit-label">Contact Phone</label>
               <input [(ngModel)]="currentUser.phone" class="edit-input" placeholder="07xxxxxxxx" />
@@ -66,13 +104,20 @@
         </div>
       </ng-container>
 
+      <!-- Profile Bottom Buttons Settings -->
       <hr class="card-divider-line">
       <div class="profile-actions-toolbar">
+        
+        <!-- Edit Profile Trigger Button -->
         <button *ngIf="!isEditing" (click)="isEditing = true" class="btn-primary">Edit Profile</button>
+        
+        <!-- Edit, Save or Cancel Options -->
         <div class="edit-actions" *ngIf="isEditing">
           <button (click)="saveProfile()" class="btn-save">Save Changes</button>
           <button (click)="cancelEdit()" class="btn-cancel">Cancel</button>
         </div>
+
+        <!-- Account Logout or Delete Controls -->
         <div class="danger-zone-actions" *ngIf="!isEditing">
           <button (click)="signOut()" class="btn-logout">Log Out</button>
           <button (click)="deleteAccount()" class="btn-delete">Delete Account</button>
@@ -81,10 +126,15 @@
     </div>
   </div>
 
+  <!-- User posts management feed on the right side -->
   <div class="table-column-posts-right">
+
+    <!--Shelter Documents Approval Dashboard -->
     <div *ngIf="currentUser.role === 'admin'" style="margin-bottom: 30px;">
       <h2 class="feed-heading">Shelter Approval Dashboard</h2>
       <div class="empty-feed" *ngIf="pendingShelters.length === 0"><p>No pending shelters at this time.</p></div>
+      
+      <!-- Loops over every waiting shelter registration document -->
       <div class="timeline-posts-container" *ngFor="let shelter of pendingShelters">
         <div class="animal-card" style="padding: 20px; margin-bottom: 15px;">
           <h3>{{ shelter.name }}</h3>
@@ -101,24 +151,33 @@
       </div>
     </div>
 
+    <!-- Pet adoption posts -->
     <h2 class="feed-heading">Active Pet Adoption Posts</h2>
     <div class="empty-feed" *ngIf="myAnimals.length === 0">
       <p>No active adoption posts listed yet.</p>
     </div>
+
+    <!-- Loops over user pet lists -->
     <div class="timeline-posts-container" *ngIf="myAnimals.length > 0">
       <div *ngFor="let animal of myAnimals" class="animal-card">
+
+        <!-- Post Header -->
         <div class="post-meta-header">
            <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
            <div style="flex-grow: 1;">
              <div class="post-meta-name">{{ currentUser.name }}</div>
              <div class="post-meta-sub">Posted on {{ animal.createdAt | date:'MMMM d, y' }}</div>
            </div>
+
+           <!-- Three dots button opening options dropdown link menu -->
            <button class="three-dots" (click)="toggleMenu(animal)">•••</button>
            <div class="dropdown-menu" *ngIf="isMenuOpen(animal)">
              <button (click)="openEditModal(animal)">✏️ Edit</button>
              <button (click)="deletePost(animal)" class="menu-delete-btn">🗑️ Delete</button>
            </div>
         </div>
+
+        <!-- Post Layout Content Info -->
         <div class="post-body-layout">
           <div class="post-details-side">
             <h2>{{ animal.name }}</h2>
@@ -129,36 +188,52 @@
               <p><b>Location:</b> {{ animal.location }}</p>
             </div>
           </div>
+
+          <!-- Animal image -->
           <div class="post-image-side"><img [src]="animal.imageUrl" class="post-pet-img"></div>
         </div>
+        <!-- Animal descriptions -->
         <div class="post-footer-description">{{ animal.description }}</div>
       </div>
     </div>
 
+    <!-- Lost and found posts -->
     <h2 class="feed-heading" style="margin-top: 40px;">Active Lost & Found Reports</h2>
     <div class="empty-feed" *ngIf="myLostAndFoundPosts.length === 0">
       <p>No active missing or found reports filed yet.</p>
     </div>
+
+    <!-- Loops over lost or found listings -->
     <div class="timeline-posts-container" *ngIf="myLostAndFoundPosts.length > 0">
       <div *ngFor="let post of myLostAndFoundPosts" class="animal-card">
+
+        <!-- Header -->
         <div class="post-meta-header">
           <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
           <div style="flex-grow: 1;">
             <div class="post-meta-name">{{ currentUser.name }}</div>
             <div class="post-meta-sub">Reported on {{ post.createdAt | date:'MMMM d, y' }}</div>
           </div>
+
+          <!-- Three dots button opening options dropdown link menu -->
           <button class="three-dots" (click)="toggleMenu(post)">•••</button>
           <div class="dropdown-menu" *ngIf="isMenuOpen(post)">
             <button (click)="openEditLostFoundModal(post)">✏️ Edit</button>
             <button (click)="deleteLostFoundPost(post)" class="menu-delete-btn">🗑️ Delete</button>
           </div>
         </div>
+
+        <!-- Post content layout -->
         <div class="post-body-layout">
           <div class="post-details-side">
             <h2 style="text-transform: capitalize;">
-              {{ post.species }} 
+              {{ post.species }}
+
+              <!-- Lost or Found badge --> 
               <span style="font-size: 14px; font-weight: 600; padding: 3px 8px; border-radius: 8px; margin-left: 5px;" [style.background]="post.postType === 'lost' ? '#ffebe9' : '#e6f4ea'" [style.color]="post.postType === 'lost' ? '#ef4444' : '#137333'">{{ post.postType | uppercase }}</span>
             </h2>
+
+            <!-- Pet details -->
             <div class="details-spec-list">
               <p><b>Breed:</b> {{ post.breed || 'Unknown' }}</p>
               <p><b>Last Seen:</b> {{ post.lastSeenLocation }}</p>
@@ -166,59 +241,78 @@
               <p><b>Microchip:</b> {{ post.microchipped ? 'Yes' : 'No' }}</p>
             </div>
           </div>
+
+          <!-- Pet photo -->
           <div class="post-image-side"><img [src]="post.imageUrl || 'https://placehold.co/250x250?text=No+Pet+Image'" class="post-pet-img"></div>
         </div>
+
+        <!-- Post description text -->
         <div class="post-footer-description">{{ post.description }}</div>
       </div>
     </div>
 
+  <!-- Pet sitting offers --> 
   <div *ngIf="currentUser.role === 'petsitter'" style="margin-top: 40px;">
     <h2 class="feed-heading">Active Sitting Offers</h2>
   
-  <div class="empty-feed" *ngIf="mySittingOffers.length === 0">
-    <p>No active sitting offers posted yet.</p>
-  </div>
+    <!-- Shows if there are no sitting offers -->
+    <div class="empty-feed" *ngIf="mySittingOffers.length === 0">
+      <p>No active sitting offers posted yet.</p>
+    </div>
 
-  <div class="timeline-posts-container" *ngIf="mySittingOffers.length > 0">
-    <div *ngFor="let offer of mySittingOffers" class="animal-card">
-      <div class="post-meta-header">
-        <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
-        <div style="flex-grow: 1;">
-          <div class="post-meta-name">{{ currentUser.name }}</div>
-          <div class="post-meta-sub">Posted on {{ offer.createdAt | date:'MMMM d, y' }}</div>
-        </div>
-        <button class="three-dots" (click)="toggleMenu(offer)">•••</button>
-        <div class="dropdown-menu" *ngIf="isMenuOpen(offer)">
-          <button (click)="openEditSittingModal(offer)">✏️ Edit</button>
-          <button (click)="deleteSittingPost(offer)" class="menu-delete-btn">🗑️ Delete</button>
-        </div>
-      </div>
-      <div class="post-body-layout">
-        <div class="post-details-side">
-          <h2>{{ offer.name }}</h2>
-          <div class="details-spec-list">
-            <p><b>Species:</b> {{ offer.species }}</p>
-            <p><b>Experience:</b> {{ offer.experience }}</p>
-            <p><b>Pricing:</b> {{ offer.pricing }}</p>
-            <p><b>Location:</b> {{ offer.location }}</p>
+    <!-- Loops through all sitting offers -->
+    <div class="timeline-posts-container" *ngIf="mySittingOffers.length > 0">
+      <div *ngFor="let offer of mySittingOffers" class="animal-card">
+
+        <!-- Post Header -->
+        <div class="post-meta-header">
+          <img [src]="currentUser.imageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" class="post-meta-avatar">
+          <div style="flex-grow: 1;">
+            <div class="post-meta-name">{{ currentUser.name }}</div>
+            <div class="post-meta-sub">Posted on {{ offer.createdAt | date:'MMMM d, y' }}</div>
+          </div>
+
+          <!-- Three-dots dropdown menu -->
+          <button class="three-dots" (click)="toggleMenu(offer)">•••</button>
+          <div class="dropdown-menu" *ngIf="isMenuOpen(offer)">
+            <button (click)="openEditSittingModal(offer)">✏️ Edit</button>
+            <button (click)="deleteSittingPost(offer)" class="menu-delete-btn">🗑️ Delete</button>
           </div>
         </div>
-        <div class="post-image-side"><img [src]="offer.imageUrl" class="post-pet-img"></div>
+
+        <!-- Offer details and image -->
+        <div class="post-body-layout">
+          <div class="post-details-side">
+            <h2>{{ offer.name }}</h2>
+            <div class="details-spec-list">
+              <p><b>Species:</b> {{ offer.species }}</p>
+              <p><b>Experience:</b> {{ offer.experience }}</p>
+              <p><b>Pricing:</b> {{ offer.pricing }}</p>
+              <p><b>Location:</b> {{ offer.location }}</p>
+            </div>
+          </div>
+          <div class="post-image-side"><img [src]="offer.imageUrl" class="post-pet-img"></div>
+        </div>
+
+        <!-- Offer description text -->
+        <div class="post-footer-description">{{ offer.description }}</div>
       </div>
-      <div class="post-footer-description">{{ offer.description }}</div>
     </div>
-  </div>
 </div>
 
+<!-- Editing posts modal card -->
 <div class="modal-overlay" *ngIf="showModal" (click)="showModal = false; isEditingSitting = false; isEditingLostFound = false;" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 9999;">
   <div class="modal-card" (click)="$event.stopPropagation()" style="background: white; padding: 30px; border-radius: 14px; width: 550px; max-height: 90vh; overflow-y: auto;">
     
+    <!-- Changes popup title based on what you are editing -->
     <h3 *ngIf="!isEditingSitting && !isEditingLostFound">Edit Buddy</h3>
     <h3 *ngIf="isEditingSitting">Edit Sitting Offer</h3>
     <h3 *ngIf="isEditingLostFound">Edit Lost & Found Report</h3>
     
+    <!-- Submits the correct form based on what you are editing -->
     <form (submit)="isEditingSitting ? saveSittingPost() : (isEditingLostFound ? saveLostFoundPost() : savePost())" style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
       
+      <!-- Editing standard pet adoption posts -->
       <ng-container *ngIf="!isEditingSitting && !isEditingLostFound">
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label>Name</label>
@@ -253,6 +347,7 @@
         </div>
       </ng-container>
 
+      <!-- Editing sitting offers -->
       <ng-container *ngIf="isEditingSitting">
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label>Offer Title</label>
@@ -284,6 +379,7 @@
         </div>
       </ng-container>
 
+      <!-- Editing lost & found reports -->
       <ng-container *ngIf="isEditingLostFound">
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label>Species *</label>
@@ -314,6 +410,7 @@
         </div>
       </ng-container>
 
+      <!-- Cancel and Save buttons for modal -->
       <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 5px;">
         <button type="button" (click)="showModal = false; isEditingSitting = false; isEditingLostFound = false;">Cancel</button>
         <button type="submit">Save</button>
