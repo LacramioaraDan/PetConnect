@@ -1,18 +1,28 @@
+<!-- === Authentication Container -->
 <div *ngIf="!remult.authenticated()" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; background: #dcb0e2;">
+  
+  <!-- The main split-screen background layout -->
   <div class="auth-page" style="display: flex; height: 100%; width: 100%; background: #dcb0e2;">
+    
+    <!-- Left-side panel displaying the main background image -->
     <div class="auth-aside" style="flex: 1; background-color: #d5c1ef; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center;">
       <img src="login.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: center;">
     </div>
 
+    <!-- Right-side panel containing the headings and input fields -->
     <div class="auth-main" style="flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px; background: #dcb0e2;">
       <div class="form-container" style="width: 100%; max-width: 500px; text-align: center; display: flex; flex-direction: column; align-items: center;">
         <h1 style="font-size: 3.5rem; font-weight: 900; color: #8b2e8b; margin: 0; line-height: 1.1; letter-spacing: -1.5px;">Hey there fellow animal lover!</h1>
+        
+        <!-- Smart subtitle that changes based on what the user is doing (Login, Signup, Reset) -->
         <p style="color: #666; margin: 10px 0 35px 0; font-size: 1.2rem;">
           {{ resetMode ? 'Choose a new password' : (forgotPasswordMode ? 'Enter email to reset password' : (isSignUp ? 'Join the pack today' : 'Welcome back! Login please')) }}
         </p>
 
+        <!-- The submission form switcher that routes to different functions -->
         <form (submit)="resetMode ? finishReset() : (forgotPasswordMode ? sendResetEmail() : (isSignUp ? signUp() : signIn()))" style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px;">
           
+          <!-- Password Reset Mode -->
           <ng-container *ngIf="resetMode">
             <div class="input-wrap" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
               <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">Reset Token</label>
@@ -26,7 +36,10 @@
             <p (click)="resetMode = false" style="margin-top: 25px; color: #8b2e8b; font-size: 1rem; cursor: pointer; text-decoration: underline; font-weight: 700;">Back to Login</p>
           </ng-container>
 
+          <!-- Handles regular Sign-In and full Sign-Up forms -->
           <ng-container *ngIf="forgotPasswordMode && !resetMode">
+
+            <!-- Sign-Up options: User, Shelter, or Sitter -->
             <div class="input-wrap" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
               <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">Email Address</label>
               <input [(ngModel)]="email" name="email" type="email" placeholder="email@example.com" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />
@@ -50,6 +63,7 @@
               <input [(ngModel)]="name" name="name" type="text" [placeholder]="role === 'shelter' ? 'e.g., Happy Paws Shelter' : 'Your Name'" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />
             </div>
 
+            <!-- Extra info fields shown only to Shelters and Pet Sitters during Sign-Up -->
             <div *ngIf="isSignUp && (role === 'shelter' || role === 'petsitter')" style="width: 100%;">
               <div class="input-wrap" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
                 <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">Physical Address</label>
@@ -67,11 +81,13 @@
               </div>
             </div>
 
+            <!-- Shelter license link input shown only to Shelters during Sign-Up -->
             <div class="input-wrap" *ngIf="isSignUp && role === 'shelter'" style="width: 100%; max-width: 500px; margin: 0 auto 20px auto; display: flex; flex-direction: column;">
               <label style="font-weight: 700; margin-bottom: 8px;">Shelter License URL(make sure it can be viewed by our administrators)</label>
               <input [(ngModel)]="verificationDocumentUrl" name="verificationDocumentUrl" placeholder="Paste Google Drive link here" style="width: 100%; box-sizing: border-box; padding: 12px 20px; border-radius: 50px; border: 1px solid #ddd;" />
             </div>
 
+            <!-- Main login fields always needed for email and password -->
             <div class="input-wrap" style="width: 100%; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
               <label style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 8px;">Email Address</label>
               <input [(ngModel)]="email" name="email" type="email" placeholder="email@example.com" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />
@@ -82,6 +98,7 @@
               <input [(ngModel)]="password" name="password" type="password" placeholder="••••••••" style="width: 100%; padding: 16px; border: 1px solid #ddd; border-radius: 50px; text-align: center; outline: none; background: white; font-size: 1rem;" />
             </div>
 
+            <!-- Submit buttons and text links to switch between Login and Sign-Up screens -->
             <p class="edit-p-text" *ngIf="!isSignUp" (click)="forgotPasswordMode = true" style="color: #8b2e8b; font-size: 0.9rem; cursor: pointer; margin-bottom: 15px; text-decoration: underline; font-weight: 600; width: 100%; text-align: center;">Forgot Password?</p>
             <button type="submit" style="width: 100%; background: #000; color: #fff; padding: 18px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; font-size: 1.1rem; margin-top: 10px;">{{ isSignUp ? 'Create Account' : 'Login' }}</button>
             <p (click)="isSignUp = !isSignUp" style="margin-top: 25px; color: #8b2e8b; font-size: 1rem; cursor: pointer; text-decoration: underline; font-weight: 700;">{{ isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up' }}</p>
@@ -92,9 +109,16 @@
   </div>
 </div>
 
+<!-- Main website view that loads up only when the user logs in successfully -->
 <ng-container *ngIf="remult.authenticated()">
+
+  <!-- Main white navigation bar fixed at the very top of the screen -->
   <nav class="navbar" style="height: 80px; background: white; display: flex !important; justify-content: space-between; align-items: center; padding: 0 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+    
+    <!-- Website logo link that takes you back to the home page -->
     <div style="flex: 1;"><h2 style="color: #8b2e8b; margin: 0; cursor: pointer; font-weight: 900; font-size: 2rem;" routerLink="/">PetConnect</h2></div>
+    
+    <!-- Group of menu links to visit different pages of the app -->
     <div class="nav-center" style="display: flex; gap: 20px; justify-content: center; align-items: center; white-space: nowrap;">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Adoption Announcements</a>
       <a routerLink="/shelters" routerLinkActive="active">Shelters</a>
@@ -103,6 +127,8 @@
       <a routerLink="/petsitting" routerLinkActive="active">Pet Sitting</a>
       <a routerLink="/lost-and-found" routerLinkActive="active">Lost & Found</a>
     </div>
+
+    <!-- User profile page link showing your name and avatar image -->
     <div style="flex: 1; display: flex; justify-content: flex-end; align-items: center;">
       <div routerLink="/profile" style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
         <span style="font-size: 18px; font-weight: 700; color: #050505;">{{ remult.user?.name }}</span>
@@ -110,6 +136,8 @@
       </div>
     </div>
   </nav>
+
+  <!-- Main content box where different page features load under the navbar -->
   <div class="main-content" style="padding-top: 110px; width: 100%; display: flex; flex-direction: column; align-items: center;">
     <router-outlet></router-outlet>
   </div>
