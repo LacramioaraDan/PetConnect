@@ -17,43 +17,52 @@ import { SittingPost } from '../../shared/SittingPosts';
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
-export class Profile implements OnInit, OnDestroy {
+
+export class Profile implements OnInit {
+
+  // Lists containing every type of posts 
   currentUser?: User | null;
+
   myAnimals: Animal[] = [];
   pendingShelters: User[] = [];
-  isEditing = false;
-  showModal = false;
   editableAnimal: Partial<Animal> = {};
-  tempImagePreview: string | null = null;
+
   mySittingOffers: SittingPost[] = [];
   editableSittingPost: Partial<SittingPost> = {};
   
-  // Lost and Found Additions
   myLostAndFoundPosts: LostAndFoundPost[] = [];
   editableLostFoundPost: Partial<LostAndFoundPost> = {};
   isEditingLostFound = false;
   isEditingSitting = false;
 
+  isEditing = false;
+  showModal = false;
+  tempImagePreview: string | null = null;
+
   fullUser: User | null | undefined = null;
 
   constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {}
 
+  /* Runs automatically when the page loads */
   async ngOnInit() {
     await this.fetchCurrentUser();
     if (this.currentUser) {
+
+      // If user is an admin, load up unverified shelter sign-up requests
       if (this.currentUser.role === 'admin') {
         this.pendingShelters = await remult.repo(User).find({
           where: { role: 'shelter', isVerified: false }
         });
       }
+
+      // Load all lists belonging to this specific user
       await this.fetchMyAnimals();
       await this.fetchMySittingOffers();
       await this.fetchMyLostAndFoundPosts();
     }
   }
 
-  ngOnDestroy() {}
-
+  // Gets data for the currently logged-in account
   async fetchCurrentUser() {
     if (remult.user) {
       this.currentUser = await remult.repo(User).findId(remult.user.id);
@@ -61,14 +70,17 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  // Gets user's active pet adoption listings
   async fetchMyAnimals() {
-  if (this.currentUser) {
-    this.myAnimals = await remult.repo(Animal).find({
-      where: { userId: this.currentUser.id },
-      orderBy: { createdAt: 'desc' }
-    });
+    if (this.currentUser) {
+      this.myAnimals = await remult.repo(Animal).find({
+        where: { userId: this.currentUser.id },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
   }
-}
+
+  // Gets user's active pet sitting offer listings
   async fetchMySittingOffers() {
     if (this.currentUser) {
       this.mySittingOffers = await remult.repo(SittingPost).find({
@@ -78,6 +90,7 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  // Gets user's active missing or found pet posts
   async fetchMyLostAndFoundPosts() {
     if (this.currentUser) {
       this.myLostAndFoundPosts = await remult.repo(LostAndFoundPost).find({
@@ -87,6 +100,7 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  // Approves a registration request for a shelter account
   async approveShelter(id: string) {
     try {
       await User.approveShelter(id);
@@ -97,7 +111,7 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
-  // Add this method alongside approveShelter(id: string)
+  // Denies and deletes a pending shelter application
   async denyShelter(id: string) {
     if (!confirm("Are you sure you want to deny and permanently delete this shelter request?")) return;
     try {
@@ -109,12 +123,14 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  // Saves updated profile fields
   async saveProfile() {
     try {
       if (this.currentUser) {
         if (this.tempImagePreview) this.currentUser.imageUrl = this.tempImagePreview;
         const savedUser = await remult.repo(User).save(this.currentUser);
         
+        // Updates active layout header components with new info immediately
         if (remult.user) {
           remult.user.imageUrl = savedUser.imageUrl;
           remult.user.name = savedUser.name;
@@ -128,6 +144,7 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  // Reverts modified profile fields back to normal database values
   cancelEdit() {
     this.isEditing = false;
     this.tempImagePreview = null;
@@ -136,6 +153,7 @@ export class Profile implements OnInit, OnDestroy {
     });
   }
 
+  // Logs out the user and sends them back to the authentication page
   async signOut() {
     try {
       await lastValueFrom(this.http.post('/api/signOut', {}));
@@ -144,6 +162,7 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { remult.user = undefined; this.router.navigate(['/']); }
   }
 
+  // Deletes the logged-in user account entirely
   async deleteAccount() {
     if (!this.fullUser || !confirm("Are you sure? This will permanently delete your account and all your posts.")) return;
     try {
@@ -154,6 +173,7 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  // Converts uploaded image files into a text-based format (Base64) to save online
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
@@ -161,6 +181,7 @@ export class Profile implements OnInit, OnDestroy {
       reader.onload = (e: any) => {
         const base64Image = e.target.result;
         
+        // Assigns image to whichever entity form is actively being edited
         if (this.isEditingSitting) {
           this.editableSittingPost.imageUrl = base64Image;
         } else if (this.isEditingLostFound) {
@@ -177,8 +198,11 @@ export class Profile implements OnInit, OnDestroy {
     }
   }
 
+  // Toggles the little edit/delete menu open or closed on a specific card block
   toggleMenu(post: any) {
     const currentState = !!post['_showMenu'];
+
+    // Closes menus on all other active posts first so only one is open
     this.myAnimals.forEach((p: any) => p['_showMenu'] = false);
     this.mySittingOffers.forEach((p: any) => p['_showMenu'] = false);
     this.myLostAndFoundPosts.forEach((p: any) => p['_showMenu'] = false);
@@ -187,6 +211,7 @@ export class Profile implements OnInit, OnDestroy {
 
   isMenuOpen(post: any): boolean { return !!post['_showMenu']; }
 
+  // Opens the edit popup modal filled with a pet adoption post's current data
   openEditModal(post: Animal) {
     (post as any)._showMenu = false;
     this.editableAnimal = { ...post }; 
@@ -195,6 +220,7 @@ export class Profile implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
+  // Saves changes made to a pet adoption post
   async savePost() {
     try {
       await remult.repo(Animal).save(this.editableAnimal);
@@ -204,6 +230,7 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { alert(error.message); }
   }
 
+  // Permanently deletes a pet adoption post
   async deletePost(post: Animal) {
     (post as any)._showMenu = false;
     if (!confirm(`Delete ${post.name}?`)) return;
@@ -213,6 +240,7 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { alert(error.message); }
   }
 
+  // Saves changes made to a sitting offer post
   async saveSittingPost() {
     try {
       await remult.repo(SittingPost).save(this.editableSittingPost);
@@ -224,6 +252,7 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { alert(error.message); }
   }
 
+  // Permanently deletes a pet sitting offer post
   async deleteSittingPost(post: SittingPost) {
     (post as any)._showMenu = false;
     if (!confirm(`Delete sitting offer ${post.name}?`)) return;
@@ -233,6 +262,7 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { alert(error.message); }
   }
 
+  // Opens the edit popup modal filled with a sitting offer's current data
   openEditSittingModal(post: SittingPost) {
     (post as any)._showMenu = false;
     this.editableSittingPost = { ...post }; 
@@ -241,7 +271,7 @@ export class Profile implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
-  // Lost and Found Action Methods
+  // Opens the edit popup modal filled with a lost & found report's current data
   openEditLostFoundModal(post: LostAndFoundPost) {
     (post as any)._showMenu = false;
     this.editableLostFoundPost = { ...post };
@@ -250,6 +280,7 @@ export class Profile implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
+  // Saves changes made to a lost & found post
   async saveLostFoundPost() {
     try {
       await remult.repo(LostAndFoundPost).save(this.editableLostFoundPost);
@@ -259,6 +290,7 @@ export class Profile implements OnInit, OnDestroy {
     } catch (error: any) { alert(error.message); }
   }
 
+  // Permanently deletes a lost & found report post
   async deleteLostFoundPost(post: LostAndFoundPost) {
     (post as any)._showMenu = false;
     if (!confirm(`Delete lost & found report for ${post.species}?`)) return;
