@@ -48,13 +48,13 @@ app.use((req, res, next) => {
 });
 
 // Handles receiving an uploaded file and sends back its new saved web address
-app.post('/api/upload', upload.single('file'), (req, res) => {
+app.post('/api/upload', upload.single('file'), (req: express.Request, res: express.Response) => {
 
     // If the user didn't select an image or file, stop and show an error
     if (!req.file) return res.status(400).send('No file uploaded.');
 
     // Sends back the exact folder path location of where the file was saved
-    res.json({ url: `/uploads/${req.file.filename}` });
+    return res.json({ url: `/uploads/${req.file!.filename}` });
 });
 
 // Tells the server to let users view files directly out of the uploads folder
