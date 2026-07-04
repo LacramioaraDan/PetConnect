@@ -1,5 +1,3 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
@@ -11,8 +9,8 @@
 , "src/server/index.js"  ],
   "exclude": [
     "src/**/*.spec.ts",
-    "src/server/**/*",        // <--- Excludes your backend server folder
-    "src/api/**/*",           // <--- Excludes any separate API folders
-    "node_modules/nodemailer" // <--- Excludes backend dependencies from client bundling
+    "src/server/**/*",
+    "src/api/**/*",
+    "node_modules/nodemailer"
   ]
 }

@@ -11,23 +11,19 @@ import { PetAdvisor } from './app/pet-advisor/pet-advisor';
 import { PetSitting } from './app/petsitting/petsitting';
 import { LostAndFound } from './app/lost-and-found/lost-and-found';
 
-// 2. Define the variable FIRST
+// Maps screen components to specific web address links (URLs)
 export const routes: Routes = [
   { path: '', component: Posts },
   { path: 'shelters', component: Shelters },
   { path: 'profile', component: Profile },
   { path: 'advisor', component: PetAdvisor },
-  // ADD THESE TWO:
-  { path: 'messages', component: Messages },           // Generic inbox
-  { path: 'messages/:userId', component: Messages },    // Specific chat with a user
-  { path: 'petsitting', component: PetSitting}, 
+  { path: 'messages', component: Messages },
+  { path: 'messages/:userId', component: Messages },
+  { path: 'petsitting', component: PetSitting},
   { path: 'lost-and-found', component: LostAndFound}
 ];
 
-// 3. Now use it in the bootstrap call SECOND
+// Starts the whole website application and injects the links and server connection tools
 bootstrapApplication(App, {
-  providers: [
-    provideRouter(routes), 
-    provideHttpClient()
-  ]
+  providers: [ provideRouter(routes), provideHttpClient()]
 }).catch((err) => console.error(err));

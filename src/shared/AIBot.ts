@@ -1,5 +1,6 @@
 import { BackendMethod, Allow, isBackend } from "remult";
 
+// Score profiles (1 to 5) for each pet type used to mathematically match user lifestyles
 const PET_PROFILES: Record<string, any> = {
   dog:        { energy: 5, space: 4, social: 5, upkeep: 3, budget: 4, travel: false },
   cat:        { energy: 3, space: 2, social: 3, upkeep: 2, budget: 3, travel: true },
@@ -13,6 +14,7 @@ const PET_PROFILES: Record<string, any> = {
   turtle:     { energy: 1, space: 3, social: 1, upkeep: 4, budget: 3, travel: false }
 };
 
+// Detailed care instructions and images pulled right before displaying final results
 const PET_INFO: Record<string, { desc: string, img: string }> = {
   dog: { desc: "Dogs are loyal companions who thrive on routine.<br><br><b>Feeding:</b> High-quality protein-based diet twice daily.<br><b>Care:</b> Daily walks, mental stimulation (toys/puzzles), and consistent training.<br><b>Pro Tip:</b> Keep their mind sharp with new tricks—a tired dog is a happy, well-behaved dog!", img: "dog.jpg" },
   cat: { desc: "Cats are independent but love affection.<br><br><b>Feeding:</b> Mix of wet food for hydration and quality dry food.<br><b>Care:</b> Scoop the litter box daily and provide vertical climbing spots like shelves or cat trees.<br><b>Pro Tip:</b> Use a laser pointer or feather wand to mimic hunting; it's the best way to bond with them.", img: "cat.jpg" },
@@ -26,51 +28,54 @@ const PET_INFO: Record<string, { desc: string, img: string }> = {
   turtle: { desc: "Turtles are slow, long-term companions.<br><br><b>Feeding:</b> Pellets, leafy greens, and occasional protein.<br><b>Care:</b> A large tank with a powerful filter is non-negotiable.<br><b>Pro Tip:</b> Keep a log of their growth and behavior—it's a great way to track their health over many years.", img: "turtle.jpg" }
 };
 
+// Sequence of questions that the bot asks the user one by one to determine their score
 const CONVERSATIONAL_MAP: { bridge: string }[] = [
-  { bridge: "Great! Let's get to know you. How would your friends describe your personality?" }, // 0
-  { bridge: "Cool. And what's your vibe like—are you more high-energy or laid-back?" }, // 1
-  { bridge: "Got it. What kind of home setup are you working with?" }, // 2
-  { bridge: "Nice. Are you the type to want a super cuddly pet, or do you prefer some space?" }, // 3
-  { bridge: "Got it. Do you find yourself traveling a lot?" }, // 4 (Mapped to travel boolean)
-  { bridge: "Understood! What kind of budget are you thinking for your new buddy?" }, // 5 (Mapped to budget value parse)
-  { bridge: "Awesome! How do you feel about cleaning up after a pet?" }, // 6
-  { bridge: "Noted! What’s your biggest pet peeve when it comes to animals?" }, // 7
-  { bridge: "Makes sense. How much time do you realistically have for a pet each week?" }, // 8
-  { bridge: "Good to know! Do you have any kids or other pets already?" }, // 9
-  { bridge: "Great! Do you want a pet that learns tricks?" }, // 10 (Mapped to upkeep)
-  { bridge: "Got it! When hanging out at home, do you want a pet that’s active or one that’s happy chilling?" }, // 11
-  { bridge: "Understood! How often is the place empty during the day?" }, // 12 (Mapped to hours logic)
-  { bridge: "Lifespans vary a lot, does that matter much to you?" }, // 13
-  { bridge: "Some people love a noisy house, are you into that?" }, // 14 (Mapped to energy)
-  { bridge: "Regarding snacks and meals, do you want something simple?" }, // 15
-  { bridge: "Just being real, are you cool with occasional surprise vet bills?" }, // 16 (Mapped to budget)
-  { bridge: "Do you want a pet that can be handled easily?" }, // 17
-  { bridge: "Big step! Are you ready for a long-term commitment?" }, // 18 (Mapped to upkeep)
-  { bridge: "Almost done! What’s the main reason you’re looking for a pet?" } // 19
+  { bridge: "Great! Let's get to know you. How would your friends describe your personality?" },
+  { bridge: "Cool. And what's your vibe like—are you more high-energy or laid-back?" },
+  { bridge: "Got it. What kind of home setup are you working with?" },
+  { bridge: "Nice. Are you the type to want a super cuddly pet, or do you prefer some space?" },
+  { bridge: "Got it. Do you find yourself traveling a lot?" },
+  { bridge: "Understood! What kind of budget are you thinking for your new buddy?" },
+  { bridge: "Awesome! How do you feel about cleaning up after a pet?" },
+  { bridge: "Noted! What’s your biggest pet peeve when it comes to animals?" },
+  { bridge: "Makes sense. How much time do you realistically have for a pet each week?" },
+  { bridge: "Good to know! Do you have any kids or other pets already?" },
+  { bridge: "Great! Do you want a pet that learns tricks?" },
+  { bridge: "Got it! When hanging out at home, do you want a pet that’s active or one that’s happy chilling?" },
+  { bridge: "Understood! How often is the place empty during the day?" },
+  { bridge: "Lifespans vary a lot, does that matter much to you?" },
+  { bridge: "Some people love a noisy house, are you into that?" },
+  { bridge: "Regarding snacks and meals, do you want something simple?" },
+  { bridge: "Just being real, are you cool with occasional surprise vet bills?" },
+  { bridge: "Do you want a pet that can be handled easily?" },
+  { bridge: "Big step! Are you ready for a long-term commitment?" },
+  { bridge: "Almost done! What’s the main reason you’re looking for a pet?" }
 ];
 
-// Corrected index correlations matching the exact question being processed
+// Directly updates specific trait metrics when a user answers "Yes" or "No" to specific questions.
 const INDEX_LOGIC: Record<number, { trait: string, positive: number, negative: number, isBoolean?: boolean }> = {
   4:  { trait: 'travel', positive: 1, negative: 0, isBoolean: true },
   10: { trait: 'upkeep', positive: 2, negative: -1 }, 
   14: { trait: 'energy', positive: 2, negative: -2 }, 
-  16: { trait: 'budget', positive: -2, negative: 2 }, // Vet bills: "Yes" requires higher budget availability, lowers matching compatibility with low budget numbers.
+  16: { trait: 'budget', positive: -2, negative: 2 },
   18: { trait: 'upkeep', positive: 3, negative: -3 }  
 };
 
+// Storage object to track each user's current quiz answers and scores separately
 const userSessions: Record<string, any> = {};
 
 export class AIBot {
+
   @BackendMethod({ allowed: Allow.everyone })
   static async processAnswer(userId: string, currentQuestionIndex: number, answerText: string) {
     if (!isBackend()) return { question: "Error", final: true, index: currentQuestionIndex };
     
     const text = answerText.toLowerCase().trim();
 
-    // Initialization logic
+    // Detects greeting words to create a fresh scoring session card
     if (currentQuestionIndex === -1 && (text.includes("hi") || text.includes("hello") || text.includes("yes") || text.includes("ready") || text.includes("let's start"))) {
       userSessions[userId] = { 
-        energy: 3, // Baseline starter metrics (median scale value)
+        energy: 3,
         space: 2, 
         social: 3, 
         upkeep: 3, 
@@ -87,7 +92,7 @@ export class AIBot {
     }
     const scores = userSessions[userId];
 
-    // Final guide step verification
+    // If user is finished with questions, checks if they want to view the final care instructions sheet
     if (scores.awaitingInfo) {
       return text.match(/\b(yes|sure|ok|please|yeah|yep)\b/) 
         ? { 
@@ -101,7 +106,7 @@ export class AIBot {
 
     let inputMatched = false;
 
-    // Direct extraction for explicit Binary Yes/No configurations
+    // Scans text for explicit yes/no indicators to trigger the automated mathematical points
     const isYes = /\b(yes|sure|yeah|i do|i want|ok|yep|true)\b/i.test(text);
     const isNo = /\b(no|nope|don't|not|never|false)\b/i.test(text);
 
@@ -118,7 +123,7 @@ export class AIBot {
         }
     }
 
-    // Number extraction validation metrics
+    // Grabs raw numbers from typing text to auto-assign custom budget ranks or alter home presence rules
     const numericValue = parseInt(text.match(/\d+/)?.[0] || "0");
     if (numericValue > 0) {
         inputMatched = true;
@@ -128,8 +133,8 @@ export class AIBot {
             else if (numericValue > 50) scores.budget = 2;
             else scores.budget = 1;
         }
-        if (currentQuestionIndex === 12 && numericValue > 6) {
-             scores.energy -= 1; // Left alone for long hours: lower energy animal preferred
+        if (currentQuestionIndex === 12 && numericValue > 8) {
+             scores.energy -= 1;
         }
     }
 
@@ -147,7 +152,7 @@ export class AIBot {
         for (const kw of keywords) {
             const matchResult = text.match(kw.regex);
             if (matchResult) {
-                // Positional negation context matching check
+                // Handles negation tracking
                 const matchIndex = matchResult.index || 0;
                 const contextualPrefix = text.substring(0, matchIndex).trim();
                 const isNegated = /\b(don't|not|never|no)\b\s*$/i.test(contextualPrefix);
@@ -158,39 +163,41 @@ export class AIBot {
         }
     }
 
-    // Bound metrics scales securely between minimum 1 and maximum 5 values
+    // Keeps calculated values strictly locked between 1-5
     for (const key of ['energy', 'space', 'social', 'upkeep', 'budget']) {
         scores[key] = Math.max(1, Math.min(5, scores[key]));
     }
 
     const nextIndex = currentQuestionIndex + 1;
     
-    // Evaluate ultimate choices when reaching map limits
+    // Runs when all questions are answered to calculate which profile is closest to the user's score
     if (nextIndex >= CONVERSATIONAL_MAP.length) {
       let bestPet = "";
       let minDiff = Infinity;
       let bestPetProfile: any = null;
 
       for (const [pet, profile] of Object.entries(PET_PROFILES)) {
-        // Evaluate Travel Restrictions Exclusion Rule
+        // Skips easily portable animals if the user indicated they never travel
         if (scores.travel === false && profile.travel === true) {
-            continue; // Skip matching easily transportable animals if user never travels
+            continue;
         }
 
-        // Manhattan Distance Calculation
+        // Manhattan Distance: Computes the absolute variation differences across all score components
         const diff = Math.abs(scores.energy - profile.energy) + 
                      Math.abs(scores.space - profile.space) + 
                      Math.abs(scores.social - profile.social) + 
                      Math.abs(scores.upkeep - profile.upkeep) + 
                      Math.abs(scores.budget - profile.budget);
         
+        // Keeps the pet with the absolute lowest difference score
         if (diff < minDiff) { 
           minDiff = diff; 
           bestPet = pet; 
           bestPetProfile = profile;
         } 
+
+        // If two pets have the same distance score, we pick the one that requires less maintenance
         else if (diff === minDiff && bestPetProfile) {
-          // Tiebreaker: pick lower maintenance pet
           if (profile.upkeep < bestPetProfile.upkeep) {
             bestPet = pet;
             bestPetProfile = profile;
@@ -206,6 +213,7 @@ export class AIBot {
       scores.awaitingInfo = true;
       scores.bestPet = bestPet;
       
+      // Delivers recommendation card
       return { 
         question: `I’d recommend a ${bestPet.toUpperCase()}!<br><br><img src="/${PET_INFO[bestPet].img}" width="200" alt="Pet Image" /><br><br>Would you like to read some general info about this type of animals?`, 
         final: false, 
@@ -214,6 +222,7 @@ export class AIBot {
       };
     }
     
+    // Continues forward to deliver the next line from the questions queue
     return { question: CONVERSATIONAL_MAP[nextIndex].bridge, final: false, index: nextIndex };
   }
 }
