@@ -14,11 +14,12 @@ import { Router } from '@angular/router';
   styleUrl: './shelters.css'
 })
 export class Shelters implements OnInit {
-  // Master lists loaded directly from the database
+
+  // Shelters lists from the database
   allShelters: User[] = []; 
   allShelterAnimals: Animal[] = []; 
 
-  // Filtered lists rendered in the HTML layout
+  // Filtered shelters lists
   sheltersList: User[] = [];
   shelterAnimals: Animal[] = [];
   
@@ -26,33 +27,35 @@ export class Shelters implements OnInit {
   shelterImageUrl = ''; 
   remult = remult;
 
-  // Filter binding models matching your input fields
+  // Filtering fields
   filterLocation = '';
-  filterShelterName = ''; // <--- NEW PROPERTY FOR THE CENTER SEARCH BAR
+  filterShelterName = '';
   filterSpecies = '';
   filterAge = '';
   filterGender = '';
 
   constructor(private router: Router) {}
 
+  /* Runs automatically when the page loads */
   async ngOnInit() {
-    // Load ONLY VERIFIED shelters from the database
+
+    // Loads ONLY shelters that have been approved by an admin
     this.allShelters = await remult.repo(User).find({
       where: { 
         role: 'shelter',
-        isVerified: true // <--- THIS ENSURES ONLY VERIFIED SHELTERS ARE LOADED
+        isVerified: true
       }
     });
     
-    // Set initial display list to show all centers
+    // Shows all verified shelters by default when starting
     this.sheltersList = this.allShelters;
   }
 
-  // Real-time joint filter evaluating location criteria alongside center names
+  // Filters the shelters list based on location and name inputs
   onLocationFilterChange() {
     let tempShelters = [...this.allShelters];
 
-    // Apply location input constraint if text exists
+    // Filter by location
     if (this.filterLocation.trim()) {
       const searchLoc = this.filterLocation.toLowerCase();
       tempShelters = tempShelters.filter(shelter => 
@@ -60,7 +63,7 @@ export class Shelters implements OnInit {
       );
     }
 
-    // Apply name search bar input constraint if text exists
+    // Filter by shelter name
     if (this.filterShelterName.trim()) {
       const searchName = this.filterShelterName.toLowerCase();
       tempShelters = tempShelters.filter(shelter => 
@@ -71,36 +74,31 @@ export class Shelters implements OnInit {
     this.sheltersList = tempShelters;
   }
 
-  // Combined animal filtering criteria matching the Home Page logic
+  // Filters the animals list based on species, age, and gender inputs
   applyAnimalFilters() {
     let tempAnimals = [...this.allShelterAnimals];
 
-    // 1. Species input field - Case-insensitive text search (.includes)
+    // Filter by species text
     if (this.filterSpecies.trim()) {
       const searchSpecies = this.filterSpecies.toLowerCase();
       tempAnimals = tempAnimals.filter(a => a.species?.toLowerCase().includes(searchSpecies));
     }
 
-    // 2. Age Group selection - Advanced text logic for months/weeks vs years
+    // Filter by age group
     if (this.filterAge) {
       tempAnimals = tempAnimals.filter(a => {
         const ageText = a.age.toLowerCase();
         
-        // Detect if the age format is written in months or weeks
-        const isVeryYoung = ageText.includes('month') ||
-                            ageText.includes('week');
+        const isVeryYoung = ageText.includes('month') || ageText.includes('week');
 
-        // Handle the 'baby' group filter route
         if (this.filterAge === 'baby') {
           if (isVeryYoung) return true;
           const ageNum = parseInt(a.age);
           return !isNaN(ageNum) && ageNum < 1;
         }
 
-        // Stop puppy/kitten monthly values from leaking into older year buckets
         if (isVeryYoung) return false;
 
-        // Fallback calculation for standard year values
         const ageNum = parseInt(a.age);
         if (isNaN(ageNum)) return ageText.includes(this.filterAge);
         
@@ -111,7 +109,7 @@ export class Shelters implements OnInit {
       });
     }
 
-    // 3. Gender option selector - Exact database string mapping
+    // Filter by gender choice
     if (this.filterGender) {
       tempAnimals = tempAnimals.filter(a => a.gender === this.filterGender);
     }
@@ -119,27 +117,23 @@ export class Shelters implements OnInit {
     this.shelterAnimals = tempAnimals;
   }
 
-  // --- Filter System Operations ---
+  // Resets all active filters
   resetFilters() {
-    // 1. Reset shelter-specific search text inputs
+
     this.filterLocation = '';
     this.filterShelterName = '';
-
-    // 2. Reset animal-specific filter criteria variables
     this.filterSpecies = '';
     this.filterAge = '';
     this.filterGender = '';
-
-    // 3. Clear selected shelter active focus context if any
     this.selectedShelterName = '';
     this.shelterImageUrl = '';
     this.allShelterAnimals = [];
     this.shelterAnimals = [];
 
-    // 4. Force list views back to their initial un-filtered master datasets
     this.sheltersList = this.allShelters;
   }
 
+  // Redirects the user to the chat screen with this shelter
   openChatWithShelter(shelterId: string) {
     if (!shelterId) {
       alert("Error: Missing owner ID for chat.");
@@ -148,23 +142,21 @@ export class Shelters implements OnInit {
     this.router.navigate(['/messages', shelterId]);
   }
 
-  // Triggered when a user clicks "View Animals" on a shelter card
+  // Allows users to see all active posts of the selected shelter
   async viewShelterAnimals(shelter: User) {
     this.selectedShelterName = shelter.name;
     this.shelterImageUrl = shelter.imageUrl; 
     
-    // Reset view models for animal inputs whenever changing the selected shelter
     this.filterSpecies = '';
     this.filterAge = '';
     this.filterGender = '';
 
     try {
-      // Query animal posts belonging exclusively to the selected shelter
+      // Fetch only the animals that belong to this chosen shelter
       this.allShelterAnimals = await remult.repo(Animal).find({
         where: { userId: shelter.id }
       });
       
-      // Populate active view list
       this.shelterAnimals = this.allShelterAnimals;
     } catch (error) {
       console.error("Failed to load shelter animals:", error);
