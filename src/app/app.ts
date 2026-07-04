@@ -15,33 +15,38 @@ import { User, UserRole } from '../shared/User';
   imports: [FormsModule, HttpClientModule, RouterModule, CommonModule]
 })
 export class App implements OnInit {
+
+  // Application titles and form storage fields for user typed inputs
   protected readonly title = signal('AdoptionApp');
   email = '';
   password = '';
   name = '';
   verificationDocumentUrl = '';
   
-  // MODIFICAT: Permite 'sitter' direct sau extinde tipul dacă UserRole este strict definit în fișierul partajat
+  // Default values and variables for custom registration fields
   role: UserRole | 'sitter' = 'user'; 
   address = '';
   phone = '';
   experience = '';
 
+  // True/False toggles to switch between login, signup, and reset screens
   isSignUp = false;
   forgotPasswordMode = false;
   resetMode = false; 
   resetToken = '';
   newPassword = '';
   
-
+  // Storage variables to hold logged-in session data
   remult = remult;
   fullUser?: User | null;
 
+  // Constructor setup to wrap database messages nicely inside Angular
   constructor(private http: HttpClient, private zone: NgZone) {
     remult.apiClient.wrapMessageHandling = (handler) =>
       this.zone.run(() => handler());
   }
 
+  // Runs automatically on start to check if the user is already logged in
   async ngOnInit() {
     try {
       this.remult.user = await lastValueFrom(
@@ -53,31 +58,29 @@ export class App implements OnInit {
     } catch (e) {}
   }
 
-  
- async fetchFullUser() {
-  try {
-    if (this.remult.user) {
-      const user = await this.remult.repo(User).findId(this.remult.user.id);
-      
-      // If 'user' is undefined, it means the account was deleted in the DB
-      if (!user) {
-        throw new Error("Account no longer exists");
+  // Grabs the detailed profile details or kicks out users whose accounts were deleted
+  async fetchFullUser() {
+    try {
+      if (this.remult.user) {
+        const user = await this.remult.repo(User).findId(this.remult.user.id);
+        
+        if (!user) {
+          throw new Error("Account no longer exists");
+        }
+        
+        this.fullUser = user;
       }
+    } catch (e) {
       
-      this.fullUser = user;
+      this.remult.user = undefined;
+      this.fullUser = null;
+      
+      alert("Your account has been removed. You are being logged out.");
+      window.location.reload(); 
     }
-  } catch (e) {
-    // 1. Clear the local user state
-    this.remult.user = undefined;
-    this.fullUser = null;
-    
-    // 2. Force the browser to refresh, which will redirect the user to the login screen
-    // because remult.authenticated() will now be false.
-    alert("Your account has been removed. You are being logged out.");
-    window.location.reload(); 
   }
-}
 
+  // Submits the typed email and password to log the user into the app
   async signIn() {
     try {
       this.remult.user = await lastValueFrom(
@@ -94,6 +97,7 @@ export class App implements OnInit {
     }
   }
 
+  // Sends a password recovery security token code to the user's email
   async sendResetEmail() {
     try {
       const result = await User.sendResetEmail(this.email);
@@ -105,6 +109,7 @@ export class App implements OnInit {
     }
   }
 
+  // Submits the received security code along with a chosen new password
   async finishReset() {
     try {
       const result = await User.resetPassword(this.resetToken, this.newPassword);
@@ -115,7 +120,10 @@ export class App implements OnInit {
     }
   }
 
+  // Creates a brand new account and empties all form fields when successful
   async signUp() {
+
+    // Sends all the typed-in form data to the server to create the account
     try {
       this.remult.user = await lastValueFrom(
         this.http.post<UserInfo>('/api/signUp', {
@@ -126,14 +134,14 @@ export class App implements OnInit {
           address: this.address,
           phone: this.phone,
           experience: this.experience,
-          // We include this to match the backend expectation
           verificationDocumentUrl: this.verificationDocumentUrl 
         })
       );
       
+      // Grabs the newly created user's complete profile data from the database
       await this.fetchFullUser();
       
-      // Reset all form fields to clean the UI after successful registration
+      // Clears out all the text input boxes on the screen so they are empty again
       this.email = '';
       this.password = '';
       this.name = '';
@@ -141,11 +149,10 @@ export class App implements OnInit {
       this.address = '';
       this.phone = '';
       this.experience = '';
-      this.verificationDocumentUrl = ''; // Reset the link field
+      this.verificationDocumentUrl = '';
       
       alert("Account created successfully!");
     } catch (e: any) {
-      // Improved error reporting
       console.error("Sign up error:", e);
       alert(e.error?.message || "Sign up failed. Please check your inputs.");
     }
