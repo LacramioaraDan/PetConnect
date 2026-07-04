@@ -3,14 +3,19 @@ import { Animal } from "./Animal";
 import { LostAndFoundPost } from "./LostAndFoundPosts";
 import { SittingPost } from "./SittingPosts";
 
+// Defines the custom user category permissions allowed by the platform
 export type UserRole = "user" | "shelter" | "petsitter" | "admin";
 
 @Entity("users", {
+
+  // Sets standard read, update, and delete access rules for authenticated accounts
   allowApiRead: Allow.authenticated,
   allowApiUpdate: Allow.authenticated,
   allowApiInsert: true, 
   allowApiDelete: Allow.authenticated 
 })
+
+// User Entity Fields
 export class User {
   @Fields.uuid()
   id = "";
@@ -57,14 +62,16 @@ export class User {
   @Fields.boolean()
   isVerified = false;
 
-  /* --- BACKEND METHODS --- */
-
+  // Password reset logic that generates security tokens and emails them to users
   @BackendMethod({ allowed: Allow.everyone })
+
   static async sendResetEmail(email: string) {
     const userRepo = remult.repo(User);
     const user = await userRepo.findFirst({ email });
 
     if (user) {
+
+      // Creates a temporary alphanumeric string code for verification steps
       user.resetToken = Math.random().toString(36).substring(2, 15);
       await userRepo.save(user);
 
@@ -90,6 +97,8 @@ export class User {
       `;
 
       try {
+
+        // Dispatches the compiled HTML layout directly through the third-party email service provider
         const response = await (globalThis as any).fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -116,7 +125,9 @@ export class User {
     return "If an account exists for this email, a reset link has been sent.";
   }
 
+  // Shelter verification logic that enables shelter accounts 
   @BackendMethod({ allowed: () => remult.user?.role === 'admin' })
+
   static async approveShelter(userId: string) {
     const userRepo = remult.repo(User);
     const user = await userRepo.findId(userId);
@@ -129,55 +140,56 @@ export class User {
     }
   }
 
-  // Add this method inside your User class alongside approveShelter
+  // Shelter verification denial logic that rejects pending shelters and clears out their entry details
   @BackendMethod({ allowed: () => remult.user?.role === 'admin' })
+
   static async denyShelter(userId: string) {
-    // We reuse the existing deleteUserAccount logic since it handles 
-    // wiping data and removing the core user record cleanly.
+    // Routes directly to account destruction steps since application access is being rejected
     await User.deleteUserAccount(userId);
     console.log(`Shelter with ID ${userId} has been denied access and their account has been deleted.`);
   }
 
+  // User account deletion logic that deletes all records of that user account
   @BackendMethod({ allowed: Allow.authenticated })
+
   static async deleteUserAccount(userId: string) {
     const userRepo = remult.repo(User);
     const animalRepo = remult.repo(Animal);
     const lostRepo = remult.repo(LostAndFoundPost);
-    const sittingRepo = remult.repo(SittingPost); // Target repository assigned
+    const sittingRepo = remult.repo(SittingPost); 
     
     const user = await userRepo.findId(userId);
     if (!user) throw new Error("User not found");
 
-    // SECURITY CHECK: Only allow if it's the account owner or an admin
+    // Only allow account deletion if it's the account owner or an admin
     if (remult.user?.id !== userId && remult.user?.role !== 'admin') {
       throw new Error("Permission denied");
     }
 
-    // 1. Clean out standard listings/adoption posts
+    // Clean out adoption posts
     const usersAnimals = await animalRepo.find({ where: { userId } });
     for (const animal of usersAnimals) {
       await animalRepo.delete(animal);
     }
 
-    // 2. Clean out lost and found posts
+    // Clean out lost and found posts
     const usersLostPosts = await lostRepo.find({ where: { userId } });
     for (const post of usersLostPosts) {
       await lostRepo.delete(post);
     }
 
-    // 3. Clean out all pet sitting offers/requests
+    // Clean out pet sitting posts
     const usersSittingPosts = await sittingRepo.find({ where: { userId } });
     for (const post of usersSittingPosts) {
       await sittingRepo.delete(post);
     }
 
-    // 4. Finally drop core client login record
+    // Delete client login record
     await userRepo.delete(user);
     return "Account and all associated records deleted successfully";
   }
 
-
-
+  // Verifies security tokens and overwrites old passwords
   @BackendMethod({ allowed: Allow.everyone })
   static async resetPassword(token: string, newPassword: string) {
     if (!token) throw new Error("Invalid token");
@@ -189,6 +201,7 @@ export class User {
       throw new Error("Invalid or expired reset token");
     }
 
+    // Dynamically imports encryption libraries to securely lock down the new credential text
     const libraryName = 'bcryptjs';
     const bcrypt = await import(/* @vite-ignore */ libraryName);
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -201,6 +214,7 @@ export class User {
   }
 }
 
+// Adds our custom details like user role, name picture or verification status to the default login profile card
 declare module 'remult' {
   export interface UserInfo {
     id: string;
