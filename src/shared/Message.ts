@@ -18,9 +18,6 @@ export class Message {
   @Fields.string()
   text = "";
 
-  // Folosim varianta cea mai simplă. 
-  // Remult + Postgres maprează @Fields.string() la tipul TEXT în baza de date 
-  // DACĂ tabela este creată de la zero.
   @Fields.string()
   imageUrl = "";
 
