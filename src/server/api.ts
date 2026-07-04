@@ -8,11 +8,22 @@ import { AIBot } from "../shared/AIBot";
 import { SittingPost } from "../shared/SittingPosts";
 import { LostAndFoundPost } from "../shared/LostAndFoundPosts";
 
+// Sets up the main backend API configurations and connects it to the database
 export const api = remultApi({
-  entities: [User, Message, Animal, SittingPost, LostAndFoundPost], // 1. Register all entities here
-  controllers: [AIBot], // 2. Updated registration
+
+  // Lists all the main data groups used in the app
+  entities: [User, Message, Animal, SittingPost, LostAndFoundPost],
+  
+  // Connects the custom code files that handle logic, like the AI chat bot
+  controllers: [AIBot], 
+
+  // Automatically grabs and tracks who is logged into the current browsing session
   getUser: (req) => req.session!['user'],
-  subscriptionServer: new SseSubscriptionServer(), // SSE este suficient dacă optimizăm datele
+
+  // Sets up live updates so changes show up on screen instantly without reloading
+  subscriptionServer: new SseSubscriptionServer(),
+
+  //Links the app to the live online database or falls back to a local computer database
   dataProvider: createPostgresConnection({
     connectionString: process.env["DATABASE_URL"] || 
     "postgres://postgres:MASTERKEY@localhost:5432/postgres"
