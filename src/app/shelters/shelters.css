@@ -1,9 +1,11 @@
+/* Main container for the whole shelters page */
 .shelters-page {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
+/* Grid layout that handles auto-fitting columns */
 .shelters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -11,6 +13,7 @@
   margin-top: 20px;
 }
 
+/* Box container for a single shelter */
 .shelter-card {
   background: white;
   border-radius: 12px;
@@ -20,12 +23,14 @@
   flex-direction: column;
 }
 
+/* Image at the top of the shelter card */
 .shelter-img {
   width: 100%;
   height: 200px;
   object-fit: cover;
 }
 
+/* Box wrapper for text inside the card */
 .shelter-info {
   padding: 15px;
   display: flex;
@@ -34,21 +39,10 @@
   flex-grow: 1;
 }
 
+/* Text styles */
 .shelter-info h3 { margin: 0; color: #333; }
 .shelter-info p { margin: 0; color: #666; font-size: 14px; }
 .shelter-info .desc { font-style: italic; margin-top: 5px; }
 
-.contact-btn {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: auto;
-  font-weight: bold;
-  transition: background 0.2s;
-}
-
-.contact-btn:hover { background: #2563eb; }
+/* Text style used when there are zero shelters found */
 .no-shelters { text-align: center; color: #999; margin-top: 40px; }
