@@ -1,6 +1,7 @@
-/* --- Global Resets --- */
+/* Global Resets */
 * { box-sizing: border-box; }
 
+/* Body Styling */
 body {
   margin: 0;
   padding: 0;
@@ -8,22 +9,24 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* --- Navbar: Restored to original layout --- */
+/* Navbar Container */
 .navbar {
   height: 60px;
   background: rgb(188, 162, 208);
   display: flex !important;
-  justify-content: space-between; /* Keeps left, center, right separate */
+  justify-content: space-between;
   align-items: center;
   padding: 0 20px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   position: fixed;
-  top: 0; width: 100%; z-index: 9999;
+  top: 0; 
+  width: 100%; 
+  z-index: 9999;
 }
 
 .nav-left { flex: 1; }
 
-/* --- Navbar Center Component Layout Fix --- */
+/* Center area for navbar links */
 .nav-center { 
   display: flex !important; 
   gap: 40px; 
@@ -32,68 +35,180 @@ body {
   align-items: center;
 }
 
+/* Individual links inside the navbar */
 .nav-center a { 
-  font-size: 26px; /* Optimized scale: perfectly balanced for text length */
+  font-size: 26px;
   text-decoration: none !important; 
   padding: 8px 4px; 
   transition: 0.2s ease-in-out; 
   cursor: pointer !important; 
-  color: #8b2e8b; /* Forces your brand purple styling instead of browser link blue */
+  color: #8b2e8b; 
 }
 
+/* The currently selected link */
 .nav-center a.active { 
   border-bottom: 3px solid #6200ea !important; 
   color: #6200ea !important; 
   border-radius: 0; 
 }
 
-.nav-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; }
-
-/* --- Content Layout --- */
-.main-content {
-  padding-top: 80px; width: 100%;
-  display: flex; flex-direction: column; align-items: center; 
+/* Right side of the navbar */
+.nav-right { 
+  flex: 1; 
+  display: flex; 
+  justify-content: flex-end; 
+  align-items: center; 
 }
 
-/* --- Auth Page: Split-screen style --- */
+/* Main page content layout wrapper */
+.main-content {
+  padding-top: 80px; 
+  width: 100%;
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+}
+
+/* Full-screen background for the login/signup page */
 .auth-wrapper {
   position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
+  top: 0; left: 0; 
+  width: 100vw; 
+  height: 100vh;
   z-index: 15000;
 }
 
-.auth-page { display: flex; height: 100%; width: 100%; background: rgb(205, 164, 212); }
+/* The split-screen login/signup container */
+.auth-page { display: flex;
+  height: 100%;
+  width: 100%; 
+  background: rgb(205, 164, 212); 
+}
 
-.auth-aside { flex: 1; background-color: #b07ac4; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-.auth-aside img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Side panel for holding the background image */
+.auth-aside { 
+  flex: 1; 
+  background-color: #b07ac4; 
+  position: relative; 
+  overflow: hidden; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+}
 
-.auth-main { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px; }
+/* --- Background image on the side panel --- */
+.auth-aside img { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
 
-.form-container { width: 100%; max-width: 550px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+/* Main side panel holding the actual form */
+.auth-main { flex: 1; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  padding: 40px; 
+}
 
-.main-title { font-size: 3rem; font-weight: 900; color: #8b2e8b; margin: 0; line-height: 1.1; letter-spacing: -1.5px; }
+/* Wrapper box for the text and fields together */
+.form-container { 
+  width: 100%; 
+  max-width: 550px; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  text-align: center; 
+}
 
-.subtitle { color: #666; margin: 10px 0 35px 0; font-size: 1.1rem; }
+/* Main title text */
+.main-title { 
+  font-size: 3rem; 
+  font-weight: 900; 
+  color: #8b2e8b; 
+  margin: 0; 
+  line-height: 1.1; 
+  letter-spacing: -1.5px; 
+}
 
-.stacked-form { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 400px; }
+/* Smaller description text under the title */
+.subtitle { 
+  color: #666; 
+  margin: 10px 0 35px 0; 
+  font-size: 1.1rem; 
+}
 
-.input-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+/* Form container that stacks fields vertically */
+.stacked-form { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  width: 100%; 
+  max-width: 400px; 
+}
 
-.input-wrap label { font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 8px; width: 100%; }
+/* Wrapper for an individual label and input field */
+.input-wrap { 
+  width: 100%; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  margin-bottom: 20px; 
+}
 
-.input-wrap input { width: 100%; padding: 14px 22px; border: 1px solid #ddd; border-radius: 50px; background: #f8fafc; font-size: 1rem; text-align: center; outline: none; }
+/* Small bold label text above the inputs */
+.input-wrap label { 
+  font-weight: 700; 
+  font-size: 0.8rem; 
+  text-transform: uppercase; 
+  margin-bottom: 8px; 
+  width: 100%; 
+}
 
-.pilled-login-btn { width: 100%; background: #000; color: #fff; padding: 16px; border-radius: 50px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
+/* Rounded text input typing boxes */
+.input-wrap input { 
+  width: 100%;
+  padding: 14px 22px; 
+  border: 1px solid #ddd; 
+  border-radius: 50px; 
+  background: #f8fafc; 
+  font-size: 1rem; 
+  text-align: center; 
+  outline: none; 
+}
 
-.toggle-text { margin-top: 25px; color: #888; font-size: 0.9rem; cursor: pointer; }
+/* Main pill-shaped submit button */
+.pilled-login-btn { 
+  width: 100%; 
+  background: #000; 
+  color: #fff; 
+  padding: 16px; 
+  border-radius: 50px; 
+  border: none; 
+  font-weight: 700; 
+  font-size: 1.1rem; 
+  cursor: pointer; 
+  margin-top: 10px; 
+}
 
-/* Add this at the very bottom of your CSS file */
+/* Clickable text link to switch forms */
+.toggle-text { 
+  margin-top: 25px; 
+  color: #888; 
+  font-size: 0.9rem; 
+  cursor: pointer; 
+}
+
+/* Shrinks navbar text layout for different screen sizes */
 @media (max-width: 1050px) {
   .nav-center {
-    gap: 15px; /* Shrink the gap to fit more on one line */
+    gap: 15px; 
   }
   .nav-center a {
-    font-size: 18px; /* Reduce font size slightly during zoom */
+    font-size: 18px; 
   }
 }
 
