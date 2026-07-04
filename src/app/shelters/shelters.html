@@ -1,27 +1,32 @@
 <!-- Main page layout split into 3 columns (Filters, Shelters, Animals) -->
 <div class="shelters-full-layout" style="display: grid; grid-template-columns: 360px 2fr 1.2fr; width: 100vw; min-height: calc(100vh - 70px); background: transparent; box-sizing: border-box; margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); padding: 0 25px; position: relative;">
   
+  <!-- Filters Column -->
   <div class="table-column-filters" style="padding: 30px 24px 30px 10px; box-sizing: border-box; background: transparent; display: flex; flex-direction: column;">
     <h3 style="margin-top: 0; margin-bottom: 24px; font-size: 25px; font-weight: 800; color: #8b2e8b; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 12px; letter-spacing: -0.5px; text-align: center;">
       Filters 🔍
     </h3>
     
+    <!-- Shelter Location filter input box -->
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Shelter Location</label>
       <input type="text" [(ngModel)]="filterLocation" (input)="onLocationFilterChange()" placeholder="e.g. Timisoara" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: white;">
     </div>
 
+    <!-- Warning message shown if no shelter is selected yet -->
     <div style="border-top: 1px dashed rgba(0,0,0,0.15); padding-top: 20px; margin-top: 10px;">
       <p style="font-size: 13px; font-weight: 600; color: #8b2e8b; margin: 0 0 15px 0; text-align: center;" *ngIf="!selectedShelterName">
         ⚠️ Select a shelter to unlock pet filters
       </p>
     </div>
 
+    <!-- Pet Species filter input box -->
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Species</label>
       <input type="text" [disabled]="!selectedShelterName" [(ngModel)]="filterSpecies" (input)="applyAnimalFilters()" placeholder="e.g. Rabbit, Dog, Cat" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; box-sizing: border-box; outline: none; background: white;">
     </div>
 
+    <!-- Pet Age drop-down selector -->
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Age Group</label>
       <select [disabled]="!selectedShelterName" [(ngModel)]="filterAge" (change)="applyAnimalFilters()" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background: white; outline: none; cursor: pointer;">
@@ -33,6 +38,7 @@
       </select>
     </div>
 
+    <!-- Pet Gender drop-down selector -->
     <div style="margin-bottom: 24px;">
       <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 15px; color: #4b4f56;">Gender</label>
       <select [disabled]="!selectedShelterName" [(ngModel)]="filterGender" (change)="applyAnimalFilters()" style="width: 100%; padding: 12px 14px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 15px; background: white; outline: none; cursor: pointer;">
@@ -42,11 +48,14 @@
       </select>
     </div>
     
+    <!-- Reset Filters Button -->
     <button (click)="resetFilters()" style="width: 100%; background: transparent; color: #784b83; border: 2px solid #784b83; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 15px; transition: all 0.2s; margin-top: 5px; flex-shrink: 0;">
         🔄 Reset Filters
-      </button>
-    </div>
+    </button>
 
+  </div>
+
+  <!-- Animal Shelters List -->
   <div class="table-column-shelters" style="padding: 30px 40px; box-sizing: border-box; border-left: 1px solid rgba(0,0,0,0.15); border-right: 1px solid rgba(0,0,0,0.15); background: transparent;">
     <div style="max-width: 1200px; margin: 0 auto 24px auto;">
       <h2 style="font-size: 32px; font-weight: 900; margin-top: 0; margin-bottom: 0; color: #8b2e8b; letter-spacing: -0.8px; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 12px; text-align: center;">
@@ -54,6 +63,7 @@
       </h2>
     </div>
 
+    <!-- Search box to find a shelter by its name -->
     <div style="max-width: 1200px; margin: 0 auto 24px auto; width: 100%;">
       <input type="text" 
              [(ngModel)]="filterShelterName" 
@@ -62,17 +72,21 @@
              style="width: 100%; padding: 14px 20px; border: 1px solid #ccd0d5; border-radius: 25px; font-size: 16px; box-sizing: border-box; outline: none; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
     </div>
     
+    <!-- Grid that lists all the matching shelters -->
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; max-width: 1200px; margin: 0 auto;">
+      
+      <!-- Loops through each shelter card item -->
       <div *ngFor="let shelter of sheltersList" class="shelter-card" 
            style="border: 1px solid #ddd; border-radius: 14px; padding: 20px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08); box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between;">
-        
         <div>
           <h3 style="font-size: 22px; font-weight: 900; margin: 0 0 14px 0; color: #1c1e21; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ shelter.name }}</h3>
           
+          <!-- Shelter Image Frame -->
           <div style="width: 100%; height: 180px; border-radius: 12px; overflow: hidden; border: 1px solid #eee; margin-bottom: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
             <img [src]="shelter.imageUrl" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
 
+          <!-- Shelter info details (Address, phone, description) -->
           <div style="font-size: 16px; color: #4b4f56; margin-bottom: 16px; line-height: 1.4; display: grid; grid-template-columns: 1fr; gap: 8px;">
             <p style="margin: 0;" *ngIf="shelter.address"><b>📍 Address:</b> {{ shelter.address }}</p>
             <p style="margin: 0;" *ngIf="shelter.phone"><b>📞 Phone:</b> {{ shelter.phone }}</p>
@@ -82,6 +96,7 @@
           </div>
         </div>
 
+        <!-- Shelter Action Buttons -->
         <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
           <button (click)="viewShelterAnimals(shelter)" 
                   style="width: 100%; background: #8b2e8b; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; white-space: nowrap;">
@@ -95,28 +110,36 @@
       </div>
     </div>
 
+    <!-- Message shown if no shelters match the active search filters -->
     <div *ngIf="sheltersList.length === 0" style="text-align: center; color: #65676b; padding: 40px 0; font-size: 18px;">
       No shelters match your selected filters. 🐾
     </div>
   </div>
 
+  <!-- Available Animals Display Feed -->
   <div class="table-column-animals" style="padding: 30px 10px 30px 35px; box-sizing: border-box; background: transparent;">
     <h2 style="font-size: 32px; font-weight: 900; margin-top: 0; margin-bottom: 24px; color: #8b2e8b; letter-spacing: -0.8px; border-bottom: 1px solid rgba(0,0,0,0.15); padding-bottom: 12px; text-align: center;">
       {{ selectedShelterName ? 'Buddies at ' + selectedShelterName : 'Available Buddies' }}
     </h2>
 
+    <!-- Placeholder card shown if no shelter has been chosen yet -->
     <div *ngIf="!selectedShelterName" style="padding: 40px 20px; text-align: center; color: #65676b; font-size: 17px; border: 2px dashed rgba(0,0,0,0.15); border-radius: 12px; background: transparent; font-weight: 600;">
       Select a shelter from the middle column to see their active buddy posts here. 🐾
     </div>
 
+    <!-- Placeholder card shown if a shelter is selected but has no matching pets -->
     <div style="padding: 40px 20px; text-align: center; color: #65676b; font-size: 17px; border: 1px solid #ddd; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" *ngIf="selectedShelterName && shelterAnimals.length === 0">
       No buddies match your selected filters.
     </div>
 
+    <!-- Animal posts for a selected shelter-->
     <div *ngIf="selectedShelterName && shelterAnimals.length > 0" style="display: flex; flex-direction: column; gap: 30px;">
+      
+      <!-- Loops through each animal profile card item -->
       <div *ngFor="let animal of shelterAnimals" class="animal-card" 
            style="background: white; border: 1px solid #ddd; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: visible; width: 100%; box-sizing: border-box; display: block !important;">
         
+        <!-- Post Sub-Header detailing shelter info -->
         <div style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid #f0f2f5; width: 100%; box-sizing: border-box;">
           <img [src]="shelterImageUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + selectedShelterName" 
                style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; margin-right: 18px; border: 1px solid #eee;">
@@ -126,6 +149,7 @@
           </div>
         </div>
 
+        <!-- Post card structure -->
         <div style="display: flex; padding: 30px; gap: 35px; align-items: flex-start; width: 100%; box-sizing: border-box;">
           <div style="flex: 1;">
             <h2 style="font-size: 34px; font-weight: 900; margin: 0 0 18px 0; color: #1c1e21; letter-spacing: -0.8px;">{{ animal.name }}</h2>
@@ -137,15 +161,18 @@
             </div>
           </div>
 
+          <!-- Pet Photo Image Box Container Frame -->
           <div style="width: 250px; height: 250px; border-radius: 14px; overflow: hidden; border: 1px solid #eee; flex-shrink: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
             <img [src]="animal.imageUrl" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
         </div>
 
+        <!-- Post description -->
         <div style="padding: 0 30px 20px 30px; font-size: 20px; line-height: 1.6; color: #1c1e21;">
           {{ animal.description }}
         </div>
 
+        <!-- Message shelter option -->
         <div style="padding: 0 30px 30px 30px;" *ngIf="remult.user?.id !== animal.userId">
           <button (click)="openChatWithShelter(animal.userId)" 
                   style="position: relative; z-index: 10; width: 100%; background: #784b83; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; gap: 10px;">
