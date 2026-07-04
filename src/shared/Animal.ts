@@ -2,9 +2,12 @@ import { Allow, Entity, Fields, Relations, Validators, remult, isBackend } from 
 import { User } from './User';
 
 @Entity('animals', {
+
+    // Anyone logged in can view the animals and add new ones
     allowApiRead: Allow.authenticated,
     allowApiInsert: Allow.authenticated,
 
+    // Controls who is allowed to edit animal post details
     allowApiUpdate: (entity, remult) => {
         const animal = entity as Animal;
         if (!remult?.authenticated()) return false;
@@ -12,6 +15,7 @@ import { User } from './User';
         return animal.userId === remult?.user?.id;
     },
 
+    // Controls who is allowed to delete an animal post
     allowApiDelete: (entity, remult) => {
         const animal = entity as Animal;
         if (!remult?.authenticated()) return false;
@@ -19,18 +23,15 @@ import { User } from './User';
         return animal?.userId === remult?.user?.id;
     },
 
-    // FIXED: Using Remult's top-level isBackend() function and standard lifecycle arguments
+    // Extra safety rules that run automatically right before saving a post
     saving: async (animal, e) => {
-        // Only enforce this validation logic strictly on the backend when creating a new record
         if (isBackend() && e.isNew) {
             const sessionUser = remult.user;
             if (!sessionUser) throw new Error("Forbidden: Not authenticated");
             
-            // Admins bypass verification checks
             if (sessionUser.role === 'admin') return;
 
             if (sessionUser.role === 'shelter') {
-                // Query the database dynamically to pull the real-time user record
                 const dbUser = await remult.repo(User).findId(sessionUser.id);
                 if (!dbUser || !dbUser.isVerified) {
                     throw new Error("Forbidden: Your shelter account is pending verification and cannot post yet.");
@@ -39,6 +40,8 @@ import { User } from './User';
         }
     }
 })
+
+// Animal Entity Fields
 export class Animal {
     @Fields.autoIncrement()
     id = 0;

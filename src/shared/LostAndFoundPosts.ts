@@ -4,6 +4,8 @@ import { User } from "./User";
 @Entity("lostAndFoundPosts", {
   allowApiCrud: true
 })
+
+// LostAndFoundPost Entity Fields
 export class LostAndFoundPost {
   @Fields.autoIncrement()
   id = 0;
@@ -23,7 +25,6 @@ export class LostAndFoundPost {
   @Fields.string({ inputType: 'text' })
   imageUrl = '';
 
-  // --- Physical Attributes ---
   @Fields.string()
   size = '';
 

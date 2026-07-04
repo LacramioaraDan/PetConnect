@@ -18,6 +18,8 @@ import { User } from './User';
         return post?.userId === remult?.user?.id;
     }
 })
+
+// SittingPost Entity Fields
 export class SittingPost {
     @Fields.autoIncrement()
     id = 0;
