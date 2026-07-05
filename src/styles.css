@@ -1,8 +1,12 @@
 /* --- Global Resets & Theme --- */
+
+/* Removes default spacing, sets sizes, and applies the purple background theme */
 * { 
   box-sizing: border-box; 
 }
 
+
+/* Base settings for the background layer */
 body {
   font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
@@ -12,14 +16,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #d5c1ef; /* Your signature purple theme */
+  background-color: #d5c1ef;
   color: #1c1e21;
 }
 
-/* --- Typography --- */
+/* Title centered at the top of the feed */
 h1 {
   text-align: center;
-  font-size: 4.5rem; /* Larger, more impactful */
+  font-size: 4.5rem;
   font-weight: 900;
   margin: 3rem 0;
   background: linear-gradient(to right, #8b1d9e, #db2777);
@@ -29,11 +33,11 @@ h1 {
   filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.15));
 }
 
-/* --- Main Content Container (The List) --- */
+/* White card wrapper that stands in the middle to contain all animal row items */
 main {
   background-color: #ffffff;
   width: 95%;
-  max-width: 800px; /* Matches the Post feed width */
+  max-width: 800px;
   margin: 20px auto 50px auto;
   border: 1px solid #ddd;
   border-radius: 16px;
@@ -41,30 +45,12 @@ main {
   overflow: hidden;
 }
 
-/* --- Individual Item Cards --- */
-.animal-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 35px; /* Generous spacing */
-  border-bottom: 1px solid #f0f2f5;
-  gap: 40px;
-  transition: background 0.2s ease;
-}
-
-.animal-card:hover {
-  background-color: #fafafa;
-}
-
-.animal-card:last-child {
-  border-bottom: none;
-}
-
 /* Text info inside the card */
 .info {
   flex: 1;
 }
 
+/* Headers for animal or post names */
 .info h2 {
   font-size: 34px; /* Big and Bold */
   font-weight: 900;
@@ -73,29 +59,20 @@ main {
   letter-spacing: -0.5px;
 }
 
+/* Spacing and text size metrics inside description paragraphs */
 .info p {
-  font-size: 19px; /* Scaled up for readability */
+  font-size: 19px;
   line-height: 1.6;
   color: #4b4f56;
   margin: 10px 0;
 }
 
+/* Purple accents for labels */
 .info b {
-  color: #8b1d9e; /* Purple accents for labels */
+  color: #8b1d9e;
 }
 
-/* Image inside the card */
-.animal-card img {
-  width: 250px; /* Scaled up from 180px/220px */
-  height: 250px;
-  border-radius: 14px;
-  object-fit: cover;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  border: 1px solid #eee;
-  flex-shrink: 0;
-}
-
-/* --- Form / Search Styling --- */
+/* Simple horizontal row lining up search boxes and buttons together */
 form {
   display: flex;
   justify-content: center;
@@ -106,6 +83,7 @@ form {
   max-width: 600px;
 }
 
+/* Search input boxes with clean round corners and light borders */
 form input {
   flex-grow: 1;
   padding: 15px 20px;
@@ -117,10 +95,12 @@ form input {
   transition: border-color 0.2s;
 }
 
+/* Darkens the search input frame to solid purple when clicked to type */
 form input:focus {
   border-color: #8b1d9e;
 }
 
+/* Main brand purple search action execution button */
 form button {
   background-color: #8b1d9e;
   color: white;
@@ -133,11 +113,12 @@ form button {
   transition: transform 0.1s, background 0.2s;
 }
 
+/* Shrinks the button slightly when clicked */
 form button:active {
   transform: scale(0.96);
 }
 
-/* --- Modal Styles (Scaled Up) --- */
+/* Full screen dark overlay blanket that slightly blurs out underlying pages */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -150,18 +131,7 @@ form button:active {
   backdrop-filter: blur(4px);
 }
 
-.modal-card {
-  background-color: #ffffff;
-  padding: 45px;
-  border-radius: 24px;
-  width: 95%;
-  max-width: 600px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
+/* Title header styles for forms inside popup box views */
 .modal-card h2 {
   font-size: 28px;
   font-weight: 800;
@@ -169,6 +139,7 @@ form button:active {
   color: #8b1d9e;
 }
 
+/* Input rows and larger detail paragraphs fields inside popup cards */
 .modal-card input, 
 .modal-card textarea {
   width: 100%;
@@ -180,12 +151,13 @@ form button:active {
   outline: none;
 }
 
+/* Standard height for text box descriptions */
 .modal-card textarea {
   min-height: 120px;
   resize: vertical;
 }
 
-/* --- Action Buttons (Save/Cancel) --- */
+/* Action Buttons (Save/Cancel) */
 .btn-row {
   display: flex;
   justify-content: flex-end;
@@ -193,6 +165,7 @@ form button:active {
   margin-top: 10px;
 }
 
+/* Save Button Design */
 .btn-save {
   background: #6200ea;
   color: white;
@@ -203,6 +176,7 @@ form button:active {
   cursor: pointer;
 }
 
+/* Cancel Button Design */
 .btn-cancel {
   background: none;
   color: #64748b;
