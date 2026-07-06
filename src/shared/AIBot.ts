@@ -2,16 +2,16 @@ import { BackendMethod, Allow, isBackend } from "remult";
 
 // Score profiles (1 to 5) for each pet type used to mathematically match user lifestyles
 const PET_PROFILES: Record<string, any> = {
-  dog:        { energy: 5, space: 4, social: 5, upkeep: 3, budget: 4, travel: false },
-  cat:        { energy: 3, space: 2, social: 3, upkeep: 2, budget: 3, travel: true },
-  rabbit:     { energy: 2, space: 3, social: 2, upkeep: 4, budget: 3, travel: false },
+  dog:        { energy: 5, space: 3, social: 5, upkeep: 3, budget: 3, travel: true },
+  cat:        { energy: 3, space: 3, social: 3, upkeep: 2, budget: 3, travel: true },
+  rabbit:     { energy: 2, space: 2, social: 2, upkeep: 4, budget: 3, travel: false},
   chicken:    { energy: 3, space: 4, social: 2, upkeep: 4, budget: 2, travel: false },
-  parrot:     { energy: 4, space: 3, social: 5, upkeep: 5, budget: 5, travel: false },
+  parrot:     { energy: 4, space: 3, social: 5, upkeep: 5, budget: 3, travel: false },
   hamster:    { energy: 2, space: 1, social: 1, upkeep: 1, budget: 1, travel: true },
-  reptile:    { energy: 1, space: 2, social: 1, upkeep: 3, budget: 3, travel: true },
-  fish:       { energy: 1, space: 1, social: 1, upkeep: 2, budget: 2, travel: true },
-  guinea_pig: { energy: 2, space: 2, social: 3, upkeep: 3, budget: 2, travel: false },
-  turtle:     { energy: 1, space: 3, social: 1, upkeep: 4, budget: 3, travel: false }
+  reptile:    { energy: 1, space: 1, social: 1, upkeep: 3, budget: 5, travel: false },
+  fish:       { energy: 1, space: 1, social: 1, upkeep: 2, budget: 4, travel: false },
+  guinea_pig: { energy: 2, space: 2, social: 3, upkeep: 3, budget: 2, travel: true },
+  turtle:     { energy: 1, space: 2, social: 1, upkeep: 4, budget: 4, travel: false }
 };
 
 // Detailed care instructions and images pulled right before displaying final results
@@ -28,7 +28,7 @@ const PET_INFO: Record<string, { desc: string, img: string }> = {
   turtle: { desc: "Turtles are slow, long-term companions.<br><br><b>Feeding:</b> Pellets, leafy greens, and occasional protein.<br><b>Care:</b> A large tank with a powerful filter is non-negotiable.<br><b>Pro Tip:</b> Keep a log of their growth and behavior—it's a great way to track their health over many years.", img: "turtle.jpg" }
 };
 
-// Sequence of questions that the bot asks the user one by one to determine their score
+// List of questions
 const CONVERSATIONAL_MAP: { bridge: string }[] = [
   { bridge: "Great! Let's get to know you. How would your friends describe your personality?" },
   { bridge: "Cool. And what's your vibe like—are you more high-energy or laid-back?" },
@@ -52,16 +52,20 @@ const CONVERSATIONAL_MAP: { bridge: string }[] = [
   { bridge: "Almost done! What’s the main reason you’re looking for a pet?" }
 ];
 
-// Directly updates specific trait metrics when a user answers "Yes" or "No" to specific questions.
+// Scoring for yes/no questions
 const INDEX_LOGIC: Record<number, { trait: string, positive: number, negative: number, isBoolean?: boolean }> = {
-  4:  { trait: 'travel', positive: 1, negative: 0, isBoolean: true },
-  10: { trait: 'upkeep', positive: 2, negative: -1 }, 
-  14: { trait: 'energy', positive: 2, negative: -2 }, 
-  16: { trait: 'budget', positive: -2, negative: 2 },
-  18: { trait: 'upkeep', positive: 3, negative: -3 }  
+  3:  { trait: 'social', positive: 2, negative: -2 }, 
+  4:  { trait: 'travel', positive: 1, negative: 0, isBoolean: true }, 
+  10: { trait: 'social', positive: 2, negative: -1 }, 
+  13: { trait: 'upkeep', positive: 2, negative: -1 }, 
+  14: { trait: 'social', positive: 2, negative: -3 },
+  15: { trait: 'upkeep', positive: -1, negative: 1 }, 
+  16: { trait: 'budget', positive: -2, negative: 2 }, 
+  17: { trait: 'social', positive: 1, negative: -2 }, 
+  18: { trait: 'upkeep', positive: 2, negative: -2 }   
 };
 
-// Storage object to track each user's current quiz answers and scores separately
+// Stores user answers
 const userSessions: Record<string, any> = {};
 
 export class AIBot {
@@ -72,132 +76,229 @@ export class AIBot {
     
     const text = answerText.toLowerCase().trim();
 
-    // Detects greeting words to create a fresh scoring session card
+    // Detects greeting words to create a new session
     if (currentQuestionIndex === -1 && (text.includes("hi") || text.includes("hello") || text.includes("yes") || text.includes("ready") || text.includes("let's start"))) {
       userSessions[userId] = { 
-        energy: 3,
-        space: 2, 
-        social: 3, 
-        upkeep: 3, 
-        budget: 3, 
-        travel: false, 
-        awaitingInfo: false, 
-        bestPet: "" 
+        energy: 3, space: 2, social: 3, upkeep: 3, budget: 3, travel: false, awaitingInfo: false, bestPet: "",
+        dislikesNoise: false, strictApartment: false, zeroFreeTime: false, noBudget: false
       };
       return { question: CONVERSATIONAL_MAP[0].bridge, final: false, index: 0 };
     }
 
     if (!userSessions[userId]) {
-      userSessions[userId] = { energy: 3, space: 2, social: 3, upkeep: 3, budget: 3, travel: false, awaitingInfo: false, bestPet: "" };
+      userSessions[userId] = { energy: 3, space: 2, social: 3, upkeep: 3, budget: 3, travel: false, awaitingInfo: false, bestPet: "", dislikesNoise: false, strictApartment: false, zeroFreeTime: false, noBudget: false};
     }
     const scores = userSessions[userId];
 
-    // If user is finished with questions, checks if they want to view the final care instructions sheet
+    // Returns care information or ends the conversation
     if (scores.awaitingInfo) {
       return text.match(/\b(yes|sure|ok|please|yeah|yep)\b/) 
-        ? { 
-            question: `<b>Please Consider:</b> Adopting is a big commitment. ${PET_INFO[scores.bestPet].desc}`, 
-            final: true, 
-            index: 99,
-            recommendedSpecies: scores.bestPet 
-          }
+        ? { question: `<b>Please Consider:</b> Adopting is a big commitment. ${PET_INFO[scores.bestPet].desc}`, final: true, index: 99, recommendedSpecies: scores.bestPet }
         : { question: "No problem! Thanks for chatting with me. Have a nice day!", final: true, index: 99 };
     }
 
     let inputMatched = false;
 
-    // Scans text for explicit yes/no indicators to trigger the automated mathematical points
     const isYes = /\b(yes|sure|yeah|i do|i want|ok|yep|true)\b/i.test(text);
-    const isNo = /\b(no|nope|don't|not|never|false)\b/i.test(text);
+    const isNo = /\b(no|nope|don't|not|not really|never|false)\b/i.test(text);
 
+    // Apply strict binary checks
     if (currentQuestionIndex >= 0 && INDEX_LOGIC[currentQuestionIndex]) {
-        const logic = INDEX_LOGIC[currentQuestionIndex];
-        if (isYes) { 
-            if (logic.isBoolean) scores[logic.trait] = true;
-            else scores[logic.trait] += logic.positive; 
-            inputMatched = true; 
-        } else if (isNo) { 
-            if (logic.isBoolean) scores[logic.trait] = false;
-            else scores[logic.trait] += logic.negative; 
-            inputMatched = true; 
-        }
+      const logic = INDEX_LOGIC[currentQuestionIndex];
+      if (isYes) { 
+        if (logic.isBoolean) scores[logic.trait] = true;
+        else scores[logic.trait] += logic.positive; 
+        inputMatched = true; 
+      } else if (isNo) { 
+        if (logic.isBoolean) scores[logic.trait] = false;
+        else scores[logic.trait] += logic.negative; 
+        inputMatched = true; 
+      }
     }
 
-    // Grabs raw numbers from typing text to auto-assign custom budget ranks or alter home presence rules
+    // Capture explicit Yes/No conditions for dealbreaker questions
+    if (currentQuestionIndex === 14 && isNo) {
+      scores.dislikesNoise = true;
+      inputMatched = true;
+    }
+
+    // Interprets numbers to map exact budget
     const numericValue = parseInt(text.match(/\d+/)?.[0] || "0");
     if (numericValue > 0) {
-        inputMatched = true;
-        if (currentQuestionIndex === 5) {
-            if (numericValue > 500) scores.budget = 5;
-            else if (numericValue > 150) scores.budget = 4;
-            else if (numericValue > 50) scores.budget = 2;
-            else scores.budget = 1;
+      inputMatched = true;
+
+      // Question 5 - Interprets budget given in numbers
+      if (currentQuestionIndex === 5) {
+        if (numericValue > 500) scores.budget = 5;
+        else if (numericValue > 250) scores.budget = 4;
+        else if (numericValue > 150) scores.budget = 3;
+        else if (numericValue > 50) scores.budget = 2;
+        else { scores.budget = 1; scores.noBudget = true; }
+      }
+
+      // Question 8 - Interprets time given in hours
+      if (currentQuestionIndex === 8) {
+        if (numericValue > 15) scores.social += 2;
+        else if (numericValue < 5) { 
+          scores.social -= 2; 
+          scores.energy -= 1; 
+          scores.zeroFreeTime = true; 
         }
-        if (currentQuestionIndex === 12 && numericValue > 8) {
-             scores.energy -= 1;
-        }
+      }
+
+      // Question 12 - Interprets empty house time bigger than 8 hours
+      if (currentQuestionIndex === 12 && numericValue > 8) {
+        scores.energy -= 1;
+      }
     }
 
-    // Parse open text if it hasn't matched a strict Yes/No condition yet
     if (!inputMatched) {
+      // Question 0
+      if (currentQuestionIndex === 0) {
+        if (text.match(/\b(loner|introvert|quiet|shy|private|alone)\b/)) scores.social -= 1;
+        if (text.match(/\b(outgoing|social|bubbly|friendly|extrovert|talkative)\b/)) scores.social += 1;
+      }
+
+      // Question 2
+      if (currentQuestionIndex === 2) {
+        if (text.match(/\b(apartment|small|condo|flat|tiny|room|studio|cramped|balcony)\b/)) {
+          scores.space = 1;
+          scores.strictApartment = true; 
+        }
+        else if (text.match(/\b(medium| medium house|average|normal|townhouse|duplex|suburban|small yard|shared yard)\b/)) {
+          scores.space = 3; 
+        }
+        else if (text.match(/\b(big| big house|yard|garden|backyard|big|large|spacious|farm|acre|land)\b/)) {
+          scores.space = 5; 
+        }
+      }
+
+      // Question 5
+      if (currentQuestionIndex === 5) {
+        if (text.match(/\b(low|cheap|tight|broke|student|save|minimal|small|not a lot|barely)\b/)){
+          scores.budget = 1;
+          scores.noBudget = true; 
+        }
+        if (text.match(/\b(decent|enough|average|normal|medium|mid|moderate|reasonable|comfortable|flexible|ok|okay)\b/)) scores.budget = 3;
+        if (text.match(/\b(high|rich|no limit|expensive|any amount|generous|a lot)\b/)) scores.budget = 5;
+      }
+
+      // Question 6
+      if (currentQuestionIndex === 6) {
+        if (text.match(/\b(hate|dislike|bad|no|mind|clean)\b/)) scores.upkeep = Math.max(1, scores.upkeep - 1);
+        if (text.match(/\b(fine|ok|cool|yes|good|dont mind|don't mind)\b/)) scores.upkeep = Math.min(5, scores.upkeep + 1);
+      }
+
+      // Question 7
+      if (currentQuestionIndex === 7) {
+        if (text.match(/\b(noise|loud|bark|scream|cry|sound|noisy|volume)\b/)) scores.dislikesNoise = true; 
+        if (text.match(/\b(mess|smell|poop|clean|odor|dirty|cleaning|hair|shed|fur)\b/)) scores.upkeep = Math.max(1, scores.upkeep - 2);
+      }
+
+      // Question 8
+      if (currentQuestionIndex === 8) {
+        if (text.match(/\b(tons|lots|all the time|a lot|all day|plenty|unlimited|always)\b/)) scores.social += 2;
+        if (text.match(/\b(none|barely|not a lot|not much|little|busy|rarely|hardly any)\b/)) {
+          scores.social -= 2;
+          scores.energy -= 1; 
+          scores.zeroFreeTime = true; 
+        }
+      }
+
+      // Question 9
+      if (currentQuestionIndex === 9) {
+        if (text.match(/\b(kid|child|baby|son|daughter|kids|children|family)\b/)) scores.social = Math.min(5, scores.social + 1);
+        if (text.match(/\b(dog|cat|pet|animal|pets|animals)\b/)) scores.energy = Math.min(5, scores.energy + 1);
+      }
+
+      // Question 12
+      if (currentQuestionIndex === 12) {
+        if (text.match(/\b(all day|most of the day|hours|long time|empty|work shift)\b/)) scores.energy -= 1;
+        if (text.match(/\b(never|hardly ever|someone is always|always home|not much)\b/)) scores.energy += 1;
+      }
+
+      // Question 19
+      if (currentQuestionIndex === 19) {
+        if (text.match(/\b(companion|friend|love|lonely|cuddle|company|affection)\b/)) scores.social += 1;
+        if (text.match(/\b(guard|protection|work|hunting|mice|catch|security)\b/)) scores.energy += 1;
+      }
+
+      
+      // Global Keyword Scanner
+      if (currentQuestionIndex === 0 || currentQuestionIndex === 1) {
         const keywords = [
-            { regex: /\b(active|high|run|play|walk|energetic|sporty|fit|jog|zoomies|dynamic)\b/, trait: 'energy', val: 2 },
-            { regex: /\b(lazy|chill|laid-back|calm|quiet|relaxed|sofa|sleepy|couch|low-key)\b/, trait: 'energy', val: -2 },
-            { regex: /\b(apartment|small|condo|flat|tiny|room|studio|cramped)\b/, trait: 'space', val: -1 }, // Subtract to look for lower space profiles
-            { regex: /\b(house|yard|garden|backyard|big|large|spacious|farm)\b/, trait: 'space', val: 2 },
-            { regex: /\b(cuddly|social|friendly|loving|affection|companion|hug|hold|family)\b/, trait: 'social', val: 2 },
-            { regex: /\b(independent|space|alone|distant|aloof|private|introvert|shy)\b/, trait: 'social', val: -2 }
+          { regex: /\b(active|high|run|play|walk|energetic|sporty|fit|jog|zoomies|dynamic)\b/, trait: 'energy', val: 1 },
+          { regex: /\b(lazy|chill|laid-back|calm|quiet|relaxed|sofa|sleepy|couch|low-key)\b/, trait: 'energy', val: -1 },
+          { regex: /\b(cuddly|social|friendly|loving|affection|companion|hug|hold|family)\b/, trait: 'social', val: 1 },
+          { regex: /\b(independent|space|alone|distant|aloof|private|introvert|shy)\b/, trait: 'social', val: -1 }
         ];
 
+        // Negation logic
         for (const kw of keywords) {
-            const matchResult = text.match(kw.regex);
-            if (matchResult) {
-                // Handles negation tracking
-                const matchIndex = matchResult.index || 0;
-                const contextualPrefix = text.substring(0, matchIndex).trim();
-                const isNegated = /\b(don't|not|never|no)\b\s*$/i.test(contextualPrefix);
-                
-                const modifier = isNegated ? -kw.val : kw.val;
-                scores[kw.trait] += modifier;
-            }
+          const matchResult = text.match(kw.regex);
+          if (matchResult) {
+            const matchIndex = matchResult.index || 0;
+            const contextualPrefix = text.substring(0, matchIndex).trim();
+            const isNegated = /\b(don't|not|never|not necessarily|not really|no)\b\s*$/i.test(contextualPrefix);
+                  
+            const modifier = isNegated ? -kw.val : kw.val;
+            scores[kw.trait] += modifier;
+          }
         }
+      }
     }
 
     // Keeps calculated values strictly locked between 1-5
     for (const key of ['energy', 'space', 'social', 'upkeep', 'budget']) {
-        scores[key] = Math.max(1, Math.min(5, scores[key]));
+      scores[key] = Math.max(1, Math.min(5, scores[key]));
     }
 
     const nextIndex = currentQuestionIndex + 1;
     
-    // Runs when all questions are answered to calculate which profile is closest to the user's score
+    // Runs when all questions are answered to calculate matches
     if (nextIndex >= CONVERSATIONAL_MAP.length) {
       let bestPet = "";
       let minDiff = Infinity;
       let bestPetProfile: any = null;
 
       for (const [pet, profile] of Object.entries(PET_PROFILES)) {
-        // Skips easily portable animals if the user indicated they never travel
-        if (scores.travel === false && profile.travel === true) {
-            continue;
+        
+        // Dealbreakers
+
+        if (scores.dislikesNoise === true && (pet === "parrot" || pet === "dog")) {
+          continue;
+        }
+        if (scores.strictApartment === true && (profile.space > 3 || pet === "chicken")) {
+          continue;
+        }
+        if (scores.zeroFreeTime === true && profile.social >= 4) {
+          continue;
+        }
+        if (scores.noBudget === true && profile.budget >= 4) {
+          continue;
         }
 
-        // Manhattan Distance: Computes the absolute variation differences across all score components
-        const diff = Math.abs(scores.energy - profile.energy) + 
-                     Math.abs(scores.space - profile.space) + 
-                     Math.abs(scores.social - profile.social) + 
-                     Math.abs(scores.upkeep - profile.upkeep) + 
-                     Math.abs(scores.budget - profile.budget);
+        // Manhattan Distance Difference Calculation
+        let diff = Math.abs(scores.energy - profile.energy) + 
+                   Math.abs(scores.space - profile.space) + 
+                   Math.abs(scores.social - profile.social) + 
+                   Math.abs(scores.upkeep - profile.upkeep) + 
+                   Math.abs(scores.budget - profile.budget);
         
-        // Keeps the pet with the absolute lowest difference score
-        if (diff < minDiff) { 
+        // Travel penalty application
+        if (scores.travel === true && profile.travel === false) {
+            diff += 1; 
+        }
+
+        // Selection loop tracking
+        if (diff < minDiff) {
+          // Found a candidate with absolute minimum distance score
           minDiff = diff; 
           bestPet = pet; 
           bestPetProfile = profile;
         } 
-
-        // If two pets have the same distance score, we pick the one that requires less maintenance
         else if (diff === minDiff && bestPetProfile) {
+          // Tie-Breaker Logic - chooses the lowest upkeep profile
           if (profile.upkeep < bestPetProfile.upkeep) {
             bestPet = pet;
             bestPetProfile = profile;
@@ -205,15 +306,13 @@ export class AIBot {
         }
       }
       
-      // Fallback in case travel filtering completely zeroed alternatives out
-      if (!bestPet) {
-         bestPet = "cat"; 
-      }
+      // Fail Safe Solution
+      if (!bestPet) { bestPet = "cat"; }
 
       scores.awaitingInfo = true;
       scores.bestPet = bestPet;
       
-      // Delivers recommendation card
+      // Returns recommendation to client
       return { 
         question: `I’d recommend a ${bestPet.toUpperCase()}!<br><br><img src="/${PET_INFO[bestPet].img}" width="200" alt="Pet Image" /><br><br>Would you like to read some general info about this type of animals?`, 
         final: false, 
@@ -222,7 +321,7 @@ export class AIBot {
       };
     }
     
-    // Continues forward to deliver the next line from the questions queue
+    // Advances conversation sequence to next index question
     return { question: CONVERSATIONAL_MAP[nextIndex].bridge, final: false, index: nextIndex };
   }
 }

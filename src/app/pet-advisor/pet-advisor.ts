@@ -41,7 +41,7 @@ export class PetAdvisor {
 
     this.scrollToBottom();
 
-    // Simulate a delay to mimic the bot "thinking" before responding
+    // Simulate a delay to mimic the bot thinking before responding
     await new Promise(resolve => setTimeout(resolve, 800));
 
     // Attempt to process the user's answer and get a response from the AI bot
